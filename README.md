@@ -1,6 +1,6 @@
-# test-project-unit
+# Sharewave
 
-> A Vue.js project
+> A Vue.js Social Spotiy Web App
 
 ## Build Setup
 
@@ -10,6 +10,9 @@ npm install
 
 # serve with hot reload at localhost:8080
 npm run dev
+
+# run server
+node server/server.js
 
 # build for production with minification
 npm run build

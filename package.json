@@ -1,8 +1,8 @@
 {
-  "name": "test-project-unit",
+  "name": "Sharewave",
   "version": "1.0.0",
-  "description": "A Vue.js project",
-  "author": "",
+  "description": "A Vue.js Social Spotiy Web App",
+  "author": "Thomas Wieck",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
