@@ -1,17 +1,12 @@
 <template>
   <div class="homepage">
-    <spotify-login></spotify-login>
+  	<p>Welcome to ShareWave</p>
   </div>
 </template>
 
 <script>
-import SpotifyLogin from './SpotifyLogin.vue'
-
 export default {
-  name: 'Home',
-  components: {
-    'spotify-login': SpotifyLogin
-  }
+  name: 'Home'
 }
 </script>
 

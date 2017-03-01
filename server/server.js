@@ -37,12 +37,12 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/callback', function(req, res) {
-  let loginVars = handleLogin.generateAccess(spotifyApi, req, function(callback){
+  handleLogin.generateAccess(spotifyApi, req, function(callback){
   	res.clearCookie(setupVar.stateKey);
     spotifyApi.setAccessToken(callback.access_token);
     spotifyApi.setRefreshToken(callback.refresh_token);
   	// console.log(querystring.stringify(callback));
-  	res.redirect('http://localhost:8080/#/loggedin/' + querystring.stringify(callback));
+	res.redirect(`http://localhost:8080/#/loggedin/${callback.access_token}/${callback.refresh_token}`);
   });
 });
 
@@ -58,6 +58,10 @@ app.get('/getMe', function(req, res) {
 app.get('/search', function(req, res) {
 	let searchTerm = req.query.searchTerm;
 	let servicesArr = req.query.services.split(' ');
+	spotifyApi.setAccessToken(req.query.access_token);
+	console.log(req.query.accessToken);
+
+	console.log(spotifyApi.getAccessToken());
 
 	makeAllCalls(servicesArr, searchTerm).done(function (results) {
 	  let data = results.map(extractData);
@@ -68,6 +72,30 @@ app.get('/search', function(req, res) {
 		console.log(err);
 	  // If any of the files fails to be read, err is the first error
 	});
+});
+
+app.get('/clientCredential', function(req, res) {
+	// stringify required when using Content-Type header
+	let base64string = new Buffer(`${spotifyApi.getClientId()}:${spotifyApi.getClientSecret()}`).toString('base64');
+	let clientUrl = 'https://accounts.spotify.com/api/token'
+	let grantType = querystring.stringify({
+	    grant_type: 'client_credentials'
+	  });
+	let headers = {
+    headers: { 
+    	'Authorization': 'Basic ' + base64string,
+    	'Content-Type': 'application/x-www-form-urlencoded' 
+    }
+  };
+	axios.post(clientUrl, grantType, headers)
+		.then(function(response) {
+			console.log(response.data);
+			res.send(response.data);
+		})
+		.catch(function(err) {
+			console.log(err);
+			res.send(err);
+		})
 });
 
 function extractData(response) {
@@ -81,7 +109,7 @@ function makeAllCalls(services, searchTerm) {
 
 function makeCalls(s, searchTerm) {
 	if (s === 'Spotify') {
-		return spotifyApi.searchTracks(searchTerm) 
+		return spotifyApi.searchTracks(searchTerm); 
 	}
 	else if (s === 'iTunes') {
 		return axios.get(

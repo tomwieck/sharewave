@@ -1,24 +1,58 @@
 <template>
   <div class="login">
-    <button v-on:click="spotifyLogin">Login with Spotify</button>
-    <button v-on:click="getMe">Get Details</button>
-    <div></div>
+    <div v-if="username" class="login--username">
+      <a href="#/myPlaylists">
+        <img class="profile-img" :src="imgUrl">
+        <span class="profile-name">{{ username }}</span>
+      </a>
+    </div>
+    <a v-else @click="showModal = true" class="login--link">
+      <span>Login</span>
+    </a>
+<!--     <a v-else v-on:click="spotifyLogin" class="login--link">
+      <span>Login</span>
+    </a> -->
+    <!-- use the modal component, pass in the prop -->
+    <modal v-if="showModal" @close="showModal = false">
+      <h3 slot="header">Login</h3>
+      <a slot="body" class="login-slot--link" href="" v-on:click="spotifyLogin">With Spotify</a>
+      <a slot="body" class="login-slot--link" href="" v-on:click="genericLogin">Without Spotify</a>
+    </modal>
   </div>
 </template>
 
 <script>
-import Spotify from 'spotify-web-api-js'
+import SpotifyMixin from './mixins.js'
+import Modal from './Modal.vue'
+
 export default {
   name: 'SpotifyLogin',
   data() {
     return {
-      access_token: '',
-      refresh_token: '',
-      spotifyApi: new Spotify()
+      access_token: null,
+      refresh_token: null,
+      imgUrl: null,
+      userId: null,
+      username: null,
+      showModal: false
     }
   },
+  mixins: [SpotifyMixin],
   mounted: function () {
+    if ('caches' in window) {
+      console.log('Has support!')
+    }
     this.updateHashParams();
+    if (this.$cookie.get('access_token')) {
+      var vm = this;
+      if (!vm.username) {
+        vm.getMe(function(callback) {
+          vm.username = callback.display_name || callback.id;
+          vm.imgUrl = callback.images.length > 0 ? callback.images[0].url : '../static/placeholder.png'
+          vm.userId = callback.id;
+        });
+      }
+    }
   },
   methods: {
     spotifyLogin: function() {
@@ -34,43 +68,62 @@ export default {
           console.log(error);
         })
     },
-    getMe: function() {
-      let accessToken = this.$cookie.get('access_token');
-      this.spotifyApi.setAccessToken(accessToken);
-      this.spotifyApi.getMe()
-      .then(function(res) {
-        console.log(res);
-      })
-      .catch(function(err) {
-        console.log(err);
-      })
-    },
-    // Obtains parameters from the hash of the URL @return Object
+    // Obtains parameters from the tokens object (route of the URL) @return Object
     updateHashParams: function () {
-      let tokens = this.$route.params.tokens;
-      if (tokens) {
-        // -16 = '%26refresh_token'
-        this.access_token = tokens.split('=')[1].slice(0, -14);
-        this.refresh_token = tokens.split('=')[2];
-
-        this.$cookie.set('access_token', this.access_token, 1);
-        this.$cookie.set('refresh_token', this.refresh_token, 1);
+      if (this.$route.params.access_token) {
+        this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
+        this.$cookie.set('refresh_token', this.$route.params.refresh_token, { expires: '1h' });
       }
-    },
-    readCookie: function(name) {
-      var nameEQ = name + '=';
-      var ca = document.cookie.split(';');
-      for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-      }
-      return null;
     }
+  },
+  components: {
+    modal: Modal
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+@import "../assets/sass/styles.scss";
+
+.profile-img {
+  border-radius: 50%;
+  height: 32px;
+}
+
+.profile-name {
+  width: 100%;
+  display: inline-block;
+}
+
+.login--username {
+  width:100%;
+  font-size: 20px;
+}
+
+.login--link {
+  color: white;
+  font-size: 22px;
+  margin-top: 15px;
+}
+
+.login--link:hover {
+  color: $logo-color;
+}
+
+.login-slot--link {
+  border: 2px solid $play-color;
+  border-radius: 5px;
+  color: $logo-color;
+  display: block;
+  padding: 10px;
+  margin: auto;
+  margin-bottom: 10px;
+  text-decoration: none;
+  width: 200px;  
+}
+
+.login-slot--link:hover {
+  color: $play-color;
+}
+
 </style>

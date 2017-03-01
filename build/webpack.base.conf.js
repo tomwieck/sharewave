@@ -19,7 +19,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue', '.json', '.scss'],
     modules: [
       resolve('src'),
       resolve('node_modules')
@@ -28,7 +28,8 @@ module.exports = {
       'vue$': 'vue/dist/vue.common.js',
       'src': resolve('src'),
       'assets': resolve('src/assets'),
-      'components': resolve('src/components')
+      'components': resolve('src/components'),
+      'styles': resolve('src/assets/sass.scss')
     }
   },
   module: {

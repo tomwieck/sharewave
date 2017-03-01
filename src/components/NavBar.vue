@@ -1,63 +1,107 @@
 <template>
-  <div id="nav-bar">
-    <ul class="nav-bar">
-      <li><a href="/#/"><img class="logo" src="../assets/logo3.png"></a></li>
+  <div id="nav-bar" class="nav-bar">
+    <a href="/#/"><img class="nav-bar--logo" src="../assets/logo3.png"></a>
+    <h1 class="nav-bar--heading">ShareWave</h1>
+    <ul class="nav-links-ul">
       <li><a class="nav-bar--link" href="#/search">Search</a></li>
-    </ul>
+      <li><a class="nav-bar--link" href="#/myPlaylists">My Playlists</a></li>
+    </ul>   
+    <login></login>
   </div>
 </template>
 
 <script>
+import SpotifyLogin from './SpotifyLogin.vue'
+
 export default {
-  name: 'nav-bar'
+  name: 'nav-bar',
+  components: {
+    'login': SpotifyLogin
+  }
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<style lang="scss">
+// @import "../assets/sass/styles.scss";
+.nav-bar {
+  background-color: #299dcf;
+  height: 55px;
+  margin: 0;
+  padding: 10px 1%;
+  width: 98%;
 }
 
-.nav-bar {
-  /*background-color: #bdc3c7;*/
-  background-color: #299dcf;
-  /*border-bottom: 2px solid #17375c;*/
-  border-top: 0;
+.nav-bar:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.nav-links-ul {
   display: inline-block;
-  left: 0;
+  float: left;
   list-style-type: none;
-  margin: 0px 10%;
-  padding: 0;
-  text-align: left;
-  top: 0;
-  width: 80%;
+  margin-bottom: 0;
+  padding-left: 14px; 
+}
+
+.nav-links-ul li {
+  display: inline-block;
+}
+
+.nav-bar--heading {
+  float: left;
+}
+
+.nav-bar--link {
+  border-bottom: 2px solid white;
+  float: left;
+  margin-left: 10px;
+}
+
+.nav-bar--login {
+  float: right;
 }
 
 .nav-bar--link {
   color: #fff;
-  display: inline-block;
-  font-size: 30px;
+  font-size: 20px;
   text-decoration: none;
 }
 
-.logo {
-  margin-top: 10px;
+.nav-bar--link:hover {
+  border-bottom: 2px solid #17375c;
+}
+
+.login:hover {
+  color: #17375c;
+  cursor: pointer;
+}
+
+.nav-bar--heading {
+  color: #fff;
+  display: inline-block;
+  font-size: 49px;
+  text-decoration: none;
+  font-weight: normal;
+  margin: 0;
+}
+
+.nav-bar--logo {
+  float: left;
+  padding-right: 10px;
   width: 50px;
 }
 
-li {
-  display: inline-block;
-  margin: 0 10px;
+.login {
+  float: right;
 }
 
-a:hover {
-  color: #17375c;
+.login--username a {
+  color: #fff;
+  float: none;
+  text-decoration: none;
 }
-
 /*logo*/
 /* play - 299dcf */
 /* 17375c */

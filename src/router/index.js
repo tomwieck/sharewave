@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from 'components/Home'
 import Search from 'components/Search'
-import SpotifyLogin from 'components/SpotifyLogin'
+import UserPlaylists from 'components/UserPlaylists'
+// import SpotifyLogin from 'components/SpotifyLogin'
 
 Vue.use(Router)
 
@@ -14,14 +15,19 @@ export default new Router({
       component: Home
     },
     {
-      path: '/loggedin/:tokens',
+      path: '/loggedin/:access_token/:refresh_token',
       name: 'Logged in',
-      component: SpotifyLogin
+      component: UserPlaylists
     },
     {
       path: '/search',
       name: 'Search',
       component: Search
+    },
+    {
+      path: '/myPlaylists',
+      name: 'My Playlists',
+      component: UserPlaylists
     }
   ]
 })
