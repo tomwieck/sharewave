@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="nav-login">
     <div v-if="username" class="login--username">
       <a href="#/myPlaylists">
         <img class="profile-img" :src="imgUrl">
@@ -9,14 +9,13 @@
     <a v-else @click="showModal = true" class="login--link">
       <span>Login</span>
     </a>
-<!--     <a v-else v-on:click="spotifyLogin" class="login--link">
-      <span>Login</span>
-    </a> -->
-    <!-- use the modal component, pass in the prop -->
-    <modal v-if="showModal" @close="showModal = false">
+    <modal v-if="showModal" @close="showModal=false">
       <h3 slot="header">Login</h3>
       <a slot="body" class="login-slot--link" href="" v-on:click="spotifyLogin">With Spotify</a>
-      <a slot="body" class="login-slot--link" href="" v-on:click="genericLogin">Without Spotify</a>
+      <a slot="body" class="login-slot--link" href="/#/emailLogin">Without Spotify</a>
+      <h3 slot="footer" href=""> Don't have an account?</h3>
+      <a slot="footer" class="signup-slot--link" href="https://www.spotify.com/signup/">Sign up for a Spotify Account</a>
+      <a slot="footer" class="signup-slot--link" href="/#/emailSignup">Sign up for a Sharewave Account</a>
     </modal>
   </div>
 </template>
@@ -26,7 +25,7 @@ import SpotifyMixin from './mixins.js'
 import Modal from './Modal.vue'
 
 export default {
-  name: 'SpotifyLogin',
+  name: 'Login',
   data() {
     return {
       access_token: null,
@@ -39,9 +38,6 @@ export default {
   },
   mixins: [SpotifyMixin],
   mounted: function () {
-    if ('caches' in window) {
-      console.log('Has support!')
-    }
     this.updateHashParams();
     if (this.$cookie.get('access_token')) {
       var vm = this;
@@ -62,7 +58,6 @@ export default {
           if (response.data) {
             window.location.href = response.data;
           }
-          // console.log(response);
         })
         .catch(function (error) {
           console.log(error);
@@ -84,6 +79,17 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/styles.scss";
+
+.nav-login {
+  cursor: pointer;
+  float: right;
+}
+
+.login--username a {
+  color: #fff;
+  float: none;
+  text-decoration: none;
+}
 
 .profile-img {
   border-radius: 50%;
@@ -125,5 +131,20 @@ export default {
 .login-slot--link:hover {
   color: $play-color;
 }
+
+.signup-slot--link {
+  color: $logo-color;
+  display: block; 
+  // text-decoration: none;
+  margin-bottom: 10px;
+}
+
+.signup-slot--link:hover {
+  color: $play-color;
+  display: block; 
+  // text-decoration: none;
+  margin-bottom: 10px;
+}
+
 
 </style>

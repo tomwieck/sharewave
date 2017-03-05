@@ -5,10 +5,10 @@ import App from './App'
 import router from './router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import VuePouchDb from 'vue-pouchdb'
 import VueCookie from 'vue-cookie'
+import VeeValidate from 'vee-validate';
 
-Vue.use(VuePouchDb, {name: 'playlists'});
+Vue.use(VeeValidate);
 Vue.use(VueAxios, axios);
 Vue.use(VueCookie);
 

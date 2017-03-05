@@ -2,9 +2,9 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-wrapper">
-        <div class="modal-container">
+        <div class="modal-container" @click="$emit('close')">
 
-          <div class="modal-default-button" @click="$emit('close')">
+          <div class="modal-default-button">
             Close
           </div>
           
@@ -87,15 +87,6 @@ export default {
 .login-slot--link {
   color: black;
 }
-
-/*
- * The following styles are auto-applied to elements with
- * transition="modal" when their visibility is toggled
- * by Vue.js.
- *
- * You can easily play with the modal transition by editing
- * these styles.
- */
 
 .modal-enter {
   opacity: 0;

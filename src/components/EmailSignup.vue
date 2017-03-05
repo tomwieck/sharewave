@@ -1,0 +1,164 @@
+<template>
+  <div class="email-signup">
+    <form @submit.prevent="validateBeforeSubmit">
+      <div class="email-signup--container">
+        <span :class="{ 'control': true }">
+          <input 
+            class="email-signup--usr" 
+            data-vv-delay="500"
+            name="username" 
+            placeholder="Username"
+            v-model="username" 
+            v-validate="'required|min:6'" 
+            >
+          <transition name="fade">
+            <span v-show="errors.has('username')" class="help is-danger">{{ errors.first('username') }}</span>
+          </transition>
+
+          <input 
+            class="email-signup--email" 
+            data-vv-delay="500"
+            name="email" 
+            placeholder="Email"
+            type="text" 
+            v-model="email" 
+            v-validate="'required|email'" 
+            >
+          <transition name="fade">
+            <span v-show="errors.has('email')" class="help is-danger">{{ errors.first('email') }}</span>
+          </transition>
+
+          <input 
+            class="email-signup--password"
+            name="password" 
+            placeholder="Password"
+            type="password"
+            v-model="password" 
+            v-validate="{ rules: { required: true, min: 6, regex: /\d.*[A-Z]|[A-Z].*\d/}}"
+            >
+          <transition name="fade">
+            <span v-show="errors.has('password')" class="help is-danger">{{ errors.first('password') }}</span>
+          </transition>
+
+          <span class="email-signup--label">Password must:
+            <ul class="email-signup--list">
+              <li>- Be longer than 6 characters</li>
+              <li>- Contain atleast 1 number</li>
+              <li>- Contain atleast 1 Uppercase Letter</li>
+            </ul>
+          </span>
+        </span>
+        <div class="help is-danger"v-if="errorMessage"> {{ errorMessage }}</div>
+        <button> Submit </button>
+      </div>
+    </form>
+    
+</div>
+
+  </div>
+</template>
+
+<script>
+import Firebase from './firebaseMixin.js'
+
+export default {
+  name: 'EmailSignup',
+  data() {
+    return {
+      email: '',
+      errorMessage: '',
+      password: '',
+      regex: '\d.*[A-Z]|[A-Z].*\d',
+      username: ''
+    }
+  },
+  methods: {
+    emailSignup: function() {
+      let vm = this;
+      Firebase.createUserWithEmailAndPassword(this.email, this.password)
+      .then(function(response) {
+        console.log(response);
+      })
+      .catch(function(error) {
+        vm.errorMessage = error.message;
+      });
+    },
+    validateBeforeSubmit: function() {
+      // Validate All returns a promise and provides the validation result.
+      this.$validator.validateAll()
+      .then(success => {
+        this.emailSignup();
+        return false;
+      })
+    },
+    registerStateChange: function() {
+      Firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          // User is signed in.
+          // var displayName = user.displayName;
+          // var email = user.email;
+          // var emailVerified = user.emailVerified;
+          // var photoURL = user.photoURL;
+          // var isAnonymous = user.isAnonymous;
+          // var uid = user.uid;
+          // var providerData = user.providerData;
+          // ...
+        } else {
+          // User is signed out.
+          // ...
+        }
+      });
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+// @import "../assets/sass/styles.scss";
+
+// verifying classes
+.help.is-danger {
+  color: red;
+  display: block;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.email-signup--label {
+  display: block;
+  font-size: 14px;
+  padding-bottom: 12px;
+  margin: auto;
+  text-align: left;
+  width: 250px;
+}
+
+.email-signup--container {
+    margin: 1em;
+}
+
+.email-signup--list {
+  list-style: none;
+  -webkit-margin-before: 0;
+  -webkit-padding-start: 0;
+}
+
+.email-signup--usr,
+.email-signup--email,
+.email-signup--password {
+  display: block;
+  margin: auto;
+  padding: 5px;
+  margin-bottom: 10px;
+  width: 250px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
+  transition: opacity 0.5s
+}
+
+</style>

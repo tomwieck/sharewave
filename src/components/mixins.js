@@ -1,4 +1,5 @@
 import Spotify from 'spotify-web-api-js'
+
 export default {
   name: 'spotifyMixin',
   data() {
@@ -19,7 +20,7 @@ export default {
         return callback(err);
       })
     },
-    getPlaylists: function(callback, usr) {
+    getPlaylists: function(callback) {
       this.spotifyApi.getUserPlaylists()
       .then(function(data) {
         return callback(data);

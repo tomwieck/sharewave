@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import SpotifyLogin from './SpotifyLogin.vue'
+import Login from './Login.vue'
 
 export default {
   name: 'nav-bar',
   components: {
-    'login': SpotifyLogin
+    'login': Login
   }
 }
 </script>
@@ -91,16 +91,6 @@ export default {
   float: left;
   padding-right: 10px;
   width: 50px;
-}
-
-.login {
-  float: right;
-}
-
-.login--username a {
-  color: #fff;
-  float: none;
-  text-decoration: none;
 }
 /*logo*/
 /* play - 299dcf */

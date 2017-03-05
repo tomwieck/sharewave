@@ -59,9 +59,6 @@ app.get('/search', function(req, res) {
 	let searchTerm = req.query.searchTerm;
 	let servicesArr = req.query.services.split(' ');
 	spotifyApi.setAccessToken(req.query.access_token);
-	console.log(req.query.accessToken);
-
-	console.log(spotifyApi.getAccessToken());
 
 	makeAllCalls(servicesArr, searchTerm).done(function (results) {
 	  let data = results.map(extractData);
