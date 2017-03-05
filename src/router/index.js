@@ -4,6 +4,8 @@ import Home from 'components/Home'
 import Search from 'components/Search'
 import UserPlaylists from 'components/UserPlaylists'
 import EmailSignup from 'components/EmailSignup'
+import EmailLogin from 'components/EmailLogin'
+import UploadPlaylist from 'components/UploadPlaylist'
 // import SpotifyLogin from 'components/SpotifyLogin'
 
 Vue.use(Router)
@@ -12,7 +14,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
+      name: 'home',
       component: Home
     },
     {
@@ -31,9 +33,19 @@ export default new Router({
       component: UserPlaylists
     },
     {
-      path: '/emailSignup',
+      path: '/emailLogin',
       name: 'Login',
+      component: EmailLogin
+    },
+    {
+      path: '/emailSignup',
+      name: 'Signup',
       component: EmailSignup
+    },
+    {
+      path: '/uploadPlaylist',
+      name: 'UploadPlaylist',
+      component: UploadPlaylist
     }
   ]
 })

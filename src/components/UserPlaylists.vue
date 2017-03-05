@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import SpotifyMixin from './mixins.js'
+import SpotifyMixin from './spotifyMixin.js'
 
 export default {
   name: 'UserPlaylists',

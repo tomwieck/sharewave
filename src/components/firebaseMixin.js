@@ -1,5 +1,6 @@
-import firebase from 'firebase'
-// require('firebase/auth');
+import firebase from 'firebase/app'
+require('firebase/auth');
+require('firebase/database');
 
 const config = {
   apiKey: 'AIzaSyAPL6SPIz7xx5JqPo-D5ZLnCXv0vI13UuI',
@@ -9,33 +10,5 @@ const config = {
   messagingSenderId: '905795275395'
 };
 
-var fbApp = firebase.initializeApp(config);
-export default fbApp.auth();
-
-// export default {
-//   name: 'firebaseMixin',
-//   data() {
-//     return {
-//       firebase: null
-//     }
-//   },
-//   methods: {
-//     initializeFirebase: function() {
-//       this.firebase = Firebase.initializeApp(config);
-//     },
-//     createEmailUser: function(email, password, callback) {
-//       if (!this.firebase) {
-//         this.initializeFirebase();
-//       }
-//       this.firebase.auth().createUserWithEmailAndPassword(email, password)
-//       .then(function(response) {
-//         callback(response);
-//       })
-//       .catch(function(error) {
-//         // Handle Errors here.
-//         callback({error: error});
-//         // ...
-//       });
-//     }
-//   }
-// }
+var firebaseApp = firebase.initializeApp(config);
+export default firebaseApp;

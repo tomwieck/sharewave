@@ -1,7 +1,7 @@
 <template>
   <div class="nav-login">
     <div v-if="username" class="login--username">
-      <a href="#/myPlaylists">
+      <a href="/#/myPlaylists">
         <img class="profile-img" :src="imgUrl">
         <span class="profile-name">{{ username }}</span>
       </a>
@@ -11,25 +11,24 @@
     </a>
     <modal v-if="showModal" @close="showModal=false">
       <h3 slot="header">Login</h3>
-      <a slot="body" class="login-slot--link" href="" v-on:click="spotifyLogin">With Spotify</a>
-      <a slot="body" class="login-slot--link" href="/#/emailLogin">Without Spotify</a>
-      <h3 slot="footer" href=""> Don't have an account?</h3>
-      <a slot="footer" class="signup-slot--link" href="https://www.spotify.com/signup/">Sign up for a Spotify Account</a>
-      <a slot="footer" class="signup-slot--link" href="/#/emailSignup">Sign up for a Sharewave Account</a>
+        <a slot="body" class="login-slot--link" href="" v-on:click="spotifyLogin">With Spotify</a>
+        <a slot="body" class="login-slot--link" href="/#/emailLogin">With ShareWave</a>
+      <h3 slot="footer" href="">Don't have an account?</h3>
+        <a slot="footer" class="signup-slot--link" href="https://www.spotify.com/signup/">Sign up for a Spotify Account</a>
+        <a slot="footer" class="signup-slot--link" href="/#/emailSignup">Sign up for a Sharewave Account</a>
     </modal>
   </div>
 </template>
 
 <script>
-import SpotifyMixin from './mixins.js'
+import SpotifyMixin from './spotifyMixin.js'
+import Firebase from './firebaseMixin.js'
 import Modal from './Modal.vue'
 
 export default {
   name: 'Login',
   data() {
     return {
-      access_token: null,
-      refresh_token: null,
       imgUrl: null,
       userId: null,
       username: null,
@@ -38,9 +37,10 @@ export default {
   },
   mixins: [SpotifyMixin],
   mounted: function () {
-    this.updateHashParams();
+    let vm = this;
+    this.registerStateChange();
+    vm.updateHashParams();
     if (this.$cookie.get('access_token')) {
-      var vm = this;
       if (!vm.username) {
         vm.getMe(function(callback) {
           vm.username = callback.display_name || callback.id;
@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     spotifyLogin: function() {
-      var vm = this;
+      let vm = this;
       vm.axios.get('http://localhost:8888/login')
         .then(function (response) {
           if (response.data) {
@@ -69,6 +69,26 @@ export default {
         this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
         this.$cookie.set('refresh_token', this.$route.params.refresh_token, { expires: '1h' });
       }
+    },
+    updateDetails: function(user) {
+      this.username = user.displayName;
+      this.imgUrl = user.photoURL || '../static/placeholder.png'
+      this.userId = user.uid;
+    },
+    resetDetails: function(user) {
+      this.username = null;
+      this.imgUrl = null;
+      this.userId = null;
+    },
+    registerStateChange: function() {
+      let vm = this;
+      Firebase.auth().onAuthStateChanged(function(user) {
+        if (user && vm.userId === null) {
+          vm.updateDetails(user);
+        } else {
+          vm.resetDetails;
+        }
+      });
     }
   },
   components: {
@@ -87,7 +107,7 @@ export default {
 
 .login--username a {
   color: #fff;
-  float: none;
+  float: left;
   text-decoration: none;
 }
 
@@ -128,23 +148,14 @@ export default {
   width: 200px;  
 }
 
-.login-slot--link:hover {
-  color: $play-color;
-}
-
 .signup-slot--link {
   color: $logo-color;
   display: block; 
-  // text-decoration: none;
   margin-bottom: 10px;
 }
 
-.signup-slot--link:hover {
+.login-slot--link:hover,
+.signup-slot--link:hover  {
   color: $play-color;
-  display: block; 
-  // text-decoration: none;
-  margin-bottom: 10px;
 }
-
-
 </style>

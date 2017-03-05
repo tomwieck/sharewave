@@ -7,7 +7,7 @@
             class="email-signup--usr" 
             data-vv-delay="500"
             name="username" 
-            placeholder="Username"
+            placeholder="Name"
             v-model="username" 
             v-validate="'required|min:6'" 
             >
@@ -52,9 +52,6 @@
         <button> Submit </button>
       </div>
     </form>
-    
-</div>
-
   </div>
 </template>
 
@@ -72,15 +69,24 @@ export default {
       username: ''
     }
   },
+  mounted: function() {
+    this.registerStateChange();
+  },
   methods: {
     emailSignup: function() {
       let vm = this;
-      Firebase.createUserWithEmailAndPassword(this.email, this.password)
+      Firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
       .then(function(response) {
-        console.log(response);
+        vm.updateProfile();
       })
       .catch(function(error) {
         vm.errorMessage = error.message;
+      });
+    },
+    updateProfile: function() {
+      var user = Firebase.auth().currentUser;
+      user.updateProfile({
+        displayName: this.username
       });
     },
     validateBeforeSubmit: function() {
@@ -92,20 +98,12 @@ export default {
       })
     },
     registerStateChange: function() {
+      let vm = this;
       Firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
-          // User is signed in.
-          // var displayName = user.displayName;
-          // var email = user.email;
-          // var emailVerified = user.emailVerified;
-          // var photoURL = user.photoURL;
-          // var isAnonymous = user.isAnonymous;
-          // var uid = user.uid;
-          // var providerData = user.providerData;
-          // ...
+          vm.$router.push('/');
         } else {
-          // User is signed out.
-          // ...
+          console.log('not signed in');
         }
       });
     }
@@ -116,7 +114,7 @@ export default {
 <style lang="scss" scoped>
 // @import "../assets/sass/styles.scss";
 
-// verifying classes
+// verifying class
 .help.is-danger {
   color: red;
   display: block;

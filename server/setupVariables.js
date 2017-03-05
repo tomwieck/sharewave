@@ -5,7 +5,7 @@ if(!process.env.CLIENT_SECRET) {
 var stateKey = 'spotify_auth_state';
 
 //Spotify API Setup
-var scopes = ['user-read-private', 'user-read-email', 'playlist-modify-public', 'playlist-modify-private', 'user-read-recently-played'],
+var scopes = ['user-read-private', 'user-read-email', 'playlist-modify-public', 'playlist-modify-private', 'user-read-recently-played', 'playlist-read-collaborative'],
     clientSecret = process.env.CLIENT_SECRET,
     redirectUri = 'http://localhost:8888/callback';
     clientId = 'ff19960978a6466c965de4cabdb54929';
