@@ -5,8 +5,9 @@
       <div>
         <div>Showing {{ playlists.limit }} of {{ playlists.total }} playlists</div>
         <div class="playlist-container" v-for="playlist in playlists.items">
-          <img class="playlist-art" v-bind:src="playlist.images[0].url">
+          <img class="playlist-art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">
           <a class="playlist-link" v-bind:href="playlist.uri">{{ playlist.name }}</a>
+          <a class="playlist-upload" v-bind:href="`/#/upload/${playlist.owner.id}/${playlist.id}`">Upload to ShareWave</a>
         </div>
         <h2 class="playlist-load-more"><a v-on:click="loadMore">{{ loadMoreText }}</a></h2>
       </div>
@@ -32,6 +33,7 @@ export default {
     return {
       error: null,
       loadMoreText: 'Load more...',
+      placeholder: '../static/artplaceholder.png',
       playlists: null
     }
   },
@@ -96,8 +98,19 @@ export default {
   max-width: 100px;
 }
 
-.playlist-link {
+.playlist-link,
+.playlist-upload {
   display: block;
+}
+
+.playlist-upload {
+  color: #299dcf;
+  font-weight: bold;
+  padding-bottom: -2px;
+}
+
+.playlist-upload:hover {
+  color: #17385e;
 }
 
 .playlist-container {

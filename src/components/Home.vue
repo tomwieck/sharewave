@@ -1,6 +1,6 @@
 <template>
   <div class="homepage">
-  	<p>Welcome to ShareWave</p>
+  	<h2>Welcome to ShareWave</h2>
   </div>
 </template>
 

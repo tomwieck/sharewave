@@ -112,15 +112,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// @import "../assets/sass/styles.scss";
-
-// verifying class
-.help.is-danger {
-  color: red;
-  display: block;
-  font-size: 12px;
-  margin-bottom: 12px;
-}
+@import "../assets/sass/styles.scss";
 
 .email-signup--label {
   display: block;

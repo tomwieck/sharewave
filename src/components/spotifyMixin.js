@@ -9,11 +9,12 @@ export default {
   },
   methods: {
     getMe: function(callback) {
-      let accessToken = this.$cookie.get('access_token');
-      this.spotifyApi.setAccessToken(accessToken);
-      this.spotifyApi.getMe()
+      let vm = this;
+      let accessToken = vm.$cookie.get('access_token');
+      vm.spotifyApi.setAccessToken(accessToken);
+      vm.spotifyApi.getMe()
       .then(function(res) {
-        console.log(res);
+        vm.$cookie.set('user', res.id);
         return callback(res);
       })
       .catch(function(err) {
@@ -35,6 +36,35 @@ export default {
       }, function(err) {
         return callback(err);
       });
+    },
+    getSinglePlaylist: function(options, callback) {
+      let vm = this;
+      vm.checkAccessToken(function(check) {
+        let accessToken = vm.$cookie.get('access_token');
+        vm.spotifyApi.setAccessToken(accessToken);
+        vm.spotifyApi.getPlaylist(options.user, options.playlist, options.fields)
+        .then(function(data) {
+          return callback(data);
+        }, function(err) {
+          return callback(err);
+        });
+      })
+    },
+    checkAccessToken: function(check) {
+      let vm = this;
+      if (vm.$cookie.get('access_token') === null) {
+        let refreshToken = vm.$cookie.get('refresh_token')
+        vm.axios.get(`http://localhost:8888/refreshToken?refreshToken=${refreshToken}`)
+        .then(function (response) {
+          vm.$cookie.set('access_token', response.data);
+          return check();
+        })
+        .catch(function (error) {
+          return check(error);
+        })
+      } else {
+        return check();
+      }
     }
   }
 }

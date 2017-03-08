@@ -9,10 +9,7 @@
         <button> Submit </button>
       </div>
     </form>
-    
-</div>
-
-  </div>
+  </div>    
 </template>
 
 <script>

@@ -1,2 +1,9 @@
 $play-color: #299dcf;
 $logo-color: #17385e;
+// verifying class
+.help.is-danger {
+  color: red;
+  display: block;
+  font-size: 12px;
+  margin-bottom: 12px;
+}

@@ -3,7 +3,12 @@
     <div v-if="username" class="login--username">
       <a href="/#/myPlaylists">
         <img class="profile-img" :src="imgUrl">
-        <span class="profile-name">{{ username }}</span>
+        <div v-if="emailLogin">
+          <span class="profile-name"><a v-on:click="emailSignout">Logout</a></span>
+        </div>
+        <div v-else>
+          <span class="profile-name">{{ username }}</span>
+        </div>
       </a>
     </div>
     <a v-else @click="showModal = true" class="login--link">
@@ -29,6 +34,7 @@ export default {
   name: 'Login',
   data() {
     return {
+      emailLogin: false,
       imgUrl: null,
       userId: null,
       username: null,
@@ -43,8 +49,9 @@ export default {
     if (this.$cookie.get('access_token')) {
       if (!vm.username) {
         vm.getMe(function(callback) {
+          console.log(callback);
           vm.username = callback.display_name || callback.id;
-          vm.imgUrl = callback.images.length > 0 ? callback.images[0].url : '../static/placeholder.png'
+          vm.imgUrl = (callback.images !== undefined ? callback.images[0].url : '../static/placeholder.png')
           vm.userId = callback.id;
         });
       }
@@ -67,7 +74,7 @@ export default {
     updateHashParams: function () {
       if (this.$route.params.access_token) {
         this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
-        this.$cookie.set('refresh_token', this.$route.params.refresh_token, { expires: '1h' });
+        this.$cookie.set('refresh_token', this.$route.params.refresh_token);
       }
     },
     updateDetails: function(user) {
@@ -80,13 +87,22 @@ export default {
       this.imgUrl = null;
       this.userId = null;
     },
+    emailSignout: function() {
+      Firebase.auth().signOut()
+        .then(function() {
+        // Sign-out successful.
+        }, function(error) {
+          console.log(error);
+        });
+    },
     registerStateChange: function() {
       let vm = this;
       Firebase.auth().onAuthStateChanged(function(user) {
         if (user && vm.userId === null) {
           vm.updateDetails(user);
+          vm.emailLogin = true;
         } else {
-          vm.resetDetails;
+          vm.resetDetails();
         }
       });
     }

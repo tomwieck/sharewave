@@ -43,7 +43,7 @@ export default new Router({
       component: EmailSignup
     },
     {
-      path: '/uploadPlaylist',
+      path: '/upload/:user/:playlist',
       name: 'UploadPlaylist',
       component: UploadPlaylist
     }

@@ -95,6 +95,17 @@ app.get('/clientCredential', function(req, res) {
 		})
 });
 
+app.get('/refreshToken', function(req, res) {
+	spotifyApi.setRefreshToken(req.query.refreshToken);
+	spotifyApi.refreshAccessToken()
+	.then(function(data) {
+	  res.send(data.body['access_token']);
+	},
+	function(err) {
+	  res.send('Could not refresh access token', err);
+	});
+});
+
 function extractData(response) {
 	if (response.data) { return extractItunesData(response.data.results) }
 	if (response.body) { return extractSpotifyData(response.body.tracks.items) }
