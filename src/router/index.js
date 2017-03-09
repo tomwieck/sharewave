@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from 'components/Home'
+import ListPlaylists from 'components/ListPlaylists'
 import Search from 'components/Search'
 import UserPlaylists from 'components/UserPlaylists'
 import EmailSignup from 'components/EmailSignup'
@@ -14,8 +14,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home
+      name: 'Home',
+      component: ListPlaylists
     },
     {
       path: '/loggedin/:access_token/:refresh_token',

@@ -5,13 +5,11 @@
       <h3> Loading... </h3>
     </div>
     <div v-else> 
-      <img class="upload-playlist--cover" v-bind:src="imgUrl">
-      <small class="upload-play--created"> Created by - {{owner}}</small>
-      <p>
-        <span>
-          Playlist Name: 
-          <input class="upload-playlist--name-input" v-bind:class="{ 'padding-right': resetButton }" v-model="playlistName">
-        </span>
+      <img class="upload-playlist--cover" v-bind:src="imgUrl ? imgUrl : placeholder">
+      <small class="upload-play--created"><p>Created by - {{owner}}</p></small>
+
+      <span v-if="ownPlaylist">
+        <input class="upload-playlist--name-input" v-bind:class="{ 'padding-right': resetButton }" v-model="playlistName">
         <span class="upload-playlist--icon-container">
           <transition name="fade">
             <svg @click="resetChanges" v-show="resetButton" class="icon icon-spinner11"><use xlink:href="#icon-spinner11"></use></svg>
@@ -22,8 +20,14 @@
           </symbol> 
         </span>
         <span class="help is-danger"> Note: Changes made here will be reflected in Spotify</span>
-        <button @click="addToDatabase"> Upload </button>
-      </p>
+      </span>
+
+      <span v-else>
+        <span class="upload-playlist--name-span"> {{ playlistName }}</span>
+        <!-- <span class="help is-danger">Playlist names can only be changed if you own them</span> -->
+      </span>
+        
+      <a class="upload-playlist--button" @click="addToDatabase"> Upload </a>
     </div>
   </div>
 </template>
@@ -40,9 +44,12 @@ export default {
       imgUrl: '',
       originalPlaylistName: '',
       owner: '',
+      placeholder: '../static/artplaceholder.png',
       playlistName: '',
       playlistId: '',
-      resetButton: false
+      resetButton: false,
+      ownPlaylist: '',
+      uploader: this.$cookie.get('user')
     }
   },
   mixins: [SpotifyMixin],
@@ -51,6 +58,7 @@ export default {
     vm.loading = true;
     vm.owner = this.$route.params.user;
     vm.playlistId = this.$route.params.playlist;
+    vm.ownPlaylist = vm.isOwnPlaylist();
     let fields = 'images,name';
     let options = {user: vm.owner, playlist: vm.playlistId, fields: fields};
     this.getSinglePlaylist(options, function(callback) {
@@ -62,7 +70,7 @@ export default {
   },
   watch: {
     playlistName: function () {
-      if (this.playlistName !== this.originalPlaylistName) {
+      if (this.playlistNameChanged()) {
         this.resetButton = true;
       } else {
         this.resetButton = false;
@@ -75,10 +83,23 @@ export default {
     },
     addToDatabase: function() {
       let vm = this;
+      if (vm.ownPlaylist && vm.playlistNameChanged()) {
+        vm.updatePlaylistName(vm.owner, vm.playlistId, vm.playlistName, function(callback) {
+          console.log(callback);
+        });
+      }
       Firebase.database().ref('playlists/' + vm.playlistId).set({
         owner: vm.owner,
-        uploader: vm.$cookie.get('user')
+        title: vm.playlistName,
+        uploader: vm.uploader
       });
+    },
+    isOwnPlaylist: function() {
+      // Only update playlist if owned by the
+      return this.uploader === this.owner;
+    },
+    playlistNameChanged: function() {
+      return this.playlistName !== this.originalPlaylistName;
     }
   }
 }
@@ -124,6 +145,29 @@ export default {
   margin-bottom: 5px;
   padding: 5px;
   width: 180px;
+}
+
+.upload-playlist--name-span {
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.upload-playlist--button {
+  display: block;
+  margin: auto;
+  border: 2px solid #299dcf;
+  border-radius: 5px;
+  color: #17385e;
+  cursor: pointer;
+  display: block;
+  padding: 10px;
+  margin: auto;
+  text-decoration: none;
+  width: 200px;
+}
+
+.upload-playlist--button:hover {
+  color: $play-color;
 }
 
 .fade-enter-active, .fade-leave-active {

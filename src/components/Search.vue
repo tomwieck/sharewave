@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import forEach from 'lodash/forEach'
 import isEmpty from 'lodash/isEmpty'
 import debounce from 'lodash/debounce'
 
@@ -116,7 +115,7 @@ export default {
           var length = this.checked.length;
           if (length !== 0) {
             // add selected services to URL
-            forEach(this.checked, function(v, index) {
+            this.checked.forEach(function(v, index) {
               services += v;
               if (index !== length - 1) { services += '+' };
             });

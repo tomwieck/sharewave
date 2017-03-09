@@ -86,19 +86,13 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+@import "../assets/sass/styles.scss";
+
 .playlist-list {
   padding-top: 10px;
 }
 
-.playlist-art {
-  display: inline-block;
-  height: 100px;
-  max-width: 100px;
-}
-
-.playlist-link,
 .playlist-upload {
   display: block;
 }
@@ -111,16 +105,6 @@ export default {
 
 .playlist-upload:hover {
   color: #17385e;
-}
-
-.playlist-container {
-  border: 2px solid #299dcf;
-  border-radius: 5px;
-  display: inline-block;
-  height: auto;
-  padding: 10px 2%;
-  margin: 5px 2%;
-  max-width: 500px;
 }
 
 .playlist-load-more {
