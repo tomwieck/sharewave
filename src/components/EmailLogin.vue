@@ -3,7 +3,7 @@
     <form @submit.prevent="emailLogin">
       <div class="email-login--container">
         <span>
-          <input class="email-login--email" placeholder="Email" v-model="email"  >
+          <input class="email-login--email" placeholder="Email" v-model="email">
           <input class="email-login--password" placeholder="Password" type="password" v-model="password">
         </span>
         <button> Submit </button>
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// @import "../assets/sass/styles.scss";
+@import "../assets/sass/styles.scss";
 
 // verifying classes
 .help.is-danger {
@@ -80,14 +80,6 @@ export default {
   padding: 5px;
   margin-bottom: 10px;
   width: 250px;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-  opacity: 0;
-  transition: opacity 0.5s
 }
 
 </style>

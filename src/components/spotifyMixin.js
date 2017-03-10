@@ -39,16 +39,14 @@ export default {
     },
     getSinglePlaylist: function(options, callback) {
       let vm = this;
-      vm.checkAccessToken(function(check) {
-        let accessToken = vm.$cookie.get('access_token') || vm.$cookie.get('client_access_token');
-        vm.spotifyApi.setAccessToken(accessToken);
-        vm.spotifyApi.getPlaylist(options.user, options.playlist, options.fields)
-        .then(function(data) {
-          return callback(data);
-        }, function(err) {
-          return callback(err);
-        });
-      })
+      let accessToken = vm.$cookie.get('access_token') || vm.$cookie.get('client_access_token');
+      vm.spotifyApi.setAccessToken(accessToken);
+      vm.spotifyApi.getPlaylist(options.user, options.playlist, options.fields)
+      .then(function(data) {
+        return callback(data);
+      }, function(err) {
+        return callback(err);
+      });
     },
     updatePlaylistName: function(userId, playlistId, newName, callback) {
       let data = {name: newName};

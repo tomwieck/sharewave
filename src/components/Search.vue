@@ -19,7 +19,6 @@
         v-on:parentPlay="playAudio"
         v-if="sSearchResults"
         v-bind:key="sSearchResults" 
-        :playLinkText="'Stream'"
         :searchResults="sSearchResults"
         :parentWidth = "parentWidth"
         service="Spotify"> 
@@ -29,7 +28,6 @@
         v-on:parentPlay="playAudio"
         v-if="iSearchResults"
         v-bind:key="iSearchResults" 
-        :playLinkText="'Purchase'" 
         :searchResults="iSearchResults" 
         :parentWidth = "parentWidth"
         service="iTunes"> 
@@ -179,18 +177,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "../assets/sass/styles.scss";
+
 .search-area_textbox {
   padding: 5px;
   margin-bottom: 10px;
   width: 35%;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-  opacity: 0;
-  transition: opacity 0.5s
-}
 </style>

@@ -89,9 +89,13 @@ export default {
         });
       }
       Firebase.database().ref('playlists/' + vm.playlistId).set({
+        date_added: new Date().getTime(),
         owner: vm.owner,
-        title: vm.playlistName,
+        // title: vm.playlistName,
         uploader: vm.uploader
+      })
+      .then(function() {
+        console.log('uploaded');
       });
     },
     isOwnPlaylist: function() {
