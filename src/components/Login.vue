@@ -1,22 +1,18 @@
 <template>
   <div class="nav-login">
     <div v-if="username" class="login--username">
-      <a href="/#/myPlaylists">
-        <img class="profile-img" :src="imgUrl">
-        <div v-if="emailLogin">
-          <span class="profile-name"><a v-on:click="emailSignout">Logout</a></span>
-        </div>
-        <div v-else>
-          <span class="profile-name">{{ username }}</span>
-        </div>
-      </a>
+        <a href="/#/myPlaylists">
+          <img class="profile-img" :src="imgUrl">
+        </a>
+        <span class="profile-name"><a v-on:click="emailSignout">Logout</a></span>  
+<!--         <span class="profile-name">{{ username }}</span> -->
     </div>
     <a v-else @click="showModal = true" class="login--link">
       <span>Login</span>
     </a>
     <modal v-if="showModal" @close="showModal=false">
       <h3 slot="header">Login</h3>
-        <a slot="body" class="login-slot--link" href="" v-on:click="spotifyLogin">With Spotify</a>
+        <a slot="body" class="login-slot--link" v-on:click="spotifyRedirect">With Spotify</a>
         <a slot="body" class="login-slot--link" href="/#/emailLogin">With ShareWave</a>
       <h3 slot="footer" href="">Don't have an account?</h3>
         <a slot="footer" class="signup-slot--link" href="https://www.spotify.com/signup/">Sign up for a Spotify Account</a>
@@ -38,27 +34,21 @@ export default {
       imgUrl: null,
       userId: null,
       username: null,
-      showModal: false
+      showModal: false,
+      stateChange: false
     }
   },
   mixins: [SpotifyMixin],
   mounted: function () {
-    let vm = this;
-    this.registerStateChange();
-    vm.updateHashParams();
-    if (this.$cookie.get('access_token')) {
-      if (!vm.username) {
-        vm.getMe(function(callback) {
-          console.log(callback);
-          vm.username = callback.display_name || callback.id;
-          vm.imgUrl = (callback.images !== undefined ? callback.images[0].url : '../static/placeholder.png')
-          vm.userId = callback.id;
-        });
-      }
+    if (!this.stateChange) {
+      this.registerStateChange();
+    }
+    if (this.$route.params.access_token) {
+      this.updateHashParams();
     }
   },
   methods: {
-    spotifyLogin: function() {
+    spotifyRedirect: function() {
       let vm = this;
       vm.axios.get('http://localhost:8888/login')
         .then(function (response) {
@@ -70,22 +60,30 @@ export default {
           console.log(error);
         })
     },
-    // Obtains parameters from the tokens object (route of the URL) @return Object
     updateHashParams: function () {
-      if (this.$route.params.access_token) {
-        this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
-        this.$cookie.set('refresh_token', this.$route.params.refresh_token);
-      }
+      this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
+      this.$cookie.set('refresh_token', this.$route.params.refresh_token);
+      this.$cookie.set('firebase_token', this.$route.params.firebase_token);
+      this.firebaseSpotifyLogin(this.$route.params.firebase_token);
     },
-    updateDetails: function(user) {
-      this.username = user.displayName;
-      this.imgUrl = user.photoURL || '../static/placeholder.png'
-      this.userId = user.uid;
+    firebaseSpotifyLogin: function(token) {
+      // Get Spotify User Details, set them to Vue variables, then assign these to Firebase user
+      let vm = this;
+      vm.getMe(function(callback) {
+        vm.setDetails(callback);
+      });
+      Firebase.auth().signInWithCustomToken(token)
+        .then(function(user) {
+          console.log(user);
+          if (vm.username !== user.displayName || vm.imgUrl !== user.photoURL || vm.userId !== vm.userId) {
+            user.updateProfile({displayName: `${vm.username}`, photoURL: `${vm.imgUrl}`, userId: `${vm.userId}`});
+          }
+        });
     },
-    resetDetails: function(user) {
-      this.username = null;
-      this.imgUrl = null;
-      this.userId = null;
+    setDetails: function(user) {
+      this.username = user.display_name || user.id;
+      this.imgUrl = (user.images !== undefined ? user.images[0].url : '../static/placeholder.png')
+      this.userId = user.id;
     },
     emailSignout: function() {
       Firebase.auth().signOut()
@@ -97,14 +95,28 @@ export default {
     },
     registerStateChange: function() {
       let vm = this;
+      vm.stateChange = true;
       Firebase.auth().onAuthStateChanged(function(user) {
-        if (user && vm.userId === null) {
-          vm.updateDetails(user);
-          vm.emailLogin = true;
-        } else {
+        console.log('changed');
+        if (user === null) {
           vm.resetDetails();
+        } else {
+          console.log(user);
+          if (!user.uid.startsWith('spotify')) {
+            vm.updateEmailLogin(user);
+          }
         }
       });
+    },
+    updateEmailLogin: function(user) {
+      this.username = user.displayName;
+      this.imgUrl = '../static/placeholder.png';
+      this.userId = user.uid;
+    },
+    resetDetails: function(user) {
+      this.username = null;
+      this.imgUrl = null;
+      this.userId = null;
     }
   },
   components: {

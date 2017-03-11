@@ -28,7 +28,6 @@ module.exports = {
 	  spotifyApi.authorizationCodeGrant(code)
       .then(function(data) {
         //Set the access token on the API object to use it in later calls
-        console.log()
         return callback({ 
         	access_token: data.body['access_token'],
         	refresh_token: data.body['refresh_token'] 

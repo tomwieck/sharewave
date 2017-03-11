@@ -7,7 +7,7 @@
         <div class="playlist-container" v-for="playlist in playlists.items">
           <img class="playlist-art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">
           <a class="playlist-link" v-bind:href="playlist.uri">{{ playlist.name }}</a>
-          <a class="playlist-upload" v-bind:href="`/#/upload/${playlist.owner.id}/${playlist.id}`">Upload to ShareWave</a>
+          <a class="playlist-upload" v-bind:href="generateLink(playlist.owner.id, playlist.id)">Upload to ShareWave</a>
         </div>
         <h2 class="playlist-load-more"><a v-on:click="loadMore">{{ loadMoreText }}</a></h2>
       </div>
@@ -81,6 +81,10 @@ export default {
       } else {
         this.loadMoreText = '';
       }
+    },
+    generateLink: function(owner, id) {
+      owner = encodeURIComponent(owner);
+      return `/#/upload/${owner}/${id}`;
     }
   }
 }

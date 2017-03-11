@@ -18,7 +18,7 @@ export default new Router({
       component: ListPlaylists
     },
     {
-      path: '/loggedin/:access_token/:refresh_token',
+      path: '/loggedin/:access_token/:refresh_token/:firebase_token',
       name: 'Logged in',
       component: UserPlaylists
     },

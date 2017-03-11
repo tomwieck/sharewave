@@ -49,13 +49,15 @@ export default {
       });
     },
     updatePlaylistName: function(userId, playlistId, newName, callback) {
-      let data = {name: newName};
-      this.spotifyApi.changePlaylistDetails(userId, playlistId, data)
-      .then(function(data) {
-        return callback(data);
-      }, function(err) {
-        return callback(err);
-      });
+      this.checkAccessToken(function(check) {
+        let data = {name: newName};
+        this.spotifyApi.changePlaylistDetails(userId, playlistId, data)
+        .then(function(data) {
+          return callback(data);
+        }, function(err) {
+          return callback(err);
+        });
+      })
     },
     checkAccessToken: function(check) {
       let vm = this;

@@ -97,7 +97,7 @@ export default {
       var vm = this;
       vm.axios.get('http://localhost:8888/clientCredential')
       .then(function (response) {
-        vm.$cookie.set('client_access_token', response.data.access_token);
+        vm.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
       })
       .catch(function (error) {
         console.log(error);
