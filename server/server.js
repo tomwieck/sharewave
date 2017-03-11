@@ -4,10 +4,7 @@ var cors = require('cors')
 var path = require('path')
 var Promise = require('promise');
 var querystring = require('querystring');
-
-// from tutorial, will need to npm i --save express-jwt jsonwebtoken
-//var expressJWT = require ('express-jwt')
-//var jwt = require ('jsonwebtoken')
+var admin = require("firebase-admin");
 
 const handleLogin = require('./handleLogin');
 const spotify = require('./spotifyFunctions');
@@ -20,6 +17,16 @@ var spotifyApi = new SpotifyWebApi({
       clientId : setupVar.clientId,
       clientSecret : setupVar.clientSecret
     });
+
+//Firebase Setup
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://sharewave-d0ea7.firebaseio.com"
+});
 
 // Express Setup
 var express = require('express'); 
