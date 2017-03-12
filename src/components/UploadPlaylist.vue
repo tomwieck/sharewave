@@ -63,7 +63,8 @@ export default {
     let options = {user: vm.owner, playlist: vm.playlistId, fields: fields};
     this.getSinglePlaylist(options, function(callback) {
       vm.loading = false;
-      vm.imgUrl = callback.images[0].url;
+      console.log(callback);
+      vm.imgUrl = (callback.images[0] ? callback.images[0].url : null);
       vm.playlistName = callback.name;
       vm.originalPlaylistName = callback.name;
     });

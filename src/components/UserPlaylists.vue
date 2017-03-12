@@ -39,10 +39,6 @@ export default {
   },
   mixins: [SpotifyMixin],
   mounted: function () {
-    if ('caches' in window) {
-      // Use to add cache support to API call
-      // console.log('Has support!')
-    }
     if (this.$cookie.get('access_token') !== null) {
       var vm = this;
       vm.getPlaylists(function(callback) {

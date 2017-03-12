@@ -63,7 +63,7 @@ export default {
 }
 
 .email-login--container {
-    margin: 1em;
+  margin: 1em;
 }
 
 .email-login--list {

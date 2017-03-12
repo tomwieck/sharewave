@@ -5,9 +5,7 @@ var path = require('path')
 var Promise = require('promise');
 var querystring = require('querystring');
 var admin = require("firebase-admin");
-var firebase = require("firebase/app");
-require('firebase/auth');
-// require('firebase/database');
+
 
 const handleLogin = require('./handleLogin');
 const spotify = require('./spotifyFunctions');
@@ -52,11 +50,9 @@ app.get('/callback', function(req, res) {
 	    spotifyApi.setRefreshToken(callback.refresh_token);
 	  	spotify.getMe(spotifyApi, function(me) {
 	  		const safeId = me.id.replace(/\./g, '%2E');
-	  		console.log(safeId);
 			createFirebaseToken(safeId)
 			.then(function(firebaseToken) {
 				res.redirect(`http://localhost:8080/#/loggedin/${callback.access_token}/${callback.refresh_token}/${firebaseToken}`);
-				// res.send(signInFirebaseTemplate(firebaseToken, displayName, profilePic, callback.access_token));
 			});
 		});
 	});
@@ -185,51 +181,6 @@ function createFirebaseToken(id) {
   const uid = `spotify:${id}`;
   // Create the custom token.
   return admin.auth().createCustomToken(uid);
-}
-
-function signInFirebaseTemplate(token, displayName, photoURL, spotifyAccessToken) {
- return `
-   <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase.js"></script>
-   <script>
-     var token = '${token}';
-     var config = {
-       apiKey: 'AIzaSyAPL6SPIz7xx5JqPo-D5ZLnCXv0vI13UuI',
-       databaseURL: 'https://sharewave-d0ea7.firebaseio.com'
-     };
-     // We sign in via a temporary Firebase app to update the profile.
-     var tempApp = firebase.initializeApp(config, '_temp_');
-     tempApp.auth().signInWithCustomToken(token)
-     .then(function(user) {
-    
-       // Saving the Spotify API access token in the Realtime Database.
-       const tasks = [tempApp.database().ref('/SpotifyAccessToken/' + user.uid)
-           .set('${spotifyAccessToken}')];
-  
-       // Updating the displayname and photoURL if needed.
-       if ('${displayName}' !== user.displayName || '${photoURL}' !== user.photoURL) {
-         tasks.push(user.updateProfile({displayName: '${displayName}', photoURL: '${photoURL}'}));
-       }
-  
-       // Wait for completion of above tasks.
-       return Promise.all(tasks).then(function() {
-         // Delete temporary Firebase app and sign in the default Firebase app, then close the popup.
-         var firebaseApp = firebase.initializeApp(config);
-         Promise.all([
-             firebaseApp.auth().signInWithCustomToken(token),
-             tempApp.delete()]).then(function() {
-           window.close(); // We’re done! Closing the popup.
-         });
-       });
-     })
-     .catch(function(error) {
-     	var errorCode = error.code;
-		  if (errorCode === 'auth/invalid-custom-token') {
-		    alert('The token you provided is not valid.');
-		  } else {
-		    console.error(error);
-		  }
-     });
-   </script>`;
 }
 
 console.log('Listening on 8888');

@@ -98,6 +98,7 @@ export default {
       })
     },
     registerStateChange: function() {
+      // Test if needed or if handled by Login listener
       let vm = this;
       Firebase.auth().onAuthStateChanged(function(user) {
         if (user) {

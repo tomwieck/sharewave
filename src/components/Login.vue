@@ -2,7 +2,7 @@
   <div class="nav-login">
     <div v-if="username" class="login--username">
         <a href="/#/myPlaylists">
-          <img class="profile-img" :src="imgUrl">
+          <img class="profile-img" :src="imgUrl || placeholderUrl">
         </a>
         <span class="profile-name"><a v-on:click="emailSignout">Logout</a></span>  
 <!--         <span class="profile-name">{{ username }}</span> -->
@@ -30,12 +30,14 @@ export default {
   name: 'Login',
   data() {
     return {
+      email: null,
       emailLogin: false,
       imgUrl: null,
       userId: null,
       username: null,
       showModal: false,
-      stateChange: false
+      stateChange: false,
+      placeholderUrl: '../static/placeholder.png'
     }
   },
   mixins: [SpotifyMixin],
@@ -74,23 +76,31 @@ export default {
       });
       Firebase.auth().signInWithCustomToken(token)
         .then(function(user) {
-          console.log(user);
-          if (vm.username !== user.displayName || vm.imgUrl !== user.photoURL || vm.userId !== vm.userId) {
-            user.updateProfile({displayName: `${vm.username}`, photoURL: `${vm.imgUrl}`, userId: `${vm.userId}`});
+          // If Spotify email, img, id or email do not match whats on the server, update them
+          if (vm.username !== user.displayName || vm.imgUrl !== user.photoURL || vm.userId !== user.userId || vm.email !== user.email) {
+            user.updateProfile({
+              displayName: `${vm.username}`,
+              email: `${vm.emal}`,
+              photoURL: `${vm.imgUrl}`,
+              userId: `${vm.userId}`
+            });
           }
+          vm.addToUserDatabase()
         });
     },
-    setDetails: function(user) {
-      this.username = user.display_name || user.id;
-      this.imgUrl = (user.images !== undefined ? user.images[0].url : '../static/placeholder.png')
-      this.userId = user.id;
+    addToUserDatabase: function() {
+      let vm = this;
+      const safeId = vm.userId.replace(/\./g, '%2E')
+      Firebase.database().ref('users/spotify:' + safeId).set({
+        display_name: vm.username,
+        email: vm.email,
+        imgUrl: vm.imgUrl || null
+      })
     },
     emailSignout: function() {
       Firebase.auth().signOut()
         .then(function() {
         // Sign-out successful.
-        }, function(error) {
-          console.log(error);
         });
     },
     registerStateChange: function() {
@@ -108,9 +118,14 @@ export default {
         }
       });
     },
+    setDetails: function(spotifyUser) {
+      this.email = spotifyUser.email || null;
+      this.imgUrl = (spotifyUser.images !== undefined ? spotifyUser.images[0].url : null)
+      this.userId = spotifyUser.id;
+      this.username = spotifyUser.display_name || spotifyUser.id;
+    },
     updateEmailLogin: function(user) {
       this.username = user.displayName;
-      this.imgUrl = '../static/placeholder.png';
       this.userId = user.uid;
     },
     resetDetails: function(user) {
