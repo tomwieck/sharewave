@@ -22,7 +22,7 @@
           </span>
         </span>
         <div class="search-table--container-add">
-          <a href=""> Add to myWave </a>
+          <a @click="addToWave(result)"> Add to myWave </a>
         </div>
       </div>
     </div>   
@@ -39,8 +39,11 @@ export default {
   }),
   props: ['service', 'searchResults', 'parentWidth'],
   methods: {
-    parentPlay: function(url, e) {
+    parentPlay(url, e) {
       this.$emit('parentPlay', url, e);
+    },
+    addToWave(result) {
+      this.$emit('tableToSearch', result);
     }
   }
 }
@@ -75,7 +78,7 @@ td {
 }
 
 .search-table--container {
-  border: 2px solid #299dcf;
+  border: 2px solid $play-color;
   border-radius: 5px;
   display: inline-block;
   height: auto;
@@ -98,13 +101,13 @@ td {
 }
 
 .search-table--container-add a {
-  color: #299dcf;
+  color: $play-color;
   font-weight: bold;
   padding-bottom: -2px;
 }
 
 .search-table--container-add a:hover {
-  color: #17385e;
+  color: $logo-color;
 }
 
 .search-table--container-details {

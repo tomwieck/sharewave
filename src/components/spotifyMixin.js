@@ -8,33 +8,53 @@ export default {
     }
   },
   methods: {
-    getMe: function(callback) {
+    setAccessToken: function(check) {
       let vm = this;
-      let accessToken = vm.$cookie.get('access_token');
-      vm.spotifyApi.setAccessToken(accessToken);
-      vm.spotifyApi.getMe()
-      .then(function(res) {
-        vm.$cookie.set('user', res.id);
-        return callback(res);
-      })
-      .catch(function(err) {
-        return callback(err);
-      })
+      if (vm.$cookie.get('access_token') !== null) {
+        vm.spotifyApi.setAccessToken(vm.$cookie.get('access_token'));
+        return check();
+      } else {
+        let refreshToken = vm.$cookie.get('refresh_token')
+        vm.axios.get(`http://localhost:8888/refreshToken?refreshToken=${refreshToken}`)
+          .then(function (response) {
+            vm.$cookie.set('access_token', response.data, { expires: '1h' });
+            vm.spotifyApi.setAccessToken(response.data);
+            return check();
+          })
+          .catch(function (error) {
+            return check(error);
+          })
+      }
+    },
+    getMe: function(callback) {
+      this.setAccessToken(check => {
+        this.spotifyApi.getMe()
+        .then(res => {
+          return callback(res);
+        })
+        .catch(err => {
+          return callback(err);
+        });
+      });
     },
     getPlaylists: function(callback) {
-      this.spotifyApi.getUserPlaylists()
-      .then(function(data) {
-        return callback(data);
-      }, function(err) {
-        return callback(err);
+      this.setAccessToken(check => {
+        this.spotifyApi.getUserPlaylists()
+        .then(function(data) {
+          return callback(data);
+        }, function(err) {
+          return callback(err);
+        });
       });
     },
     getRecentlyPlayed: function(callback) {
-      this.spotifyApi.getRecentlyPlayed()
-      .then(function(data) {
-        return callback(data);
-      }, function(err) {
-        return callback(err);
+      this.setAccessToken(check => {
+        this.spotifyApi.getRecentlyPlayed()
+        .then(function(data) {
+          return callback(data);
+        }, function(err) {
+          return callback(err);
+        });
       });
     },
     getSinglePlaylist: function(options, callback) {
@@ -49,7 +69,7 @@ export default {
       });
     },
     updatePlaylistName: function(userId, playlistId, newName, callback) {
-      this.checkAccessToken(function(check) {
+      this.setAccessToken(check => {
         let data = {name: newName};
         this.spotifyApi.changePlaylistDetails(userId, playlistId, data)
         .then(function(data) {
@@ -58,22 +78,6 @@ export default {
           return callback(err);
         });
       })
-    },
-    checkAccessToken: function(check) {
-      let vm = this;
-      if (vm.$cookie.get('access_token') === null) {
-        let refreshToken = vm.$cookie.get('refresh_token')
-        vm.axios.get(`http://localhost:8888/refreshToken?refreshToken=${refreshToken}`)
-        .then(function (response) {
-          vm.$cookie.set('access_token', response.data);
-          return check();
-        })
-        .catch(function (error) {
-          return check(error);
-        })
-      } else {
-        return check();
-      }
     }
   }
 }

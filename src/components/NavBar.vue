@@ -4,6 +4,7 @@
     <h1 class="nav-bar--heading">ShareWave</h1>
     <ul class="nav-links-ul">
       <li><a class="nav-bar--link" href="#/search">Search</a></li>
+      <li><a class="nav-bar--link" href="#/wave">Wave</a></li>
       <li><a class="nav-bar--link" href="#/myPlaylists">My Playlists</a></li>
     </ul>   
     <login></login>
@@ -22,9 +23,9 @@ export default {
 </script>
 
 <style lang="scss">
-// @import "../assets/sass/styles.scss";
+@import "../assets/sass/styles.scss";
 .nav-bar {
-  background-color: #299dcf;
+  background-color: $play-color;
   height: 55px;
   margin: 0;
   padding: 10px 1%;
@@ -92,7 +93,4 @@ export default {
   padding-right: 10px;
   width: 50px;
 }
-/*logo*/
-/* play - 299dcf */
-/* 17375c */
 </style>

@@ -19,12 +19,27 @@ $logo-color: #17385e;
   max-width: 100px;
 }
 
-.playlist-link {
+.playlist-title {
   display: block;
 }
 
+.playlist-text {
+  display: inline-block;
+}
+
+.playlist-upload {
+  color: $play-color;
+  display: block;
+  font-weight: bold;
+  padding-bottom: -2px;
+}
+
+.playlist-upload:hover {
+  color: #17385e;
+}
+
 .playlist-container {
-  border: 2px solid #299dcf;
+  border: 2px solid $play-color;
   border-radius: 5px;
   display: inline-block;
   height: auto;

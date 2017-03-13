@@ -6,6 +6,8 @@ import UserPlaylists from 'components/UserPlaylists'
 import EmailSignup from 'components/EmailSignup'
 import EmailLogin from 'components/EmailLogin'
 import UploadPlaylist from 'components/UploadPlaylist'
+import ViewPlaylist from 'components/ViewPlaylist'
+import Wave from 'components/Wave'
 // import SpotifyLogin from 'components/SpotifyLogin'
 
 Vue.use(Router)
@@ -46,6 +48,16 @@ export default new Router({
       path: '/upload/:user/:playlist',
       name: 'UploadPlaylist',
       component: UploadPlaylist
+    },
+    {
+      path: '/playlist/:playlist',
+      name: 'ViewPlaylist',
+      component: ViewPlaylist
+    },
+    {
+      path: '/wave',
+      name: 'Wave',
+      component: Wave
     }
   ]
 })

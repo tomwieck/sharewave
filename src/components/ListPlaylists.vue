@@ -3,8 +3,11 @@
     <h2>Welcome to ShareWave</h2>
     <transition-group name="fade">
       <div class="playlist-container" v-for="playlist in playlists" :key="playlist.id">
+        <span class="playlist-text"><b>{{ playlist.title }} </b></span>
         <img class="playlist-art" v-bind:src="playlist.imgUrl">
-        <a class="playlist-link" v-bind:href="createLink(playlist.owner, playlist.id)">{{ playlist.title }}</a>
+        <a class="playlist-text" v-bind:href="createSpotifyLink(playlist.owner, playlist.id)">Open in Spotify</a>
+        <a class="playlist-text" href="" @click="shareWaveLink(playlist.id)">More Details</a>
+        </span>
       </div>
     </transition-group>
   </div>
@@ -19,72 +22,64 @@ export default {
   data() {
     return {
       placeholder: '../static/artplaceholder.png',
+      playlistRef: null,
       playlists: []
     }
   },
   mixins: [SpotifyMixin],
-  mounted: function() {
-    let vm = this;
-    vm.clientCredentials(function(callback) {
-      vm.getPlaylists();
+  beforeRouteLeave: function(to, from, next) {
+    if (this.playlistRef) {
+      this.playlistRef.off('child_added');
+    }
+    next();
+  },
+  mounted() {
+    this.clientCredentials(callback => {
+      this.getPlaylists();
     });
   },
   methods: {
-    getPlaylists: function() {
-      let vm = this;
-      let playlistRef = Firebase.database().ref('playlists/');
-      playlistRef.orderByChild('date_added').on('child_added', function(snapshot) {
+    getPlaylists() {
+      this.playlistRef = Firebase.database().ref('playlists/');
+      this.playlistRef.orderByChild('date_added').on('child_added', snapshot => {
         let childData = snapshot.val();
         childData.id = snapshot.key;
-        childData.imgUrl = vm.placeholder;
-        vm.playlists.unshift(childData);
-        vm.getPlaylistImage(childData);
+        childData.imgUrl = this.placeholder;
+        this.playlists.unshift(childData);
+        this.getPlaylistDetails(childData);
       });
     },
-    createLink: function(user, id) {
+    createSpotifyLink(user, id) {
       return `spotify:user:${user}:playlist:${id}`;
     },
-    getPlaylistImage: function(playlist) {
+    shareWaveLink(id) {
+      this.$router.push(`/playlist/${id}`);
+    },
+    getPlaylistDetails(playlist) {
       console.log('get playlist image');
-      let vm = this;
       const options = {
         user: playlist.owner,
         playlist: playlist.id,
         fields: 'images,name'
       }
-      vm.getSinglePlaylist(options, function(callback) {
+      this.getSinglePlaylist(options, callback => {
         console.log('callback', callback);
         playlist.title = callback.name;
         playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
       });
     },
-    getPlaylistImages: function() {
-      let vm = this;
-      vm.playlists.forEach(function(playlist) {
-        const options = {
-          user: playlist.owner,
-          playlist: playlist.id,
-          fields: 'images'
-        }
-        vm.getSinglePlaylist(options, function(callback) {
-          console.log(callback);
-          playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url
-        });
-      })
-    },
-    clientCredentials: function(callback) {
-      var vm = this;
-      if (vm.$cookie.get('access_token')) {
+    clientCredentials(callback) {
+      if (this.$cookie.get('access_token')) {
         return callback();
       }
-      vm.axios.get('http://localhost:8888/clientCredential')
-      .then(function (response) {
-        vm.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
-        return callback();
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
+      this.axios.get('http://localhost:8888/clientCredential')
+        .then(response => {
+          this.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
+          return callback();
+        })
+        .catch(error => {
+          console.log(error);
+        })
     }
   }
 }

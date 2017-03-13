@@ -5,9 +5,10 @@
       <div>
         <div>Showing {{ playlists.limit }} of {{ playlists.total }} playlists</div>
         <div class="playlist-container" v-for="playlist in playlists.items">
+          <span class="playlist-title"><b>{{ playlist.name }} </b></span>
           <img class="playlist-art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">
-          <a class="playlist-link" v-bind:href="playlist.uri">{{ playlist.name }}</a>
-          <a class="playlist-upload" v-bind:href="generateLink(playlist.owner.id, playlist.id)">Upload to ShareWave</a>
+          <a class="playlist-text" v-bind:href="playlist.uri">Open in Spotify</a>
+          <a class="playlist-upload" v-bind:href="generateLink(playlist.owner.id, playlist.id)">Add to ShareWave</a>
         </div>
         <h2 class="playlist-load-more"><a v-on:click="loadMore">{{ loadMoreText }}</a></h2>
       </div>
@@ -39,19 +40,13 @@ export default {
   },
   mixins: [SpotifyMixin],
   mounted: function () {
-    if (this.$cookie.get('access_token') !== null) {
-      var vm = this;
-      vm.getPlaylists(function(callback) {
-        if (callback.status === 401) {
-          vm.error = true;
-        } else {
-          console.log(callback);
-          vm.playlists = callback;
-        }
-      });
-    } else {
-      this.error = true;
-    }
+    this.getPlaylists(callback => {
+      if (callback.status === 401) {
+        this.error = true;
+      } else {
+        this.playlists = callback;
+      }
+    });
   },
   methods: {
     loadMore: function() {
@@ -64,7 +59,6 @@ export default {
         };
         vm.axios.get(nextUrl, config)
         .then(function (response) {
-          console.log(response);
           response = response.data;
           vm.playlists.next = response.next;
           vm.playlists.items.push(...response.items);
@@ -91,20 +85,6 @@ export default {
 
 .playlist-list {
   padding-top: 10px;
-}
-
-.playlist-upload {
-  display: block;
-}
-
-.playlist-upload {
-  color: #299dcf;
-  font-weight: bold;
-  padding-bottom: -2px;
-}
-
-.playlist-upload:hover {
-  color: #17385e;
 }
 
 .playlist-load-more {

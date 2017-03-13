@@ -49,7 +49,7 @@ export default {
       playlistId: '',
       resetButton: false,
       ownPlaylist: '',
-      uploader: this.$cookie.get('user')
+      uploader: Firebase.auth().currentUser.uid
     }
   },
   mixins: [SpotifyMixin],
@@ -83,25 +83,24 @@ export default {
       this.playlistName = this.originalPlaylistName;
     },
     addToDatabase: function() {
-      let vm = this;
-      if (vm.ownPlaylist && vm.playlistNameChanged()) {
-        vm.updatePlaylistName(vm.owner, vm.playlistId, vm.playlistName, function(callback) {
+      if (this.ownPlaylist && this.playlistNameChanged()) {
+        this.updatePlaylistName(this.owner, this.playlistId, this.playlistName, function(callback) {
           console.log(callback);
         });
       }
-      Firebase.database().ref('playlists/' + vm.playlistId).set({
+      Firebase.database().ref('playlists/' + this.playlistId).set({
         date_added: new Date().getTime(),
-        owner: vm.owner,
-        // title: vm.playlistName,
-        uploader: vm.uploader
+        owner: this.owner,
+        uploader: this.uploader
       })
       .then(function() {
         console.log('uploaded');
       });
     },
     isOwnPlaylist: function() {
-      // Only update playlist if owned by the
-      return this.uploader === this.owner;
+      // Only update playlist if owned by them
+      let safeOwner = this.owner.replace(/\./g, '%2E')
+      return this.uploader === safeOwner;
     },
     playlistNameChanged: function() {
       return this.playlistName !== this.originalPlaylistName;
@@ -160,9 +159,9 @@ export default {
 .upload-playlist--button {
   display: block;
   margin: auto;
-  border: 2px solid #299dcf;
+  border: 2px solid $play-color;
   border-radius: 5px;
-  color: #17385e;
+  color: $logo-color;
   cursor: pointer;
   display: block;
   padding: 10px;

@@ -137,13 +137,14 @@ function makeCalls(s, searchTerm) {
 
 function extractSpotifyData(data) {
 	var spotifyData = {spotify: {}}
-
 	for (i = 0; i < data.length; i++) {
 		spotifyData.spotify[i] = {
 			album: data[i].album.name,
 			artist: data[i].artists[0].name,
 			artwork: data[i].album.images[2].url,
+			id: data[i].id,
 			previewUrl: data[i].preview_url,
+			service: 'spotify',
 			track: data[i].name,
 			url: data[i].uri
 		}
@@ -153,13 +154,15 @@ function extractSpotifyData(data) {
 
 function extractItunesData(data) {
 	var itunesData = {itunes: {}}
-
+	console.log(data);
 	for (i = 0; i < data.length; i++) {
 		itunesData.itunes[i] = {
 			album: data[i].collectionName,
 			artist: data[i].artistName,
 			artwork: data[i].artworkUrl100,
+			id: data[i].trackId,
 			previewUrl: data[i].previewUrl,
+			service: 'itunes',
 			track: data[i].trackName,
 			url: data[i].trackViewUrl
 		}
@@ -178,7 +181,8 @@ function removeOuterArray(array) {
 
 function createFirebaseToken(id) {
   // The uid we'll assign to the user.
-  const uid = `spotify:${id}`;
+  const uid = `${id}`;
+  // const uid = `spotify:${id}`;
   // Create the custom token.
   return admin.auth().createCustomToken(uid);
 }

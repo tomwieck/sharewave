@@ -4,7 +4,7 @@
         <a href="/#/myPlaylists">
           <img class="profile-img" :src="imgUrl || placeholderUrl">
         </a>
-        <span class="profile-name"><a v-on:click="emailSignout">Logout</a></span>  
+        <span class="profile-name"><a v-on:click="signout">Logout</a></span>  
 <!--         <span class="profile-name">{{ username }}</span> -->
     </div>
     <a v-else @click="showModal = true" class="login--link">
@@ -64,7 +64,7 @@ export default {
     },
     updateHashParams: function () {
       this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
-      this.$cookie.set('refresh_token', this.$route.params.refresh_token);
+      this.$cookie.set('refresh_token', this.$route.params.refresh_token, { expires: '1Y' });
       this.$cookie.set('firebase_token', this.$route.params.firebase_token);
       this.firebaseSpotifyLogin(this.$route.params.firebase_token);
     },
@@ -85,19 +85,25 @@ export default {
               userId: `${vm.userId}`
             });
           }
-          vm.addToUserDatabase()
+          Firebase.database().ref('/users/' + vm.userId).once('value')
+            .then(snapshot => {
+              if (snapshot.val() === null) {
+                vm.addToUserDatabase();
+              };
+            })
         });
     },
     addToUserDatabase: function() {
       let vm = this;
-      const safeId = vm.userId.replace(/\./g, '%2E')
-      Firebase.database().ref('users/spotify:' + safeId).set({
+      console.log('added');
+      Firebase.database().ref('users/' + this.userId).set({
         display_name: vm.username,
         email: vm.email,
-        imgUrl: vm.imgUrl || null
+        imgUrl: vm.imgUrl || null,
+        spotify: true
       })
     },
-    emailSignout: function() {
+    signout: function() {
       Firebase.auth().signOut()
         .then(function() {
         // Sign-out successful.
@@ -110,21 +116,21 @@ export default {
         console.log('changed');
         if (user === null) {
           vm.resetDetails();
+          vm.$cookie.delete('access_token', {domain: 'localhost'});
+          vm.redirect();
         } else {
-          console.log(user);
-          if (!user.uid.startsWith('spotify')) {
-            vm.updateEmailLogin(user);
-          }
+          vm.updateDetails(user);
         }
       });
     },
     setDetails: function(spotifyUser) {
       this.email = spotifyUser.email || null;
       this.imgUrl = (spotifyUser.images !== undefined ? spotifyUser.images[0].url : null)
-      this.userId = spotifyUser.id;
+      this.userId = spotifyUser.id.replace(/\./g, '%2E');
       this.username = spotifyUser.display_name || spotifyUser.id;
     },
-    updateEmailLogin: function(user) {
+    updateDetails: function(user) {
+      this.imgUrl = user.photoURL;
       this.username = user.displayName;
       this.userId = user.uid;
     },
@@ -132,6 +138,9 @@ export default {
       this.username = null;
       this.imgUrl = null;
       this.userId = null;
+    },
+    redirect() {
+      this.$router.push('/');
     }
   },
   components: {

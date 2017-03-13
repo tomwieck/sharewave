@@ -10,13 +10,13 @@
         <label for="iTunes">iTunes</label>
         <input type="checkbox" id="checkbox" value="iTunes" v-model="checked">
       </div>
-      <button @click="recentlyPlayed">Get Recently Played Songs</button>
       <p>{{ searchPlaceholder }}</p>
     </div>
 
     <transition-group name="fade">
       <s-search-table
         v-on:parentPlay="playAudio"
+        v-on:tableToSearch="addToWave"
         v-if="sSearchResults"
         v-bind:key="sSearchResults" 
         :searchResults="sSearchResults"
@@ -26,6 +26,7 @@
 
       <i-search-table 
         v-on:parentPlay="playAudio"
+        v-on:tableToSearch="addToWave"
         v-if="iSearchResults"
         v-bind:key="iSearchResults" 
         :searchResults="iSearchResults" 
@@ -79,11 +80,6 @@ export default {
     }
   },
   methods: {
-    recentlyPlayed: function() {
-      this.getRecentlyPlayed(function(callback) {
-        console.log(callback);
-      })
-    },
     ifPlayingPause: function() {
       if (this.audioObject) {
         this.audioObject.pause();
@@ -167,6 +163,10 @@ export default {
           target.innerText = 'Preview';
         });
       }
+    },
+    addToWave(result) {
+      console.log('add to wave emit');
+      this.$emit('addToWave', result);
     }
   },
   // instantiate two tables, one for Spotify and one for iTunes
