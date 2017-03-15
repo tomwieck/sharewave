@@ -48,7 +48,7 @@ export default {
         .then(snapshot => {
           this.dateAdded = this.convertTime(snapshot.val().date_added);
           this.owner = snapshot.val().owner;
-          this.uploader = snapshot.val().uploader;
+          this.uploader = snapshot.val().uploader.replace('%2E', '.');
           this.getPlaylistImage();
         })
     },

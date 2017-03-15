@@ -6,7 +6,7 @@
         <span class="playlist-text"><b>{{ playlist.title }} </b></span>
         <img class="playlist-art" v-bind:src="playlist.imgUrl">
         <a class="playlist-text" v-bind:href="createSpotifyLink(playlist.owner, playlist.id)">Open in Spotify</a>
-        <a class="playlist-text" href="" @click="shareWaveLink(playlist.id)">More Details</a>
+        <a class="playlist-text" v-bind:href="shareWaveLink(playlist.id)">More Details</a>
         </span>
       </div>
     </transition-group>
@@ -27,7 +27,7 @@ export default {
     }
   },
   mixins: [SpotifyMixin],
-  beforeRouteLeave: function(to, from, next) {
+  beforeRouteLeave(to, from, next) {
     if (this.playlistRef) {
       this.playlistRef.off('child_added');
     }
@@ -53,10 +53,9 @@ export default {
       return `spotify:user:${user}:playlist:${id}`;
     },
     shareWaveLink(id) {
-      this.$router.push(`/playlist/${id}`);
+      return `/#/playlist/${id}`;
     },
     getPlaylistDetails(playlist) {
-      console.log('get playlist image');
       const options = {
         user: playlist.owner,
         playlist: playlist.id,

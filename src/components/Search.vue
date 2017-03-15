@@ -59,7 +59,7 @@ export default {
       parentWidth: 49
     }
   },
-  beforeRouteLeave: function(to, from, next) {
+  beforeRouteLeave(to, from, next) {
     this.ifPlayingPause();
     next();
   },

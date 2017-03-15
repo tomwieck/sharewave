@@ -5,7 +5,6 @@
           <img class="profile-img" :src="imgUrl || placeholderUrl">
         </a>
         <span class="profile-name"><a v-on:click="signout">Logout</a></span>  
-<!--         <span class="profile-name">{{ username }}</span> -->
     </div>
     <a v-else @click="showModal = true" class="login--link">
       <span>Login</span>
@@ -41,7 +40,7 @@ export default {
     }
   },
   mixins: [SpotifyMixin],
-  mounted: function () {
+  mounted() {
     if (!this.stateChange) {
       this.registerStateChange();
     }
@@ -50,91 +49,88 @@ export default {
     }
   },
   methods: {
-    spotifyRedirect: function() {
-      let vm = this;
-      vm.axios.get('http://localhost:8888/login')
-        .then(function (response) {
+    spotifyRedirect() {
+      this.axios.get('http://localhost:8888/login')
+        .then(response => {
           if (response.data) {
             window.location.href = response.data;
           }
         })
-        .catch(function (error) {
+        .catch(error => {
           console.log(error);
         })
     },
-    updateHashParams: function () {
+    updateHashParams() {
       this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
       this.$cookie.set('refresh_token', this.$route.params.refresh_token, { expires: '1Y' });
       this.$cookie.set('firebase_token', this.$route.params.firebase_token);
       this.firebaseSpotifyLogin(this.$route.params.firebase_token);
     },
-    firebaseSpotifyLogin: function(token) {
+    firebaseSpotifyLogin(token) {
       // Get Spotify User Details, set them to Vue variables, then assign these to Firebase user
-      let vm = this;
-      vm.getMe(function(callback) {
-        vm.setDetails(callback);
+      this.getMe(callback => {
+        this.setDetails(callback);
       });
       Firebase.auth().signInWithCustomToken(token)
-        .then(function(user) {
+        .then(user => {
           // If Spotify email, img, id or email do not match whats on the server, update them
-          if (vm.username !== user.displayName || vm.imgUrl !== user.photoURL || vm.userId !== user.userId || vm.email !== user.email) {
+          if (this.username !== user.displayName || this.imgUrl !== user.photoURL || this.userId !== user.userId || this.email !== user.email) {
             user.updateProfile({
-              displayName: `${vm.username}`,
-              email: `${vm.emal}`,
-              photoURL: `${vm.imgUrl}`,
-              userId: `${vm.userId}`
+              displayName: this.username,
+              email: this.email,
+              photoURL: this.imgUrl,
+              userId: this.userId
             });
           }
-          Firebase.database().ref('/users/' + vm.userId).once('value')
+          // If user doesnt already exist in user database, add them
+          Firebase.database().ref('/users/' + this.userId).once('value')
             .then(snapshot => {
               if (snapshot.val() === null) {
-                vm.addToUserDatabase();
+                this.addToUserDatabase();
               };
             })
         });
     },
-    addToUserDatabase: function() {
-      let vm = this;
-      console.log('added');
+    addToUserDatabase() {
       Firebase.database().ref('users/' + this.userId).set({
-        display_name: vm.username,
-        email: vm.email,
-        imgUrl: vm.imgUrl || null,
-        spotify: true
+        display_name: this.username,
+        email: this.email,
+        imgUrl: this.imgUrl || null,
+        spotify: true,
+        wave: false
       })
     },
-    signout: function() {
+    signout() {
       Firebase.auth().signOut()
-        .then(function() {
-        // Sign-out successful.
+        .then(() => {
+          this.resetDetails();
+          this.$cookie.delete('access_token', {domain: 'localhost'});
+          this.$cookie.delete('refresh_token', {domain: 'localhost'});
+          this.redirect();
         });
     },
-    registerStateChange: function() {
-      let vm = this;
-      vm.stateChange = true;
-      Firebase.auth().onAuthStateChanged(function(user) {
-        console.log('changed');
+    registerStateChange() {
+      this.stateChange = true;
+      Firebase.auth().onAuthStateChanged(user => {
         if (user === null) {
-          vm.resetDetails();
-          vm.$cookie.delete('access_token', {domain: 'localhost'});
-          vm.redirect();
+          console.log('null');
         } else {
-          vm.updateDetails(user);
+          this.updateDetails(user);
         }
       });
     },
-    setDetails: function(spotifyUser) {
+    setDetails(spotifyUser) {
       this.email = spotifyUser.email || null;
       this.imgUrl = (spotifyUser.images !== undefined ? spotifyUser.images[0].url : null)
       this.userId = spotifyUser.id.replace(/\./g, '%2E');
       this.username = spotifyUser.display_name || spotifyUser.id;
     },
-    updateDetails: function(user) {
+    updateDetails(user) {
       this.imgUrl = user.photoURL;
       this.username = user.displayName;
       this.userId = user.uid;
     },
-    resetDetails: function(user) {
+    resetDetails(user) {
       this.username = null;
       this.imgUrl = null;
       this.userId = null;

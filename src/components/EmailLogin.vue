@@ -6,7 +6,7 @@
           <input class="email-login--email" placeholder="Email" v-model="email">
           <input class="email-login--password" placeholder="Password" type="password" v-model="password">
         </span>
-        <button> Submit </button>
+        <button>Submit</button>
       </div>
     </form>
   </div>    
@@ -27,15 +27,14 @@ export default {
     }
   },
   methods: {
-    emailLogin: function() {
-      let vm = this;
-      Firebase.auth().signInWithEmailAndPassword(vm.email, vm.password)
-      .then(function(response) {
-        vm.password = null;
-        vm.$router.push('/');
+    emailLogin() {
+      Firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+      .then(response => {
+        this.password = null;
+        this.$router.push('/');
       })
-      .catch(function(error) {
-        vm.errorMessage = error.message;
+      .catch(error => {
+        this.errorMessage = error.message;
       });
     }
   }
@@ -44,14 +43,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/styles.scss";
-
-// verifying classes
-.help.is-danger {
-  color: red;
-  display: block;
-  font-size: 12px;
-  margin-bottom: 12px;
-}
 
 .email-login--label {
   display: block;

@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import EmailLogin from 'components/EmailLogin'
+import EmailSignup from 'components/EmailSignup'
+import Home from 'components/Home'
 import ListPlaylists from 'components/ListPlaylists'
 import Search from 'components/Search'
 import UserPlaylists from 'components/UserPlaylists'
-import EmailSignup from 'components/EmailSignup'
-import EmailLogin from 'components/EmailLogin'
 import UploadPlaylist from 'components/UploadPlaylist'
 import ViewPlaylist from 'components/ViewPlaylist'
 import Wave from 'components/Wave'
@@ -17,7 +18,7 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: ListPlaylists
+      component: Home
     },
     {
       path: '/loggedin/:access_token/:refresh_token/:firebase_token',
@@ -25,24 +26,14 @@ export default new Router({
       component: UserPlaylists
     },
     {
-      path: '/search',
-      name: 'Search',
-      component: Search
+      path: '/allPlaylists',
+      name: 'All Playlists',
+      component: ListPlaylists
     },
     {
       path: '/myPlaylists',
       name: 'My Playlists',
       component: UserPlaylists
-    },
-    {
-      path: '/emailLogin',
-      name: 'Login',
-      component: EmailLogin
-    },
-    {
-      path: '/emailSignup',
-      name: 'Signup',
-      component: EmailSignup
     },
     {
       path: '/upload/:user/:playlist',
@@ -53,6 +44,21 @@ export default new Router({
       path: '/playlist/:playlist',
       name: 'ViewPlaylist',
       component: ViewPlaylist
+    },
+    {
+      path: '/search',
+      name: 'Search',
+      component: Search
+    },
+    {
+      path: '/emailLogin',
+      name: 'Login',
+      component: EmailLogin
+    },
+    {
+      path: '/emailSignup',
+      name: 'Signup',
+      component: EmailSignup
     },
     {
       path: '/wave',

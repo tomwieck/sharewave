@@ -65,48 +65,51 @@ export default {
       email: '',
       errorMessage: '',
       password: '',
-      regex: '\d.*[A-Z]|[A-Z].*\d',
       username: ''
     }
   },
-  mounted: function() {
-    this.registerStateChange();
-  },
   methods: {
-    emailSignup: function() {
-      let vm = this;
+    emailSignup() {
       Firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
-      .then(function(response) {
-        vm.updateProfile();
+      .then(response => {
+        var user = Firebase.auth().currentUser;
+        this.updateProfile(user);
+        this.addToUserDb(user);
       })
-      .catch(function(error) {
-        vm.errorMessage = error.message;
+      .catch(error => {
+        this.errorMessage = error.message;
       });
     },
-    updateProfile: function() {
-      var user = Firebase.auth().currentUser;
-      user.updateProfile({
+    updateProfile(user) {
+      return user.updateProfile({
         displayName: this.username
       });
     },
-    validateBeforeSubmit: function() {
+    addToUserDb(user) {
+      // Check if display name is already in use?
+      Firebase.database().ref('users/' + user.uid).set({
+        display_name: this.username,
+        email: this.email,
+        spotify: false,
+        wave: false
+      })
+      .then(() => {
+        Firebase.auth().signOut()
+          .then(() => {
+            Firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+              .then(() => {
+                this.$router.push(`/`);
+              });
+          });
+      });
+    },
+    validateBeforeSubmit() {
       // Validate All returns a promise and provides the validation result.
       this.$validator.validateAll()
       .then(success => {
         this.emailSignup();
         return false;
       })
-    },
-    registerStateChange: function() {
-      // Test if needed or if handled by Login listener
-      let vm = this;
-      Firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          vm.$router.push('/');
-        } else {
-          console.log('not signed in');
-        }
-      });
     }
   }
 }

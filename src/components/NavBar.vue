@@ -2,20 +2,48 @@
   <div id="nav-bar" class="nav-bar">
     <a href="/#/"><img class="nav-bar--logo" src="../assets/logo3.png"></a>
     <h1 class="nav-bar--heading">ShareWave</h1>
-    <ul class="nav-links-ul">
-      <li><a class="nav-bar--link" href="#/search">Search</a></li>
-      <li><a class="nav-bar--link" href="#/wave">Wave</a></li>
-      <li><a class="nav-bar--link" href="#/myPlaylists">My Playlists</a></li>
-    </ul>   
+    <span v-if="loggedIn">
+      <ul class="nav-links-ul">
+        <li><a class="nav-bar--link" href="#/search">Search</a></li>
+        <li><a class="nav-bar--link" href="#/wave">Wave</a></li>
+        <li><a class="nav-bar--link" href="#/myPlaylists">My Playlists</a></li>
+      </ul> 
+    </span>  
     <login></login>
   </div>
 </template>
 
 <script>
 import Login from './Login.vue'
+import Firebase from './firebaseMixin.js'
 
 export default {
   name: 'nav-bar',
+  data() {
+    return {
+      loggedIn: false
+    }
+  },
+  mounted() {
+    this.registerStateChange();
+    // if (Firebase.auth().currentUser !== null) {
+    // } else {
+    //   this.loggedIn = false;
+    // }
+  },
+  methods: {
+    registerStateChange() {
+      Firebase.auth().onAuthStateChanged(user => {
+        if (user === null) {
+          this.loggedIn = false;
+        } else {
+          if (user.displayName !== null) {
+            this.loggedIn = true;
+          }
+        }
+      });
+    }
+  },
   components: {
     'login': Login
   }

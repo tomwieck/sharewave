@@ -27,6 +27,7 @@
 
 <script>
 import SpotifyMixin from './spotifyMixin.js'
+// import Firebase from './firebaseMixin.js'
 
 export default {
   name: 'UserPlaylists',
