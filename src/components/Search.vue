@@ -165,7 +165,6 @@ export default {
       }
     },
     addToWave(result) {
-      console.log('add to wave emit');
       this.$emit('addToWave', result);
     }
   },

@@ -104,6 +104,7 @@ td {
   color: $play-color;
   font-weight: bold;
   padding-bottom: -2px;
+  cursor: pointer;
 }
 
 .search-table--container-add a:hover {

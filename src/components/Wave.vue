@@ -1,35 +1,47 @@
 <template>
   <div class="wave">
     <h2> My Wave </h2>
-    <img class="wave--profile-pic" v-bind:class="{ 'wave-true': wave, 'wave--playing': playing, 'wave-false': !wave }" @click="playAudio" :src="imgUrl || placeholderUrl">
-    <div v-if="playing">
-      {{ counter }} / {{ waveSongs.length }}
-        <div> 
-          {{ waveSongs[counter - 1].song_artist }} - {{ waveSongs[counter - 1].song_title }} 
-          <svg @click="deleteWave(waveSongs[counter - 1].id)" 
-          class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
-          <!-- <span></span> -->
-        </div>
+    <div v-bind:class="{ 'my-wave': userId === value.id }" class="wave-container" v-for="(value, key) in waveSongs">
+      <img class="wave--profile-pic" v-bind:class="{ 'wave-true': waveSongs[key].songs.length !== 0, 'wave-false': waveSongs[key].songs.length === 0}" @click="playWave($event, key)" :src="value.imgUrl || placeholderUrl">
+      <!-- {{ key }} : {{ value }} -->
+    </div>
+    <div v-if="playing.title">
+      <h3>Now Playing</h3>
+      {{playing.title}} - {{playing.artist}}
+      <span v-if="userId === playing.ownerId">
+        <div @click="deleteWave(playing.id)">Delete</div>
+      </span>
     </div>
     <h3> Add Songs </h3>
-    <a @click="searchClicked = !searchClicked"><b>Search on Spotify and iTunes</b></a>
-    <div v-if="searchClicked">
-      <search v-on:addToWave="addToWave"></search>
-    </div>
-    <br>
-    <a v-if="spotify" @click="spotifyRecentlyPlayed">
-      <b>See your recently played Spotify tracks</b>
-    </a>
-    <div v-if="recentlyPlayedClicked">
-      <transition-group name="fade">
-        <div class="track-container" v-for="song in recentlyPlayed" :key="song.track.id">
-          <span>{{ song.track.name }} - {{ song.track.artists[0].name }}</span>
-          <span class="track-container--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
+    <div class="wave-add-songs--container">
+      <a class="wave-add-songs--link" @click="searchClicked = !searchClicked">
+        Search on Spotify and iTunes
+      </a>
+      <div v-if="searchClicked">
+        <search v-on:addToWave="addToWave"></search>
+      </div>
+      <br>
+      <a class="wave-add-songs--link" v-if="spotify" @click="spotifyRecentlyPlayed">
+        See your recently played Spotify tracks
+      </a>
+      <div v-if="recentlyPlayedClicked">
+        <div v-if="recentlyPlayed === []">
+          Loading...
         </div>
-      </transition-group>
+        <div v-else>
+          <transition-group name="fade">
+            <div class="track-container" v-for="song in recentlyPlayed" :key="song.track.id">
+              <span>{{ song.track.name }} - {{ song.track.artists[0].name }}</span>
+              <span class="track-container--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
+            </div>
+          </transition-group>
+        </div>
+      </div>
     </div>
-  <h3>Add Friends</h3>
-  <list-users></list-users>
+  <h3 @click="friendsClicked = !friendsClicked">Add Friends</h3>
+  <div v-if="friendsClicked">
+    <list-users v-on:userClicked="addFriend"></list-users>
+  </div>
 
   <symbol id="icon-bin" viewBox="0 0 32 32">
     <title>bin</title>
@@ -50,10 +62,10 @@ export default {
   data () {
     return {
       audioObject: null,
-      counter: 0,
       imgUrl: '',
+      friendsClicked: false,
       placeholderUrl: '../static/placeholder.png',
-      playing: false,
+      playing: {},
       recentlyPlayed: [],
       recentlyPlayedClicked: false,
       searchClicked: false,
@@ -62,7 +74,7 @@ export default {
       userRef: false,
       wave: false,
       waveRef: '',
-      waveSongs: []
+      waveSongs: {}
     }
   },
   mixins: [SpotifyMixin],
@@ -74,61 +86,71 @@ export default {
     this.getUser();
   },
   methods: {
-    // Scenarions
-    // User has no wave
-    // User has wave with item(s)
-    // User Adds an item, going from 0 - 1 and NOT(?) triggering child added
+    // Add LOADING...
+    // SET UP
     getUser() {
+      // Get logged in user and check if wave
       let unsubscribe = Firebase.auth().onAuthStateChanged(user => {
         if (user === null) {
-          console.log('not logged in');
+          // Not logged in
         } else {
-          this.imgUrl = user.photoURL;
-          this.userId = user.uid;
+          this.userId = user.uid.replace('%2E', '.');
           this.checkWaveTrue(user.uid);
-          this.regsiterChildAdded();
+          // Add listener to see if wave added for user
+          this.regsiterChildAdded(user);
           unsubscribe();
         }
       });
     },
     checkWaveTrue(userId) {
+      // Could set listeners for all friends so that if they are added updated in real time
       this.userRef = Firebase.database().ref(`users/${userId}`);
       this.userRef.once('value', snapshot => {
+        let friends = snapshot.val().friends;
         this.spotify = snapshot.val().spotify;
         this.wave = snapshot.val().wave;
+        for (var user in friends) {
+          // Should be non blocking, make each call to wave seperately after getting friend list ?
+          this.checkFriendsWaves(user)
+        }
       })
     },
-    deleteWave(id) {
-      this.resetPlaying();
-      var userId = userId || this.userId;
-      this.waveRef = Firebase.database().ref(`wave/${userId}`);
-      // If empty, wave false in User DB
-      this.waveRef.child(id).remove()
-      .then(() => {
-        console.log('removed from DB');
-      });
-      this.waveSongs.splice(this.counter, 1);
-      this.checkWave();
+    checkFriendsWaves(userId) {
+      let friendRef = Firebase.database().ref(`users/${userId}`)
+      friendRef.once('value', snapshot => {
+        let friendWave = snapshot.child('wave').val();
+        if (friendWave) {
+          let user = {
+            displayName: snapshot.val().display_name,
+            photoURL: snapshot.val().imgUrl,
+            uid: userId
+          }
+          this.regsiterChildAdded(user);
+        }
+      })
     },
-    regsiterChildAdded() {
-      let userId = userId || this.userId;
-      console.log(userId);
+    regsiterChildAdded(user) {
+      // Add Child removed listener too for real time updates ?
+      let userId = user.uid;
+      this.waveSongs[userId] = {};
+      let userRef = this.waveSongs[userId];
+      this.setUpUser(userRef, user);
+      // get wave DB entry for specifc user and register child added
       this.waveRef = Firebase.database().ref(`wave/${userId}`);
       this.waveRef.orderByChild(`date_added`).on('child_added', snapshot => {
-        console.log(snapshot.val());
-        this.waveSongs.unshift(snapshot.val());
-        this.checkWave();
+        userRef.songs.unshift(snapshot.val());
+        this.$forceUpdate();
       });
     },
-    checkWave() {
-      if (this.waveSongs.length === 0) {
-        this.wave = false;
-        this.userRef.update({
-          wave: false
-        })
-        this.counter = 0;
-      }
+    setUpUser(userRef, user) {
+      userRef.counter = 0;
+      userRef.id = user.uid.replace('%2E', '.');
+      userRef.imgUrl = user.photoURL;
+      userRef.name = user.displayName;
+      userRef.songs = [];
     },
+    // END OF SET UP
+    // ADD / DELETE WAVE
     addRecentToWave(song) {
       // If album is needed, could make API call here, or when retrieving album art
       const result = {
@@ -137,13 +159,14 @@ export default {
         id: song.id,
         service: 'spotify',
         track: song.name,
-        previewUrl: song.preview_url
+        previewUrl: song.preview_url,
+        url: song.uri
       }
       this.addToWave(result);
     },
     addToWave(result) {
-      this.resetPlaying();
-      let userId = this.userId;
+      this.ifPlayingPause();
+      let userId = this.userId.replace(/\./g, '%2E');
       Firebase.database().ref(`wave/${userId}/${result.id}`).update({
         artwork_url: (result.service === 'itunes' ? result.artwork : null),
         date_added: new Date().getTime(),
@@ -152,53 +175,119 @@ export default {
         service: result.service,
         song_album: result.album,
         song_artist: result.artist,
-        song_title: result.track
+        song_title: result.track,
+        url: result.url
       });
+      // https://firebase.google.com/docs/database/web/read-and-write#updating_or_deleting_data
       if (this.wave === false) {
         this.userRef.update({
           wave: true
         });
         this.wave = true;
       }
+      this.$forceUpdate();
     },
-    spotifyRecentlyPlayed() {
-      this.getRecentlyPlayed(callback => {
-        this.recentlyPlayed = callback.items;
-        this.recentlyPlayedClicked = true;
-      })
+    deleteWave(id) {
+      // Pause and reset playing
+      this.ifPlayingPause();
+      this.playing = {};
+      var userId = this.userId.replace(/\./g, '%2E');
+      // Remove from DB
+      this.waveRef = Firebase.database().ref(`wave/${userId}`);
+      this.waveRef.child(id).remove()
+      .then(() => {
+        // Deleted
+      });
+      // Remove locally
+      let userRef = this.waveSongs[userId];
+      userRef.counter--;
+      userRef.songs.splice(userRef.counter, 1);
+      this.checkEmpty(this.userId.replace(/\./g, '%2E'));
+      this.$forceUpdate();
     },
-    playAudio: function(e) {
-      if (this.counter === this.waveSongs.length) {
-        this.resetPlaying();
-      } else {
-        this.playing = true;
-        if (this.audioObject) {
-          this.audioObject.pause();
-        }
-        let i = this.counter;
-        let url = this.waveSongs[i].preview_url;
-        console.log(url);
-        this.audioObject = new Audio(url);
-        this.audioObject.play();
-        this.audioObject.addEventListener('ended', () => {
-          if (this.counter === this.waveSongs.length) {
-            this.resetPlaying();
-          } else {
-            this.playAudio();
-          }
+    checkEmpty(userId) {
+      if (this.waveSongs[userId].songs.length === 0) {
+        this.userRef.update({
+          wave: false
         });
-        this.counter++;
+        this.wave = false;
       }
     },
-    resetPlaying() {
-      this.ifPlayingPause();
-      this.playing = false;
-      this.counter = 0
+    spotifyRecentlyPlayed() {
+      if (this.recentlyPlayedClicked === true) {
+        this.recentlyPlayedClicked = false;
+      } else {
+        this.getRecentlyPlayed(callback => {
+          this.recentlyPlayed = callback.items;
+          this.recentlyPlayedClicked = true;
+        })
+      }
     },
-    ifPlayingPause: function() {
+    playAudio: function(url, target, id) {
+      // apply playing class only to target?
+      // Toggle visibility of songs with target too??
+      this.ifPlayingPause(target);
+      this.resetOtherCounters(id);
+      this.audioObject = new Audio(url);
+      this.audioObject.play();
+      this.audioObject.addEventListener('ended', () => {
+        this.playWave(target, id);
+      });
+    },
+    playWave(e, id) {
+      // e.target when from click event, just e when from playAudio
+      let target = e.target || e;
+      let waveRef = this.waveSongs[id];
+      let counter = waveRef.counter;
+      target.classList.add('wave--playing');
+      if (counter === waveRef.songs.length) {
+        waveRef.counter = 0;
+        this.ifPlayingPause();
+        this.removeClass(target);
+        this.playing = {};
+        this.$forceUpdate();
+      } else {
+        this.setPlaying(waveRef.songs[counter], id);
+        let url = waveRef.songs[counter].preview_url;
+        this.playAudio(url, target, id);
+        waveRef.counter++;
+      }
+    },
+    setPlaying(song, id) {
+      this.playing = {
+        artist: song.song_artist,
+        id: song.id,
+        ownerId: id.replace('%2E', '.'),
+        title: song.song_title,
+        service: song.service,
+        url: song.url
+      }
+    },
+    removeClass(target) {
+      target.classList.remove('wave--playing');
+    },
+    resetOtherCounters(id) {
+      for (let key in this.waveSongs) {
+        if (key !== id) {
+          this.waveSongs[key].counter = 0;
+        }
+      }
+    },
+    ifPlayingPause(target, id) {
+      if (this.previousTarget && this.previousTarget !== target) {
+        this.removeClass(this.previousTarget);
+      }
+      this.previousTarget = target;
       if (this.audioObject) {
         this.audioObject.pause();
-        this.audioObject = null;
+      }
+    },
+    addFriend(user) {
+      if (this.userId !== user.id.replace(/\./g, '%2E')) {
+        let friendsRef = Firebase.database().ref(`users/${this.userId.replace(/\./g, '%2E')}/friends`);
+        friendsRef.child(user.id).set(true);
+      } else {
+        // Cant add yourself
       }
     }
   },
@@ -211,10 +300,27 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/styles.scss";
+.wave-container {
+  display: inline-block;
+}
+
+.wave-add-songs--link {
+  color: $logo-color;
+  cursor: pointer;
+  display: block;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+// .my-wave {
+//   float: left;
+// }
+
 .wave--profile-pic {
   border-radius: 50%;
-  display: block;
-  margin: auto;
+  display: inline-block;
+  // margin: auto;
+  margin-right: 10px;
   width: 100px;
 }
 

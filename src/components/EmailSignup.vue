@@ -69,6 +69,7 @@ export default {
     }
   },
   methods: {
+    // ADD LOADING...
     emailSignup() {
       Firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
       .then(response => {

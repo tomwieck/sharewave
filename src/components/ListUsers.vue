@@ -2,6 +2,7 @@
   <div class="users">
     <!-- <input class="users--search" placeholder="Search..." v-model="searchTerm"> -->
       <div v-for="user in users" :key="user.display_name" @click="userClicked(user)">
+        <img class="users--profile-pic" :src="user.imgUrl || placeholderUrl">
         <span>{{ user.display_name }}</span>
         <small>{{ user.email }}</small>
       </div>
@@ -15,6 +16,7 @@ export default {
   name: 'ListUsers',
   data() {
     return {
+      placeholderUrl: '../static/placeholder.png',
       searchTerm: '',
       users: [],
       userRef: null
@@ -24,17 +26,17 @@ export default {
     this.getUsers();
   },
   methods: {
+    // Check logged in user so yourself is not displayed
     getUsers() {
-      console.log('here');
-      // console.log(this.userRef.toString());
       let ref = Firebase.database().ref('users').orderByKey()
-      ref.once('value')
-        .then(snapshot => {
-          this.users = snapshot.val();
-        })
+      ref.on('child_added', snapshot => {
+        let childData = snapshot.val();
+        childData.id = snapshot.key;
+        this.users.push(childData);
+      })
     },
     userClicked(user) {
-      this.$emit('user-clicked', user);
+      this.$emit('userClicked', user);
     }
   }
 }
@@ -43,7 +45,15 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .users { 
-  height: 100px;
+  height: 300px;
   overflow: scroll;
+}
+
+.users--profile-pic {
+  border-radius: 50%;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+  width: 50px;
 }
 </style>
