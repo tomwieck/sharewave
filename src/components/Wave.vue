@@ -9,7 +9,9 @@
       <h3>Now Playing</h3>
       {{playing.title}} - {{playing.artist}}
       <span v-if="userId === playing.ownerId">
-        <div @click="deleteWave(playing.id)">Delete</div>
+        <div @click="deleteWave(playing.id)">
+          <svg class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
+         </div>
       </span>
     </div>
     <h3> Add Songs </h3>
@@ -337,9 +339,9 @@ export default {
 }
 
 .wave--playing {
-  -webkit-animation:spin 3s linear infinite;
-  -moz-animation:spin 3s linear infinite;
-  animation:spin 3s linear infinite;
+  -webkit-animation:spin 1.5s linear infinite;
+  -moz-animation:spin 1.5s linear infinite;
+  animation:spin 1.5s linear infinite;
 }
 
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
