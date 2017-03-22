@@ -5,10 +5,15 @@ var path = require('path')
 var Promise = require('promise');
 var querystring = require('querystring');
 var admin = require("firebase-admin");
-
+var YouTube = require('youtube-node');
 
 const handleLogin = require('./handleLogin');
 const spotify = require('./spotifyFunctions');
+// Google Setup (Move to secret.js)
+var youTube = new YouTube();
+youTube.setKey('AIzaSyASszQqUrPWe69OXQTZB6Mnd-9XsEdVhLc');
+youTube.addParam('videoCategoryId', '10');
+youTube.addParam('type', 'video');
 
 //Spotify Setup
 var SpotifyWebApi = require('spotify-web-api-node');
@@ -66,22 +71,6 @@ app.get('/getMe', function(req, res) {
 	});
 });
 
-app.get('/search', function(req, res) {
-	let searchTerm = req.query.searchTerm;
-	let servicesArr = req.query.services.split(' ');
-	spotifyApi.setAccessToken(req.query.access_token);
-
-	makeAllCalls(servicesArr, searchTerm).done(function (results) {
-	  let data = results.map(extractData);
-	  let objectData = removeOuterArray(data);
-
-	  res.send(objectData);
-	}, function (err) {
-		console.log(err);
-	  // If any of the files fails to be read, err is the first error
-	});
-});
-
 app.get('/clientCredential', function(req, res) {
 	// stringify required when using Content-Type header
 	let base64string = new Buffer(`${spotifyApi.getClientId()}:${spotifyApi.getClientSecret()}`).toString('base64');
@@ -117,9 +106,26 @@ app.get('/refreshToken', function(req, res) {
 	});
 });
 
+app.get('/search', function(req, res) {
+	let searchTerm = req.query.searchTerm;
+	let servicesArr = req.query.services.split(' ');
+	spotifyApi.setAccessToken(req.query.access_token);
+
+	makeAllCalls(servicesArr, searchTerm).done(function (results) {
+	  let data = results.map(extractData);
+	  let objectData = removeOuterArray(data);
+
+	  res.send(objectData);
+	}, function (err) {
+		console.log(err);
+	  // If any of the files fails to be read, err is the first error
+	});
+});
+
 function extractData(response) {
 	if (response.data) { return extractItunesData(response.data.results) }
 	if (response.body) { return extractSpotifyData(response.body.tracks.items) }
+	if (response.items) { return extractYoutubeData(response.items) }
 }
 
 function makeAllCalls(services, searchTerm) {
@@ -128,10 +134,19 @@ function makeAllCalls(services, searchTerm) {
 
 function makeCalls(s, searchTerm) {
 	if (s === 'Spotify') {
+		console.log('SEARCH - ', spotifyApi.searchTracks(searchTerm));
 		return spotifyApi.searchTracks(searchTerm); 
 	}
 	else if (s === 'iTunes') {
 		return axios.get(`http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/wa/wsSearch?country=GB&limit=20&entity=musicTrack&term=${searchTerm}`)
+	}
+	else if (s === 'YouTube') {
+		return new Promise(function (resolve, reject) {
+			youTube.search(searchTerm, 20, function(err, res) {
+				if (err) reject(err);
+				else resolve(res);
+			})
+		});
 	}
 }
 
@@ -154,7 +169,6 @@ function extractSpotifyData(data) {
 
 function extractItunesData(data) {
 	var itunesData = {itunes: {}}
-	console.log(data);
 	for (i = 0; i < data.length; i++) {
 		itunesData.itunes[i] = {
 			album: data[i].collectionName,
@@ -168,6 +182,22 @@ function extractItunesData(data) {
 		}
 	}
 	return itunesData;
+}
+
+function extractYoutubeData(data) {
+	var youtubeData = {youtube: {}}
+	for (i = 0; i < data.length; i++) {
+		console.log(data[i]);
+		youtubeData.youtube[i] = {
+			artwork: data[i].snippet.thumbnails.default.url,
+			id: data[i].id.videoId,
+			previewUrl: data[i].preview_url,
+			service: 'youtube',
+			title: data[i].snippet.title,
+			url: `https://www.youtube.com/watch?${data[i].id.videoId}`
+		}
+	}
+	return youtubeData;
 }
 
 function removeOuterArray(array) {
