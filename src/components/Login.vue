@@ -95,7 +95,7 @@ export default {
       Firebase.database().ref('users/' + this.userId).set({
         display_name: this.username,
         email: this.email,
-        imgUrl: this.imgUrl || null,
+        img_url: this.imgUrl || null,
         spotify: true,
         wave: false
       })

@@ -124,7 +124,7 @@ export default {
         if (friendWave) {
           let user = {
             displayName: snapshot.val().display_name,
-            photoURL: snapshot.val().imgUrl,
+            photoURL: snapshot.val().img_url,
             uid: userId
           }
           this.regsiterChildAdded(user);

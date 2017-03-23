@@ -8,6 +8,7 @@
           <p>Uploaded: {{ dateAdded }}</p>
           <p>Uploaded By: {{ uploader }}</p>
           <p>Created By: {{ owner }}</p>
+          <p><a href="playlistUri">Open in Spotify</a></p>
         </div>
       </div>
     </span>

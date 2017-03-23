@@ -5,19 +5,27 @@
     <div v-for="result in searchResults" class="search-table--container">
       <img class="album-art" v-bind:src="result.artwork">
       <div class="search-table--container-details">
+        <span v-if="service === 'YouTube'"><div>{{ result.title }}</div></span>
         <div class="search-table--container-artist"><span>{{ result.artist }}</span></div>
         <div class="search-table--container-artist"><span>{{ result.track }}</span></div>
         <div class="search-table--container-album"><span>{{ result.album }}</span></div>
       </div>
       <div class="search-table--container-preview">
         <span class="preview-link--wrapper">
-          <span class="preview-link" v-on:click="parentPlay(result.previewUrl, $event)">
-            <a>Preview</a>
+          <span v-if="service === 'YouTube'">
+            <span class="preview-link" v-on:click="parentPlay(result.id, $event)">
+              <a>Preview</a>
+            </span>
+          </span>
+          <span v-else>
+            <span class="preview-link" v-on:click="parentPlay(result.previewUrl, $event)">
+              <a>Preview</a>
+            </span>
           </span>
           <span v-if="service === 'iTunes'">
             <a v-bind:href="result.url"><img :src="itunesBadge"></a>
           </span>
-          <span class="search-table--spotify-container" v-else>
+          <span class="search-table--spotify-container" v-else-if="service === 'Spotify'">
             <a v-bind:href="result.url"><img class="search-table--spotify-badge" :src="spotifyBadge"></a>
           </span>
         </span>

@@ -2,7 +2,7 @@
   <div class="users">
     <!-- <input class="users--search" placeholder="Search..." v-model="searchTerm"> -->
       <div v-for="user in users" :key="user.display_name" @click="userClicked(user)">
-        <img class="users--profile-pic" :src="user.imgUrl || placeholderUrl">
+        <img class="users--profile-pic" :src="user.img_url || placeholderUrl">
         <span>{{ user.display_name }}</span>
         <small>{{ user.email }}</small>
       </div>

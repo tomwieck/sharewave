@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Welcome to ShareWave</h2>
+  <h2>All Playlists</h2>
     <transition-group name="fade">
       <div class="playlist-container" v-for="playlist in playlists" :key="playlist.id">
         <span class="playlist-text"><b>{{ playlist.title }} </b></span>
@@ -18,7 +18,7 @@ import Firebase from './firebaseMixin.js'
 import SpotifyMixin from './spotifyMixin.js'
 
 export default {
-  name: 'Home',
+  name: 'ListPlaylists',
   data() {
     return {
       placeholder: '../static/artplaceholder.png',
@@ -34,9 +34,7 @@ export default {
     next();
   },
   mounted() {
-    this.clientCredentials(callback => {
-      this.getPlaylists();
-    });
+    this.getPlaylists();
   },
   methods: {
     getPlaylists() {
@@ -66,19 +64,6 @@ export default {
         playlist.title = callback.name;
         playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
       });
-    },
-    clientCredentials(callback) {
-      if (this.$cookie.get('access_token')) {
-        return callback();
-      }
-      this.axios.get('http://localhost:8888/clientCredential')
-        .then(response => {
-          this.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
-          return callback();
-        })
-        .catch(error => {
-          console.log(error);
-        })
     }
   }
 }

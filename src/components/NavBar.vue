@@ -7,6 +7,7 @@
         <li><a class="nav-bar--link" href="#/search">Search</a></li>
         <li><a class="nav-bar--link" href="#/wave">Wave</a></li>
         <li><a class="nav-bar--link" href="#/myPlaylists">My Playlists</a></li>
+        <li><a class="nav-bar--link" href="#/allPlaylists">All Playlists</a></li>
       </ul> 
     </span>  
     <login></login>

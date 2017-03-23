@@ -9,7 +9,10 @@
         <input type="checkbox" id="checkbox" value="Spotify" v-model="checked">
         <label for="iTunes">iTunes</label>
         <input type="checkbox" id="checkbox" value="iTunes" v-model="checked">
+        <label for="iTunes">YouTube</label>
+        <input type="checkbox" id="checkbox" value="YouTube" v-model="checked">
       </div>
+      <youtube :video-id="videoId" @cued="cued" @ready="ready" @playing="playing" player-width="0" player-height="0" :player-vars="{ start: 30}"></youtube>
       <p>{{ searchPlaceholder }}</p>
     </div>
 
@@ -33,6 +36,16 @@
         :parentWidth = "parentWidth"
         service="iTunes"> 
       </i-search-table>
+
+      <y-search-table 
+        v-on:parentPlay="playYoutube"
+        v-on:tableToSearch="addToWave"
+        v-if="ySearchResults"
+        v-bind:key="ySearchResults" 
+        :searchResults="ySearchResults" 
+        :parentWidth = "parentWidth"
+        service="YouTube"> 
+      </y-search-table>
     </transition-group>
   </div>
 </template>
@@ -50,13 +63,17 @@ export default {
   data () {
     return {
       audioObject: null,
-      checked: ['Spotify', 'iTunes'],
+      checked: ['Spotify', 'iTunes', 'YouTube'],
       searchTerm: '',
       searchPlaceholder: 'Please enter a search term',
       searchResults: '',
+      timer: false,
       iSearchResults: false,
       sSearchResults: false,
-      parentWidth: 49
+      ySearchResults: false,
+      youtubeTarget: '',
+      parentWidth: 49,
+      videoId: ''
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -137,10 +154,11 @@ export default {
     updateTables: function (data) {
       this.searchPlaceholder = ' ';
       // if two tables, split width
-      this.checked.length === 2 ? this.parentWidth = 49 : this.parentWidth = 98;
+      this.checked.length === 3 ? this.parentWidth = 49 : this.parentWidth = 98;
       // if data is empty, either add to table or set to null so nothing is rendered
       !isEmpty(data.spotify) ? this.sSearchResults = data.spotify : this.sSearchResults = null;
       !isEmpty(data.itunes) ? this.iSearchResults = data.itunes : this.iSearchResults = null;
+      !isEmpty(data.youtube) ? this.ySearchResults = data.youtube : this.ySearchResults = null;
     },
     playAudio: function(url, e) {
       let target = e.target;
@@ -164,14 +182,53 @@ export default {
         });
       }
     },
+    playYoutube: function(id, e) {
+      // Stop other audio object playing
+      let target = e.target;
+      if (target.classList.contains('playing')) {
+        this.stopVideo();
+      } else {
+        this.videoId = id;
+        target.classList.add('playing');
+        target.innerText = 'Playing';
+        if (this.youtubeTarget !== '') {
+          this.playingToPreview();
+        }
+        this.youtubeTarget = target;
+      }
+    },
+    cued() {
+      this.player.seekTo(30, true);
+      this.player.playVideo();
+    },
+    ready (player) {
+      this.player = player;
+    },
+    playing (player) {
+      clearTimeout(this.timer);
+      this.timer = setTimeout(this.stopVideo, 15000);
+    },
+    stopVideo() {
+      console.log('stop video called');
+      clearTimeout(this.timer);
+      this.videoId = '';
+      this.playingToPreview();
+      this.youtubeTarget = '';
+    },
+    playingToPreview() {
+      console.log('playing2preview', this.youtubeTarget);
+      this.youtubeTarget.classList.remove('playing');
+      this.youtubeTarget.innerText = 'Preview';
+    },
     addToWave(result) {
       this.$emit('addToWave', result);
     }
   },
   // instantiate two tables, one for Spotify and one for iTunes
   components: {
+    'i-search-table': SearchTable,
     's-search-table': SearchTable,
-    'i-search-table': SearchTable
+    'y-search-table': SearchTable
   }
 }
 </script>

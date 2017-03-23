@@ -7,10 +7,12 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueCookie from 'vue-cookie'
 import VeeValidate from 'vee-validate';
+import VueYouTubeEmbed from 'vue-youtube-embed'
 
 Vue.use(VeeValidate);
 Vue.use(VueAxios, axios);
 Vue.use(VueCookie);
+Vue.use(VueYouTubeEmbed);
 
 /* eslint-disable no-new */
 new Vue({
