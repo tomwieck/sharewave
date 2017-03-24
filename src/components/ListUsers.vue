@@ -1,10 +1,11 @@
 <template>
   <div class="users">
     <!-- <input class="users--search" placeholder="Search..." v-model="searchTerm"> -->
-      <div v-for="user in users" :key="user.display_name" @click="userClicked(user)">
+      <div class="users--user" v-for="user in users" :key="user.display_name">
         <img class="users--profile-pic" :src="user.img_url || placeholderUrl">
         <span>{{ user.display_name }}</span>
         <small>{{ user.email }}</small>
+        <span class="users--add-user" @click="userClicked(user)">Add to Friends</span>
       </div>
   </div>
 </template>
@@ -44,16 +45,31 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+span {
+  display: block;
+}
 .users { 
   height: 300px;
   overflow: scroll;
 }
 
+.users--user {
+  padding-bottom: 10px;
+}
+
+.users--add-user {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.users--add-user:hover {
+  text-decoration: underline;
+}
+
 .users--profile-pic {
   border-radius: 50%;
-  cursor: pointer;
   display: block;
   margin: auto;
-  width: 50px;
+  width: 70px;
 }
 </style>

@@ -1,18 +1,28 @@
 <template>
   <div class="wave">
-    <h2> My Wave </h2>
-    <div v-bind:class="{ 'my-wave': userId === value.id }" class="wave-container" v-for="(value, key) in waveSongs">
-      <img class="wave--profile-pic" v-bind:class="{ 'wave-true': waveSongs[key].songs.length !== 0, 'wave-false': waveSongs[key].songs.length === 0}" @click="playWave($event, key)" :src="value.imgUrl || placeholderUrl">
-      <!-- {{ key }} : {{ value }} -->
+    <h2> Wave </h2>
+    <div class="wave-container--background">
+      <div class="wave-container--all">
+        <!-- v-show when complete variable? -->
+        <div v-bind:class="{ 'my-wave': userId === value.id }" class="wave-container--user" v-for="(value, key) in waveSongs">
+          <img class="wave--profile-pic" v-bind:class="{ 'wave-true': waveSongs[key].songs.length !== 0, 'wave-false': waveSongs[key].songs.length === 0}" @click="playWave($event, key)" :src="value.imgUrl || placeholderUrl">
+          <span class="wave--name">{{ value.name }}</span>
+          <!-- {{ key }} : {{ value }} -->
+        </div>
+      </div>
     </div>
     <div v-if="playing.title">
       <h3>Now Playing</h3>
-      {{playing.title}} - {{playing.artist}}
-      <span v-if="userId === playing.ownerId">
-        <div @click="deleteWave(playing.id)">
-          <svg class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
-         </div>
-      </span>
+      <div>
+        <span>{{playing.title}} - {{playing.artist}}</span>
+        <br>
+        <a class="wave-playing--link" v-bind:href="playing.url">Open in {{correctCasing(playing.service)}}</a> 
+        <span v-if="userId === playing.ownerId">
+          <div @click="deleteWave(playing.id)">
+            <svg class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
+           </div>
+        </span>
+      </div>
     </div>
     <h3> Add Songs </h3>
     <div class="wave-add-songs--container">
@@ -40,11 +50,10 @@
         </div>
       </div>
     </div>
-  <h3 @click="friendsClicked = !friendsClicked">Add Friends</h3>
+  <h3 class="wave-add-songs--link" @click="friendsClicked = !friendsClicked">Add Friends</h3>
   <div v-if="friendsClicked">
     <list-users v-on:userClicked="addFriend"></list-users>
   </div>
-
   <symbol id="icon-bin" viewBox="0 0 32 32">
     <title>bin</title>
     <path d="M4 10v20c0 1.1 0.9 2 2 2h18c1.1 0 2-0.9 2-2v-20h-22zM10 28h-2v-14h2v14zM14 28h-2v-14h2v14zM18 28h-2v-14h2v14zM22 28h-2v-14h2v14z"></path>
@@ -58,6 +67,7 @@ import SpotifyMixin from './spotifyMixin.js'
 import Firebase from './firebaseMixin.js'
 import ListUsers from './ListUsers.vue'
 import Search from './Search.vue'
+import VueNotifications from 'vue-notifications'
 
 export default {
   name: 'Wave',
@@ -100,6 +110,7 @@ export default {
           this.checkWaveTrue(user.uid);
           // Add listener to see if wave added for user
           this.regsiterChildAdded(user);
+          this.$forceUpdate();
           unsubscribe();
         }
       });
@@ -167,6 +178,7 @@ export default {
       this.addToWave(result);
     },
     addToWave(result) {
+      console.log('added to wave');
       this.ifPlayingPause();
       let userId = this.userId.replace(/\./g, '%2E');
       Firebase.database().ref(`wave/${userId}/${result.id}`).update({
@@ -187,6 +199,8 @@ export default {
         });
         this.wave = true;
       }
+      console.log('add');
+      VueNotifications.success({message: `Added to Wave`});
       this.$forceUpdate();
     },
     deleteWave(id) {
@@ -196,15 +210,13 @@ export default {
       var userId = this.userId.replace(/\./g, '%2E');
       // Remove from DB
       this.waveRef = Firebase.database().ref(`wave/${userId}`);
-      this.waveRef.child(id).remove()
-      .then(() => {
-        // Deleted
-      });
+      this.waveRef.child(id).remove();
       // Remove locally
       let userRef = this.waveSongs[userId];
       userRef.counter--;
       userRef.songs.splice(userRef.counter, 1);
       this.checkEmpty(this.userId.replace(/\./g, '%2E'));
+      VueNotifications.error({message: `Removed from Wave`});
       this.$forceUpdate();
     },
     checkEmpty(userId) {
@@ -285,12 +297,24 @@ export default {
       }
     },
     addFriend(user) {
+      console.log(user);
       if (this.userId !== user.id.replace(/\./g, '%2E')) {
         let friendsRef = Firebase.database().ref(`users/${this.userId.replace(/\./g, '%2E')}/friends`);
         friendsRef.child(user.id).set(true);
+        VueNotifications.success({message: `Added ${user.display_name}`});
       } else {
-        // Cant add yourself
+        VueNotifications.info({message: "Can't add yourself..."});
       }
+    },
+    correctCasing(service) {
+      switch (service) {
+        case 'itunes':
+          return 'iTunes'
+        case 'spotify':
+          return 'Spotify'
+        case 'youtube':
+          return 'YouTube'
+      };
     }
   },
   components: {
@@ -302,11 +326,27 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/styles.scss";
-.wave-container {
-  display: inline-block;
+
+.wave-container--background {
+  background-color: #e8e8e8; 
+  // opacity: 0.5;
+  padding-top: 10px;
+  width: 100%;
+  // float: right;
 }
 
-.wave-add-songs--link {
+.wave-container--all {
+  display: inline-block;
+  // float: right;
+}
+
+.wave-container--user {
+  display: inline-block;
+  float: right;
+}
+
+.wave-add-songs--link,
+.wave-playing--link {
   color: $logo-color;
   cursor: pointer;
   display: block;
@@ -314,9 +354,9 @@ export default {
   text-decoration: underline;
 }
 
-// .my-wave {
-//   float: left;
-// }
+.my-wave {
+  float: left;
+}
 
 .wave--profile-pic {
   border-radius: 50%;
@@ -324,6 +364,10 @@ export default {
   // margin: auto;
   margin-right: 10px;
   width: 100px;
+}
+
+.wave--name {
+  display: block;
 }
 
 .wave-false {
@@ -339,9 +383,9 @@ export default {
 }
 
 .wave--playing {
-  -webkit-animation:spin 1.5s linear infinite;
-  -moz-animation:spin 1.5s linear infinite;
-  animation:spin 1.5s linear infinite;
+  -webkit-animation:spin 2s linear infinite;
+  -moz-animation:spin 2s linear infinite;
+  animation:spin 2s linear infinite;
 }
 
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }

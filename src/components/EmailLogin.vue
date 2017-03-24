@@ -1,12 +1,13 @@
 <template>
   <div class="email-login">
+  <h2>Login with ShareWave</h2>
     <form @submit.prevent="emailLogin">
       <div class="email-login--container">
         <span>
           <input class="email-login--email" placeholder="Email" v-model="email">
           <input class="email-login--password" placeholder="Password" type="password" v-model="password">
         </span>
-        <button>Submit</button>
+        <button class="email-login--submit">Submit</button>
       </div>
     </form>
   </div>    
@@ -71,6 +72,23 @@ export default {
   padding: 5px;
   margin-bottom: 10px;
   width: 250px;
+}
+
+.email-login--submit {
+  background-color: white;
+  border: 2px solid $play-color;
+  border-radius: 5px;
+  color: $logo-color;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+  padding: 10px;
+  text-decoration: none;
+  width: 96px; 
+}
+
+.email-login--submit:hover {
+  text-decoration: underline;
 }
 
 </style>

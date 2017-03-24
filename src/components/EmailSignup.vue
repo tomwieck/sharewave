@@ -1,5 +1,6 @@
 <template>
   <div class="email-signup">
+    <h2>Sign Up for a ShareWave Account</h2>
     <form @submit.prevent="validateBeforeSubmit">
       <div class="email-signup--container">
         <span :class="{ 'control': true }">
@@ -49,7 +50,7 @@
           </span>
         </span>
         <div class="help is-danger"v-if="errorMessage"> {{ errorMessage }}</div>
-        <button> Submit </button>
+        <button class="email-signup--submit"> Submit </button>
       </div>
     </form>
   </div>
@@ -147,5 +148,22 @@ export default {
   padding: 5px;
   margin-bottom: 10px;
   width: 250px;
+}
+
+.email-signup--submit {
+  background-color: white;
+  border: 2px solid $play-color;
+  border-radius: 5px;
+  color: $logo-color;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+  padding: 10px;
+  text-decoration: none;
+  width: 96px; 
+}
+
+.email-signup--submit:hover {
+  text-decoration: underline;
 }
 </style>

@@ -9,15 +9,15 @@ var YouTube = require('youtube-node');
 
 const handleLogin = require('./handleLogin');
 const spotify = require('./spotifyFunctions');
+const setupVar = require('./setupVariables');
 // Google Setup (Move to secret.js)
 var youTube = new YouTube();
-youTube.setKey('AIzaSyASszQqUrPWe69OXQTZB6Mnd-9XsEdVhLc');
+youTube.setKey(setupVar.googleKey);
 youTube.addParam('videoCategoryId', '10');
 youTube.addParam('type', 'video');
 
 //Spotify Setup
 var SpotifyWebApi = require('spotify-web-api-node');
-var setupVar = require('./setupVariables');
 var spotifyApi = new SpotifyWebApi({
       redirectUri : setupVar.redirectUri,
       clientId : setupVar.clientId,
@@ -86,11 +86,9 @@ app.get('/clientCredential', function(req, res) {
   };
 	axios.post(clientUrl, grantType, headers)
 		.then(function(response) {
-			console.log(response.data);
 			res.send(response.data);
 		})
 		.catch(function(err) {
-			console.log(err);
 			res.send(err);
 		})
 });
@@ -102,7 +100,7 @@ app.get('/refreshToken', function(req, res) {
 	  res.send(data.body['access_token']);
 	},
 	function(err) {
-	  res.send('Could not refresh access token', err);
+	  res.status(err.statusCode).send(err);
 	});
 });
 
@@ -117,6 +115,7 @@ app.get('/search', function(req, res) {
 
 	  res.send(objectData);
 	}, function (err) {
+	  	res.status(err.statusCode).send(err);
 		console.log(err);
 	  // If any of the files fails to be read, err is the first error
 	});
@@ -134,7 +133,6 @@ function makeAllCalls(services, searchTerm) {
 
 function makeCalls(s, searchTerm) {
 	if (s === 'Spotify') {
-		console.log('SEARCH - ', spotifyApi.searchTracks(searchTerm));
 		return spotifyApi.searchTracks(searchTerm); 
 	}
 	else if (s === 'iTunes') {
@@ -187,7 +185,6 @@ function extractItunesData(data) {
 function extractYoutubeData(data) {
 	var youtubeData = {youtube: {}}
 	for (i = 0; i < data.length; i++) {
-		console.log(data[i]);
 		youtubeData.youtube[i] = {
 			artwork: data[i].snippet.thumbnails.default.url,
 			id: data[i].id.videoId,

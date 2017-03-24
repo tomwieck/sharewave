@@ -81,7 +81,7 @@ export default {
     next();
   },
   mounted: function () {
-    if (!this.$cookie.get('access_token')) {
+    if (!this.$cookie.get('client_access_token') || !this.$cookie.get('access_token')) {
       this.clientCredentials();
     }
   },
@@ -138,7 +138,8 @@ export default {
               vm.updateTables(response.data);
             })
             .catch(function (error) {
-              vm.searchPlaceholder = 'Could not reach the API. ' + error
+              console.log(error)
+              vm.searchPlaceholder = 'Something went wrong, please try again' + error
             })
           } else {
             this.searchPlaceholder = 'Please select service(s) to search'
