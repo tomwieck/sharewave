@@ -302,6 +302,7 @@ export default {
         let friendsRef = Firebase.database().ref(`users/${this.userId.replace(/\./g, '%2E')}/friends`);
         friendsRef.child(user.id).set(true);
         VueNotifications.success({message: `Added ${user.display_name}`});
+        this.checkFriendsWaves(user.id);
       } else {
         VueNotifications.info({message: "Can't add yourself..."});
       }
@@ -325,19 +326,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/sass/styles.scss";
+@import "../assets/sass/colors.scss";
 
 .wave-container--background {
   background-color: #e8e8e8; 
-  // opacity: 0.5;
   padding-top: 10px;
   width: 100%;
-  // float: right;
 }
 
 .wave-container--all {
   display: inline-block;
-  // float: right;
 }
 
 .wave-container--user {

@@ -1,7 +1,6 @@
 <template>
   <div class="homepage">
   	<h1>Welcome to ShareWave</h1>
-  	<h2>Login or Sign up to begin</h2>
   </div>
 </template>
 

@@ -146,7 +146,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/sass/styles.scss";
+@import "../assets/sass/colors.scss";
 
 .nav-login {
   cursor: pointer;

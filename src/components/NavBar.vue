@@ -27,10 +27,6 @@ export default {
   },
   mounted() {
     this.registerStateChange();
-    // if (Firebase.auth().currentUser !== null) {
-    // } else {
-    //   this.loggedIn = false;
-    // }
   },
   methods: {
     registerStateChange() {
@@ -52,10 +48,10 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../assets/sass/styles.scss";
+@import "../assets/sass/colors.scss";
+
 .nav-bar {
   background-color: $play-color;
-  height: 55px;
   margin: 0;
   padding: 10px 1%;
   width: 98%;
@@ -68,6 +64,9 @@ export default {
 }
 
 .nav-links-ul {
+  @media screen and (max-width: $break-tablet) {
+    display: none;
+  }
   display: inline-block;
   float: left;
   list-style-type: none;

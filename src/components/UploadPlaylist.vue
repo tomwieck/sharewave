@@ -35,6 +35,7 @@
 <script>
 import SpotifyMixin from './spotifyMixin.js'
 import Firebase from './firebaseMixin.js'
+import VueNotifications from 'vue-notifications'
 
 export default {
   name: 'UserPlaylists',
@@ -94,6 +95,7 @@ export default {
         uploader: this.uploader
       })
       .then(function() {
+        VueNotifications.success({message: 'Playlist uploaded'});
         console.log('uploaded');
       });
     },
@@ -111,7 +113,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "../assets/sass/styles.scss";
+@import "../assets/sass/colors.scss";
 
 .icon {
   color: red;

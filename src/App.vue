@@ -21,6 +21,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import "./assets/sass/styles.scss";
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -29,7 +31,6 @@ export default {
 }
 
 .mini-toastr {
-  // position: absolute;
   bottom: 12px;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   top: auto !important;

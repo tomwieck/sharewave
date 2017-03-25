@@ -235,7 +235,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/sass/styles.scss";
 
 .search-area_textbox {
   padding: 5px;

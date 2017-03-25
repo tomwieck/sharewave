@@ -1,5 +1,4 @@
-$play-color: #299dcf;
-$logo-color: #17385e;
+@import './colors.scss';
 // verifying class
 .help.is-danger {
   color: red;
@@ -24,7 +23,7 @@ $logo-color: #17385e;
 }
 
 .playlist-text {
-  display: inline-block;
+  display: block;
 }
 
 .playlist-upload {

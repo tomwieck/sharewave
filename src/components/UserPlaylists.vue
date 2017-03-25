@@ -82,7 +82,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/sass/styles.scss";
 
 .playlist-list {
   padding-top: 10px;

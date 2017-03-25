@@ -119,7 +119,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/sass/styles.scss";
+@import "../assets/sass/colors.scss";
 
 .email-signup--label {
   display: block;
