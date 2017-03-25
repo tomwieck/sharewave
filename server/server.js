@@ -10,7 +10,8 @@ var YouTube = require('youtube-node');
 const handleLogin = require('./handleLogin');
 const spotify = require('./spotifyFunctions');
 const setupVar = require('./setupVariables');
-// Google Setup (Move to secret.js)
+
+// Google Setup 
 var youTube = new YouTube();
 youTube.setKey(setupVar.googleKey);
 youTube.addParam('videoCategoryId', '10');
@@ -52,7 +53,7 @@ app.get('/callback', function(req, res) {
   	handleLogin.generateAccess(spotifyApi, req, function(callback){
 	  	res.clearCookie(setupVar.stateKey);
 	    spotifyApi.setAccessToken(callback.access_token);
-	    spotifyApi.setRefreshToken(callback.refresh_token);
+	    // spotifyApi.setRefreshToken(callback.refresh_token);
 	  	spotify.getMe(spotifyApi, function(me) {
 	  		const safeId = me.id.replace(/\./g, '%2E');
 			createFirebaseToken(safeId)
@@ -79,11 +80,11 @@ app.get('/clientCredential', function(req, res) {
 	    grant_type: 'client_credentials'
 	  });
 	let headers = {
-    headers: { 
-    	'Authorization': 'Basic ' + base64string,
-    	'Content-Type': 'application/x-www-form-urlencoded' 
-    }
-  };
+	    headers: { 
+	    	'Authorization': 'Basic ' + base64string,
+	    	'Content-Type': 'application/x-www-form-urlencoded' 
+	    }
+	};
 	axios.post(clientUrl, grantType, headers)
 		.then(function(response) {
 			res.send(response.data);
