@@ -9,6 +9,7 @@
       <small class="upload-play--created"><p>Created by - {{owner}}</p></small>
 
       <span v-if="ownPlaylist">
+        <span>Playlist Name: </span>
         <input class="upload-playlist--name-input" v-bind:class="{ 'padding-right': resetButton }" v-model="playlistName">
         <span class="upload-playlist--icon-container">
           <transition name="fade">
@@ -26,6 +27,25 @@
         <span class="upload-playlist--name-span"> {{ playlistName }}</span>
         <!-- <span class="help is-danger">Playlist names can only be changed if you own them</span> -->
       </span>
+
+      <div>
+        <span>Tags: </span>
+        <input class="upload-playlist--name-input" name="tags" @keyup.enter="addTag" v-bind:class="{ 'padding-right': addButton }" v-model="tag">
+        <span class="upload-playlist--icon-container">
+          <transition name="fade">
+            <svg class="icon icon-plus" @clicked="addTag" v-show="addButton"><use xlink:href="#icon-plus"></use></svg>
+          </transition>
+          <symbol id="icon-plus" viewBox="0 0 32 32">
+          <title>plus</title>
+          <path d="M31 12h-11v-11c0-0.552-0.448-1-1-1h-6c-0.552 0-1 0.448-1 1v11h-11c-0.552 0-1 0.448-1 1v6c0 0.552 0.448 1 1 1h11v11c0 0.552 0.448 1 1 1h6c0.552 0 1-0.448 1-1v-11h11c0.552 0 1-0.448 1-1v-6c0-0.552-0.448-1-1-1z"></path>
+          </symbol>
+        </span>
+      </div>
+
+      <div class="upload-playlist--tags">
+        <span v-for="tag in tags">
+          <div>{{tag}}</div>
+      </div>
         
       <a class="upload-playlist--button" @click="addToDatabase"> Upload </a>
     </div>
@@ -41,34 +61,28 @@ export default {
   name: 'UserPlaylists',
   data () {
     return {
+      addButton: false,
       loading: false,
       imgUrl: '',
       originalPlaylistName: '',
       owner: '',
+      ownPlaylist: '',
       placeholder: '../static/artplaceholder.png',
       playlistName: '',
       playlistId: '',
       resetButton: false,
-      ownPlaylist: '',
-      uploader: Firebase.auth().currentUser.uid
+      tag: '',
+      tags: [],
+      uploader: ''
     }
   },
   mixins: [SpotifyMixin],
-  mounted: function () {
-    let vm = this;
-    vm.loading = true;
-    vm.owner = this.$route.params.user;
-    vm.playlistId = this.$route.params.playlist;
-    vm.ownPlaylist = vm.isOwnPlaylist();
-    let fields = 'images,name';
-    let options = {user: vm.owner, playlist: vm.playlistId, fields: fields};
-    this.getSinglePlaylist(options, function(callback) {
-      vm.loading = false;
-      console.log(callback);
-      vm.imgUrl = (callback.images[0] ? callback.images[0].url : null);
-      vm.playlistName = callback.name;
-      vm.originalPlaylistName = callback.name;
-    });
+  mounted() {
+    this.getUser();
+    this.loading = true;
+    this.owner = this.$route.params.user;
+    this.playlistId = this.$route.params.playlist;
+    this.getPlaylist()
   },
   watch: {
     playlistName: function () {
@@ -77,11 +91,52 @@ export default {
       } else {
         this.resetButton = false;
       }
+    },
+    tag() {
+      if (this.tag === '') {
+        this.addButton = false;
+      } else {
+        this.addButton = true;
+      }
     }
   },
   methods: {
+    getUser() {
+      let unsubscribe = Firebase.auth().onAuthStateChanged(user => {
+        if (user === null) {
+          // Not logged in
+        } else {
+          this.uploader = user.uid;
+          this.ownPlaylist = this.isOwnPlaylist();
+          unsubscribe();
+        }
+      });
+    },
+    getPlaylist() {
+      let fields = 'name';
+      let options = {user: this.owner, playlist: this.playlistId, fields: fields};
+      this.getSinglePlaylist(options, callback => {
+        this.loading = false;
+        console.log(callback);
+        this.imgUrl = (callback.images ? callback.images[0].url : null);
+        this.playlistName = callback.name;
+        this.originalPlaylistName = callback.name;
+      });
+    },
     resetChanges: function() {
       this.playlistName = this.originalPlaylistName;
+    },
+    isOwnPlaylist: function() {
+      // Only update playlist if owned by them
+      let safeOwner = this.owner.replace(/\./g, '%2E')
+      return this.uploader === safeOwner;
+    },
+    playlistNameChanged: function() {
+      return this.playlistName !== this.originalPlaylistName;
+    },
+    addTag() {
+      this.tags.push(this.tag.toLowerCase());
+      this.tag = '';
     },
     addToDatabase: function() {
       if (this.ownPlaylist && this.playlistNameChanged()) {
@@ -91,6 +146,7 @@ export default {
       }
       Firebase.database().ref('playlists/' + this.playlistId).set({
         date_added: new Date().getTime(),
+        tags: this.tags,
         title: this.playlistName,
         owner: this.owner,
         uploader: this.uploader
@@ -99,14 +155,6 @@ export default {
         VueNotifications.success({message: 'Playlist uploaded'});
         this.$router.push(`/allPlaylists`);
       });
-    },
-    isOwnPlaylist: function() {
-      // Only update playlist if owned by them
-      let safeOwner = this.owner.replace(/\./g, '%2E')
-      return this.uploader === safeOwner;
-    },
-    playlistNameChanged: function() {
-      return this.playlistName !== this.originalPlaylistName;
     }
   }
 }
@@ -116,8 +164,20 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
-.icon {
+.icon-spinner11 {
   color: red;
+  cursor: pointer;
+  width: 12px;
+  height: 12px;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+  position: absolute;
+  top: 6px;
+  right: 7px;
+}
+
+.icon-plus {
   cursor: pointer;
   width: 12px;
   height: 12px;
