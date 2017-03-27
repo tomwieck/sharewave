@@ -49,6 +49,7 @@ export default {
         .then(snapshot => {
           this.dateAdded = this.convertTime(snapshot.val().date_added);
           this.owner = snapshot.val().owner;
+          this.title = snapshot.val().title;
           this.uploader = snapshot.val().uploader.replace('%2E', '.');
           this.getPlaylistImage();
         })
@@ -61,10 +62,9 @@ export default {
       const options = {
         user: this.owner,
         playlist: this.playlistUri,
-        fields: 'images,name'
+        fields: 'images'
       }
       this.getSinglePlaylist(options, callback => {
-        this.title = callback.name;
         this.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
       });
     }

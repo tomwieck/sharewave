@@ -91,12 +91,13 @@ export default {
       }
       Firebase.database().ref('playlists/' + this.playlistId).set({
         date_added: new Date().getTime(),
+        title: this.playlistName,
         owner: this.owner,
         uploader: this.uploader
       })
-      .then(function() {
+      .then(() => {
         VueNotifications.success({message: 'Playlist uploaded'});
-        console.log('uploaded');
+        this.$router.push(`/allPlaylists`);
       });
     },
     isOwnPlaylist: function() {

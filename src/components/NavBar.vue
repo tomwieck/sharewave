@@ -4,7 +4,6 @@
     <h1 class="nav-bar--heading">ShareWave</h1>
     <span v-if="loggedIn">
       <ul class="nav-links-ul">
-        <li><a class="nav-bar--link" href="#/search">Search</a></li>
         <li><a class="nav-bar--link" href="#/wave">Wave</a></li>
         <li><a class="nav-bar--link" href="#/myPlaylists">My Playlists</a></li>
         <li><a class="nav-bar--link" href="#/allPlaylists">All Playlists</a></li>
@@ -64,9 +63,9 @@ export default {
 }
 
 .nav-links-ul {
-  @media screen and (max-width: $break-tablet) {
-    display: none;
-  }
+  // @media screen and (max-width: $break-tablet) {
+  //   display: none;
+  // }
   display: inline-block;
   float: left;
   list-style-type: none;
@@ -108,6 +107,9 @@ export default {
 }
 
 .nav-bar--heading {
+  @media screen and (max-width: $break-tablet) {
+    display: none;
+  }
   color: #fff;
   display: inline-block;
   font-size: 49px;

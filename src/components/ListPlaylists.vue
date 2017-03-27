@@ -1,8 +1,9 @@
 <template>
   <div>
   <h2>All Playlists</h2>
+    <div><input class="playlist--search" placeholder="Search..." v-model="search"></div>
     <transition-group name="fade">
-      <div class="playlist-container" v-for="playlist in playlists" :key="playlist.id">
+      <div class="playlist-container" v-for="playlist in searchResults" :key="playlist.id">
         <span class="playlist-text"><b>{{ playlist.title }} </b></span>
         <img class="playlist-art" v-bind:src="playlist.imgUrl">
         <a class="playlist-text" v-bind:href="createSpotifyLink(playlist.owner, playlist.id)">Open in Spotify</a>
@@ -23,7 +24,8 @@ export default {
     return {
       placeholder: '../static/artplaceholder.png',
       playlistRef: null,
-      playlists: []
+      playlists: [],
+      search: ''
     }
   },
   mixins: [SpotifyMixin],
@@ -35,6 +37,13 @@ export default {
   },
   mounted() {
     this.getPlaylists();
+  },
+  computed: {
+    searchResults() {
+      return this.playlists.filter(post => {
+        return post.title.toLowerCase().includes(this.search.toLowerCase());
+      });
+    }
   },
   methods: {
     getPlaylists() {
@@ -61,7 +70,6 @@ export default {
       }
       this.getSinglePlaylist(options, callback => {
         console.log('callback', callback);
-        playlist.title = callback.name;
         playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
       });
     }
@@ -71,4 +79,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.playlist--search {
+  padding: 5px;
+  margin-bottom: 10px;
+  width: 35%;
+}
 </style>
