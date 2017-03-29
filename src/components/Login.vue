@@ -4,7 +4,7 @@
         <a href="/#/myPlaylists">
           <img class="profile-img" :src="imgUrl || placeholderUrl">
         </a>
-        <span class="profile-name"><a v-on:click="signout">Logout</a></span>  
+        <span class="profile-name"><a v-on:click="signout">Logout</a></span>
     </div>
     <a v-else @click="showModal = true" class="login--link">
       <span>Login</span>
@@ -73,6 +73,7 @@ export default {
       });
       Firebase.auth().signInWithCustomToken(token)
         .then(user => {
+          console.log('username', this.imgUrl);
           // If Spotify email, img, id or email do not match whats on the server, update them
           if (this.username !== user.displayName || this.imgUrl !== user.photoURL || this.userId !== user.userId || this.email !== user.email) {
             user.updateProfile({
@@ -120,12 +121,16 @@ export default {
       });
     },
     setDetails(spotifyUser) {
+      console.log(spotifyUser);
       this.email = spotifyUser.email || null;
-      this.imgUrl = (spotifyUser.images !== undefined ? spotifyUser.images[0].url : null)
+      // this.imgUrl = (spotifyUser.images !== undefined ? spotifyUser.images[0].url : null)
+      this.imgUrl = spotifyUser.images !== undefined ? spotifyUser.images[0].url : null
       this.userId = spotifyUser.id.replace(/\./g, '%2E');
-      this.username = spotifyUser.display_name || spotifyUser.id;
+      // fix
+      this.username = spotifyUser.id;
     },
     updateDetails(user) {
+      console.log(user);
       this.imgUrl = user.photoURL;
       this.username = user.displayName;
       this.userId = user.uid;
@@ -193,12 +198,12 @@ export default {
   margin: auto;
   margin-bottom: 10px;
   text-decoration: none;
-  width: 200px;  
+  width: 200px;
 }
 
 .signup-slot--link {
   color: $logo-color;
-  display: block; 
+  display: block;
   margin-bottom: 10px;
 }
 

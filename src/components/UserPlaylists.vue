@@ -3,7 +3,7 @@
    <div v-if="playlists" class="playlist-list">
       <transition appear name="fade">
       <div>
-        <div>Showing {{ playlists.limit }} of {{ playlists.total }} playlists</div>
+        <div>Showing {{ playlists.total < 20 ? playlists.total : playlists.limit }} of {{ playlists.total }} playlists</div>
         <div class="playlist-container" v-for="playlist in playlists.items">
           <span class="playlist-title"><b>{{ playlist.name }} </b></span>
           <img class="playlist-art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">

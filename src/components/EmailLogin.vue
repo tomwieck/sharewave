@@ -7,10 +7,11 @@
           <input class="email-login--email" placeholder="Email" v-model="email">
           <input class="email-login--password" placeholder="Password" type="password" v-model="password">
         </span>
+        <div class="help.is-danger" v-show="errorMessage">Incorrect Password, try again</div>
         <button class="email-login--submit">Submit</button>
       </div>
     </form>
-  </div>    
+  </div>
 </template>
 
 <script>
@@ -84,7 +85,7 @@ export default {
   margin: auto;
   padding: 10px;
   text-decoration: none;
-  width: 96px; 
+  width: 96px;
 }
 
 .email-login--submit:hover {

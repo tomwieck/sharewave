@@ -7,6 +7,19 @@
   margin-bottom: 12px;
 }
 
+.button {
+  background-color: $play-color;
+  border: 2px solid $logo-color;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 18px;
+  padding: 2px 10px;
+  margin-right: 10px;
+  text-decoration: none;
+}
+
 // Reusable playlist container
 .playlist-list {
   padding-top: 10px;
@@ -48,9 +61,9 @@
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s
+  transition: opacity 0.25s
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
   opacity: 0;
-  transition: opacity 0.5s
+  transition: opacity 0.25s
 }

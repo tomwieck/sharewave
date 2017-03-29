@@ -58,14 +58,15 @@ export default {
       });
     },
     getSinglePlaylist: function(options, callback) {
-      let vm = this;
-      let accessToken = vm.$cookie.get('access_token') || vm.$cookie.get('client_access_token');
-      vm.spotifyApi.setAccessToken(accessToken);
-      vm.spotifyApi.getPlaylist(options.user, options.playlist, options.fields)
-      .then(function(data) {
-        return callback(data);
-      }, function(err) {
-        return callback(err);
+      this.setAccessToken(check => {
+        let accessToken = this.$cookie.get('access_token') || this.$cookie.get('client_access_token');
+        this.spotifyApi.setAccessToken(accessToken);
+        this.spotifyApi.getPlaylist(options.user, options.playlist, options.fields)
+        .then(function(data) {
+          return callback(data);
+        }, function(err) {
+          return callback(err);
+        });
       });
     },
     updatePlaylistName: function(userId, playlistId, newName, callback) {

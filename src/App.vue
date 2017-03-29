@@ -3,7 +3,7 @@
     <nav-bar></nav-bar>
     <router-view></router-view>
   </div>
-</template> 
+</template>
 
 <script>
 import NavBar from './components/NavBar.vue'
@@ -22,6 +22,9 @@ export default {
 
 <style lang="scss">
 @import "./assets/sass/styles.scss";
+.block {
+  display: block;
+}
 
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

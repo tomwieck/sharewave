@@ -3,21 +3,18 @@
   <h2>All Playlists</h2>
     <div><input class="playlist--search" placeholder="Search..." v-model="search"></div>
     <div>
-      <span>Search by Tags: </span>
+      <span class="block">Search by Tags: </span>
       <span v-for="tag in tags" @click="addToSearch(tag)">
-        {{tag}}
+        <span class="button">{{tag}}</span>
       </span>
     </div>
     <transition-group name="fade">
       <div class="playlist-container" v-for="playlist in searchResults" :key="playlist.id">
         <span class="playlist-text"><b>{{ playlist.title }} </b></span>
         <img class="playlist-art" v-bind:src="playlist.imgUrl">
-          <span v-show="playlist.tags">
-          <div>Tags: </div>
+          <span class="block" v-show="playlist.tags">
             <span v-for="tag in playlist.tags">
-              <div class="playlist--tags">
-                <span>#{{tag}}</span>
-              </div>
+              <span class="button" @click="addToSearch(tag)">#{{tag}}</span>
             </span>
           </span>
         <a class="playlist-text" v-bind:href="createSpotifyLink(playlist.owner, playlist.id)">Open in Spotify</a>
@@ -55,41 +52,31 @@ export default {
   },
   computed: {
     searchResults() {
+      // returns elements that return true
       return this.playlists.filter(el => {
-        // let tagResults;
-        // if (el.tags) {
-        //   tagResults = el.tags.filter(tag => {
-        //     return tag.includes(this.search.toLowerCase());
-        //   })
-        // }
-        // console.log(tagResults);
-        return el.title.toLowerCase().includes(this.search.toLowerCase().trim());
-          // el.tags.includes(this.search.toLowerCase()));
+        // Should return TRUE or FALSE only
+        let tagCheck = false;
+        if (el.tags) {
+          el.tags.filter(v => {
+            if (tagCheck === false) { tagCheck = this.search.toLowerCase().trim().includes(v) }
+          })
+        }
+        let titleCheck = el.title.toLowerCase().includes(this.search.toLowerCase().trim())
+        return titleCheck || tagCheck;
       });
-      // let tags = this.playlists.filter(el => {
-      //   if (el.tags) {
-      //     tags = el.tags.forEach(tag => {
-      //       return tag.includes(this.search.toLowerCase());
-      //     })
-      //   };
-      // })
-      // console.log(tags);
-      // return title.concat(tags);
     }
   },
   methods: {
     getPlaylists() {
+      this.setAccessToken
       this.playlistRef = Firebase.database().ref('playlists/');
       this.playlistRef.orderByChild('date_added').on('child_added', snapshot => {
-        console.log(snapshot);
         let childData = snapshot.val();
         childData.id = snapshot.key;
         childData.imgUrl = this.placeholder;
-        console.log(snapshot.val().tags)
         if (snapshot.child('tags').exists()) {
           this.tags = this.tags.concat(snapshot.val().tags);
         }
-        console.log(this.tags);
         this.playlists.unshift(childData);
         this.getPlaylistDetails(childData);
       });
@@ -105,15 +92,19 @@ export default {
         user: playlist.owner,
         playlist: playlist.id,
         fields: 'images,name'
+        // fields: 'name'
       }
       this.getSinglePlaylist(options, callback => {
-        console.log('callback', callback);
-        playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
+        // console.log('callback', callback);
+        if (callback.images) {
+          playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
+        } else {
+          playlist.imgUrl = this.placeholder;
+        }
       });
     },
     addToSearch(tag) {
       this.search += tag + ' ';
-      console.log(tag);
     }
   }
 }
@@ -126,5 +117,9 @@ export default {
   margin-bottom: 10px;
   width: 35%;
 }
+
+/*.button:first-child {
+  margin-right: 0;
+}*/
 
 </style>

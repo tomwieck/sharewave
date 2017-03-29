@@ -4,11 +4,11 @@
     <h1 class="nav-bar--heading">ShareWave</h1>
     <span v-if="loggedIn">
       <ul class="nav-links-ul">
-        <li><a class="nav-bar--link" href="#/wave">Wave</a></li>
-        <li><a class="nav-bar--link" href="#/myPlaylists">My Playlists</a></li>
-        <li><a class="nav-bar--link" href="#/allPlaylists">All Playlists</a></li>
-      </ul> 
-    </span>  
+        <li><a class="nav-bar--link" v-bind:class="checkRoute('wave') ? 'active' : ''" href="#/wave">Wave</a></li>
+        <li><a class="nav-bar--link" v-bind:class="checkRoute('myPlaylists') ? 'active' : ''" href="#/myPlaylists">My Playlists</a></li>
+        <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">All Playlists</a></li>
+      </ul>
+    </span>
     <login></login>
   </div>
 </template>
@@ -21,14 +21,26 @@ export default {
   name: 'nav-bar',
   data() {
     return {
-      loggedIn: false
+      loggedIn: false,
+      isActive: false,
+      route: false
     }
   },
   mounted() {
+    this.checkRoute();
     this.registerStateChange();
   },
+  beforeRouteLeave(to, from, next) {
+    this.checkRoute();
+    next();
+  },
   methods: {
+    checkRoute(route) {
+      console.log(route === this.$route.path.substring(1));
+      return route === this.$route.path.substring(1);
+    },
     registerStateChange() {
+      // console.log(this.$route)
       Firebase.auth().onAuthStateChanged(user => {
         if (user === null) {
           this.loggedIn = false;
@@ -48,6 +60,28 @@ export default {
 
 <style lang="scss">
 @import "../assets/sass/colors.scss";
+
+.nav-bar--link {
+  border-bottom: 2px solid white;
+  float: left;
+  margin-left: 10px;
+  color: #fff;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.nav-bar--login {
+  float: right;
+}
+
+.nav-bar--link:hover {
+  border-bottom: 2px solid #17375c;
+}
+
+.active {
+  border-bottom: 2px solid $logo-color;
+  // color: $logo-color;
+}
 
 .nav-bar {
   background-color: $play-color;
@@ -70,7 +104,7 @@ export default {
   float: left;
   list-style-type: none;
   margin-bottom: 0;
-  padding-left: 14px; 
+  padding-left: 14px;
 }
 
 .nav-links-ul li {
@@ -79,26 +113,6 @@ export default {
 
 .nav-bar--heading {
   float: left;
-}
-
-.nav-bar--link {
-  border-bottom: 2px solid white;
-  float: left;
-  margin-left: 10px;
-}
-
-.nav-bar--login {
-  float: right;
-}
-
-.nav-bar--link {
-  color: #fff;
-  font-size: 20px;
-  text-decoration: none;
-}
-
-.nav-bar--link:hover {
-  border-bottom: 2px solid #17375c;
 }
 
 .login:hover {

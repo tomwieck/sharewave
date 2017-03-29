@@ -1,6 +1,5 @@
 <template>
   <div class="wave">
-    <h2> Wave </h2>
     <div class="wave-container--background">
       <div class="wave-container--all">
         <!-- v-show when complete variable? -->
@@ -16,7 +15,7 @@
       <div>
         <span>{{playing.title}} - {{playing.artist}}</span>
         <br>
-        <a class="wave-playing--link" v-bind:href="playing.url">Open in {{correctCasing(playing.service)}}</a> 
+        <a class="wave-playing--link" v-bind:href="playing.url">Open in {{correctCasing(playing.service)}}</a>
         <span v-if="userId === playing.ownerId">
           <div @click="deleteWave(playing.id)">
             <svg class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
@@ -329,7 +328,7 @@ export default {
 @import "../assets/sass/colors.scss";
 
 .wave-container--background {
-  background-color: #e8e8e8; 
+  background-color: #e8e8e8;
   padding-top: 10px;
   width: 100%;
 }
