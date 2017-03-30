@@ -4,7 +4,7 @@
         <a href="/#/myPlaylists">
           <img class="profile-img" :src="imgUrl || placeholderUrl">
         </a>
-        <span class="profile-name"><a v-on:click="signout">Logout</a></span>
+        <span class="profile-name"><a v-on:logout="signout" v-on:click="signout">Logout</a></span>
     </div>
     <a v-else @click="showModal = true" class="login--link">
       <span>Login</span>
@@ -47,6 +47,7 @@ export default {
     if (this.$route.params.access_token) {
       this.updateHashParams();
     }
+    this.$on('logout', this.signout);
   },
   methods: {
     spotifyRedirect() {
@@ -72,10 +73,8 @@ export default {
         this.setDetails(callback);
         Firebase.auth().signInWithCustomToken(token)
           .then(user => {
-            console.log('SignIn');
             // If Spotify email, img, id or email do not match whats on the server, update them
             if (this.username !== user.displayName || this.imgUrl !== user.photoURL || this.userId !== user.userId || this.email !== user.email) {
-              console.log('updating with', this.username);
               user.updateProfile({
                 displayName: this.username,
                 email: this.email,
@@ -83,6 +82,7 @@ export default {
                 userId: this.userId
               });
             }
+            console.log('updated');
             // If user doesnt already exist in user database, add them
             Firebase.database().ref('/users/' + this.userId).once('value')
               .then(snapshot => {
@@ -90,6 +90,7 @@ export default {
                   this.addToUserDatabase();
                 };
               })
+            this.$emit('loginEmit');
           });
       });
     },
@@ -122,18 +123,14 @@ export default {
       });
     },
     setDetails(spotifyUser) {
-      console.log(spotifyUser);
-      // console.log(spotifyUser.id.replace(/\./g, '%2E'));
       this.email = spotifyUser.email || null;
       this.imgUrl = spotifyUser.images.length !== 0 ? spotifyUser.images[0].url : null
       this.userId = spotifyUser.id.replace(/\./g, '%2E');
       this.username = spotifyUser.display_name ? spotifyUser.display_name : spotifyUser.id;
-      console.log('setDetails');
     },
     updateDetails(user) {
       this.imgUrl = user.photoURL;
-      console.log('displayName', user.displayName);
-      this.username = user.displayName;
+      if (user.displayName) { this.username = user.displayName; }
       this.userId = user.uid;
     },
     resetDetails(user) {

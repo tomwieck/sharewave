@@ -105,7 +105,7 @@ export default {
         if (user === null) {
           // Not logged in
         } else {
-          this.userId = user.uid.replace('/\%2E/g', '.');
+          this.userId = user.uid.replace(/\%2E/g, '.');
           this.checkWaveTrue(user.uid);
           // Add listener to see if wave added for user
           this.regsiterChildAdded(user);
@@ -156,7 +156,7 @@ export default {
     },
     setUpUser(userRef, user) {
       userRef.counter = 0;
-      userRef.id = user.uid.replace('/\%2E/g', '.');
+      userRef.id = user.uid.replace(/\%2E/g, '.');
       userRef.imgUrl = user.photoURL;
       userRef.name = user.displayName;
       userRef.songs = [];
@@ -270,7 +270,7 @@ export default {
       this.playing = {
         artist: song.song_artist,
         id: song.id,
-        ownerId: id.replace('/\%2E/g', '.'),
+        ownerId: id.replace(/\%2E/g, '.'),
         title: song.song_title,
         service: song.service,
         url: song.url

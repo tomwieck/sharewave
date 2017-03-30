@@ -1,15 +1,17 @@
 <template>
   <div id="nav-bar" class="nav-bar">
-    <a href="/#/"><img class="nav-bar--logo" src="../assets/logo3.png"></a>
+    <a href="/#/wave"><img class="nav-bar--logo" src="../assets/logo3.png"></a>
     <h1 class="nav-bar--heading">ShareWave</h1>
     <span v-if="loggedIn">
       <ul class="nav-links-ul">
         <li><a class="nav-bar--link" v-bind:class="checkRoute('wave') ? 'active' : ''" href="#/wave">Wave</a></li>
         <li><a class="nav-bar--link" v-bind:class="checkRoute('myPlaylists') ? 'active' : ''" href="#/myPlaylists">My Playlists</a></li>
         <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">All Playlists</a></li>
+        <!-- <li><a class="nav-bar--link" @click="emitLogout">Logout</a></li> -->
+
       </ul>
     </span>
-    <login></login>
+    <login ref="loginRef"></login>
   </div>
 </template>
 
@@ -36,7 +38,6 @@ export default {
   },
   methods: {
     checkRoute(route) {
-      console.log(route === this.$route.path.substring(1));
       return route === this.$route.path.substring(1);
     },
     registerStateChange() {
@@ -50,6 +51,12 @@ export default {
           }
         }
       });
+    },
+    loginTrue() {
+      this.loggedIn = true;
+    },
+    emitLogout() {
+      this.$refs.loginRef.signout()
     }
   },
   components: {

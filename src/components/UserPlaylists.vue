@@ -3,14 +3,14 @@
    <div v-if="playlists" class="playlist-list">
       <transition appear name="fade">
       <div>
-        <div>Showing {{ playlists.total < 20 ? playlists.total : playlists.limit }} of {{ playlists.total }} playlists</div>
+        <div>Showing {{ playlists.items.length }} of {{ playlists.total }} playlists</div>
         <div class="playlist-container" v-for="playlist in playlists.items">
           <span class="playlist-title"><b>{{ playlist.name }} </b></span>
           <img class="playlist-art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">
           <a class="playlist-text" v-bind:href="playlist.uri">Open in Spotify</a>
           <a class="playlist-upload" v-bind:href="generateLink(playlist.owner.id, playlist.id)">Add to ShareWave</a>
         </div>
-        <h2 class="playlist-load-more"><a v-on:click="loadMore">{{ loadMoreText }}</a></h2>
+        <h2 v-show="playlists.total > 20" class="playlist-load-more"><a v-on:click="loadMore">{{ loadMoreText }}</a></h2>
       </div>
       </transition>
     </div>
