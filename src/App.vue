@@ -41,11 +41,12 @@ export default {
 
 .mini-toastr__notification {
   animation: fadein 0.5s;
+  opacity: 1 !important;
 }
 
 @keyframes fadein {
     from { opacity: 0; }
-    to   { opacity: 0.8; }
+    to   { opacity: 1; }
 }
 
 body {

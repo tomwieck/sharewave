@@ -70,27 +70,28 @@ export default {
       // Get Spotify User Details, set them to Vue variables, then assign these to Firebase user
       this.getMe(callback => {
         this.setDetails(callback);
+        Firebase.auth().signInWithCustomToken(token)
+          .then(user => {
+            console.log('SignIn');
+            // If Spotify email, img, id or email do not match whats on the server, update them
+            if (this.username !== user.displayName || this.imgUrl !== user.photoURL || this.userId !== user.userId || this.email !== user.email) {
+              console.log('updating with', this.username);
+              user.updateProfile({
+                displayName: this.username,
+                email: this.email,
+                photoURL: this.imgUrl,
+                userId: this.userId
+              });
+            }
+            // If user doesnt already exist in user database, add them
+            Firebase.database().ref('/users/' + this.userId).once('value')
+              .then(snapshot => {
+                if (snapshot.val() === null) {
+                  this.addToUserDatabase();
+                };
+              })
+          });
       });
-      Firebase.auth().signInWithCustomToken(token)
-        .then(user => {
-          console.log('username', this.imgUrl);
-          // If Spotify email, img, id or email do not match whats on the server, update them
-          if (this.username !== user.displayName || this.imgUrl !== user.photoURL || this.userId !== user.userId || this.email !== user.email) {
-            user.updateProfile({
-              displayName: this.username,
-              email: this.email,
-              photoURL: this.imgUrl,
-              userId: this.userId
-            });
-          }
-          // If user doesnt already exist in user database, add them
-          Firebase.database().ref('/users/' + this.userId).once('value')
-            .then(snapshot => {
-              if (snapshot.val() === null) {
-                this.addToUserDatabase();
-              };
-            })
-        });
     },
     addToUserDatabase() {
       Firebase.database().ref('users/' + this.userId).set({
@@ -122,16 +123,16 @@ export default {
     },
     setDetails(spotifyUser) {
       console.log(spotifyUser);
+      // console.log(spotifyUser.id.replace(/\./g, '%2E'));
       this.email = spotifyUser.email || null;
-      // this.imgUrl = (spotifyUser.images !== undefined ? spotifyUser.images[0].url : null)
-      this.imgUrl = spotifyUser.images !== undefined ? spotifyUser.images[0].url : null
+      this.imgUrl = spotifyUser.images.length !== 0 ? spotifyUser.images[0].url : null
       this.userId = spotifyUser.id.replace(/\./g, '%2E');
-      // fix
-      this.username = spotifyUser.id;
+      this.username = spotifyUser.display_name ? spotifyUser.display_name : spotifyUser.id;
+      console.log('setDetails');
     },
     updateDetails(user) {
-      console.log(user);
       this.imgUrl = user.photoURL;
+      console.log('displayName', user.displayName);
       this.username = user.displayName;
       this.userId = user.uid;
     },

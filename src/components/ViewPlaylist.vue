@@ -53,7 +53,7 @@ export default {
           // Not logged in
         } else {
           console.log()
-          this.user = user.uid.replace('%2E', '.');
+          this.user = user.uid.replace('/\%2E/g', '.');
           unsubscribe();
         }
       });
@@ -68,7 +68,7 @@ export default {
           this.dateAdded = this.convertTime(snapshot.val().date_added);
           this.owner = snapshot.val().owner;
           this.title = snapshot.val().title;
-          this.uploader = snapshot.val().uploader.replace('%2E', '.');
+          this.uploader = snapshot.val().uploader.replace('/\%2E/g', '.');
           if (this.user === this.uploader) { this.ownPlaylist = true };
           this.getPlaylistImage();
         })
