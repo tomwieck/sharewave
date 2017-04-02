@@ -1,11 +1,10 @@
 <template>
   <div>
-  <h2>All Playlists</h2>
     <div><input class="playlist--search" placeholder="Search..." v-model="search"></div>
     <div>
       <span class="block">Search by Tags: </span>
       <span v-for="tag in tags" @click="addToSearch(tag)">
-        <span class="button">{{tag}}</span>
+        <span class="button">#{{tag}}</span>
       </span>
     </div>
     <transition-group name="fade">

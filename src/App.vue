@@ -22,8 +22,13 @@ export default {
 
 <style lang="scss">
 @import "./assets/sass/styles.scss";
+@import url('https://fonts.googleapis.com/css?family=Comfortaa');
 .block {
   display: block;
+}
+
+.logo-font {
+  font-family: 'Comfortaa', cursive;
 }
 
 #app {

@@ -1,7 +1,8 @@
 <template>
   <div id="nav-bar" class="nav-bar">
-    <a href="/#/wave"><img class="nav-bar--logo" src="../assets/logo3.png"></a>
-    <h1 class="nav-bar--heading">ShareWave</h1>
+    <a v-bind:href="loggedIn ? '/#/wave' : '/#/'"><img class="nav-bar--logo" src="../assets/logo3.png">
+      <h1 class="nav-bar--heading logo-font">ShareWave</h1>
+    </a>
     <span v-if="loggedIn">
       <ul class="nav-links-ul">
         <li><a class="nav-bar--link" v-bind:class="checkRoute('wave') ? 'active' : ''" href="#/wave">Wave</a></li>

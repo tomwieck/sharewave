@@ -1,0 +1,121 @@
+body {
+	font-family: 'Avenir', Helvetica, Arial, sans-serif;
+}
+
+.colour-preview {
+	height: 100px;
+	width: 100px;
+}
+
+.play-color {
+	background-color: #299dcf;
+}
+
+.play-color-light {
+	background-color: #94c5da;
+}
+
+.logo-color {
+	background-color: #17385e;
+	color: white;
+}
+
+.logo {
+	font-family: 'Comfortaa', cursive;
+	font-weight: normal;
+	font-size: 8vw;
+	-webkit-margin-before:0em;
+    -webkit-margin-after:0em;
+    display: inline-block;
+}
+
+.logo-png {
+	width: 9vw;
+}
+
+.heading {
+	font-family: 'Raleway', sans-serif;
+}
+
+.search-box {
+	border: 0;
+	border: 1px solid #299dcf;
+	border-radius: 2px;
+	padding: 5px;
+	width: 250px;
+	font-size: 14px;
+}
+
+.search-box:focus {
+	/*border-bottom: 2px solid #299dcf;*/
+	/*outline: 0;*/
+}
+
+.search-box::-webkit-input-placeholder {
+  color: #94c5da;
+}
+.search-box::-moz-placeholder {
+  color: #94c5da;
+}
+
+.btn {
+	font-family: 'Raleway', sans-serif;
+  	background-color: white;
+  	border: 2px solid black;
+	border-radius: 2px;
+	cursor: pointer;
+  	display: inline-block;
+  	font-size: 14px;
+ 	padding: 6px 10px;
+	margin-right: 10px;
+}
+
+.btn--main {
+  background-color: #006692;
+  border: 2px solid #17385e;
+  color: white;
+}
+
+.btn--secondary {
+  background-color: #299dcf;
+  border: 2px solid #006692;
+  color: white;
+}
+
+.btn--disabled {
+  background-color: white;
+  border: 2px solid #94c5da;
+  color: #94c5da;
+}
+
+.btn--large {
+	font-size: 18px;
+	padding: 8px 10px;
+}
+
+.tag {
+	font-family: 'Raleway', sans-serif;
+  	background-color: #299dcf;
+  	/*border: 2px solid #006692;*/
+	border-radius: 5px;
+	color: white;
+	cursor: pointer;
+  	display: inline-block;
+  	letter-spacing: 1px;
+  	font-size: 14px;
+  	font-weight: bold;
+ 	padding: 6px 10px;
+	margin-right: 10px;
+}
+
+.icon {
+  color: #17385e;
+  display: inline-block;
+  width: 20px;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+  position: relative;
+  right: 30px;
+  top: 5px;
+}

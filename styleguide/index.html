@@ -1,70 +1,54 @@
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<html>
 <head>
-  <meta charset="utf-8">
-  <title>KSS Style Guide</title>
-
-  <meta name="description" content="">
-  <meta name="generator" content="kss-node">
-  <meta name="viewport" content="width=device-width">
-
-  <link rel="stylesheet" href="kss-assets/kss.css">
-  
+<link rel="stylesheet" type="text/css" href="styles.css">
+<link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+<title>Style Guide</title>
 </head>
-<body id="kss-node" >
+<body>
 
-<div class="kss-sidebar kss-style">
-  <header class="kss-header">
-    <h1 class="kss-doc-title">KSS Style Guide</h1>
-  </header>
-  <nav class="kss-nav">
-    <ul class="kss-nav__menu">
-      <li class="kss-nav__menu-item">
-        <a class="kss-nav__menu-link" href="./">
-          <span class="kss-nav__ref">0</span
-          ><span class="kss-nav__name">Overview</span>
-        </a>
-      </li>
-      <li class="kss-nav__menu-item">
-        <a class="kss-nav__menu-link" href="section-hard-rule-markup-buttons.html">
-          <span class="kss-nav__ref">1</span><span class="kss-nav__name">hard-rule Markup: buttons</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-</div>
-<article role="main" class="kss-main">
-</article>
-
-<!-- SCRIPTS -->
-<script src="kss-assets/kss.js"></script>
-<script src="kss-assets/scrollspy.js"></script>
-<script src="kss-assets/prettify.js"></script>
-<script src="kss-assets/kss-fullscreen.js"></script>
-<script src="kss-assets/kss-guides.js"></script>
-<script src="kss-assets/kss-markup.js"></script>
-<script>
-  prettyPrint();
-  var spy = new ScrollSpy('#kss-node', {
-    nav: '.kss-nav__menu-child > li > a',
-    className: 'is-in-viewport'
-  });
-  var kssFullScreen = new KssFullScreen({
-    idPrefix: 'kss-fullscreen-',
-    bodyClass: 'kss-fullscreen-mode',
-    elementClass: 'is-fullscreen'
-  });
-  var kssGuides = new KssGuides({
-    bodyClass: 'kss-guides-mode'
-  });
-  var kssMarkup = new KssMarkup({
-    bodyClass: 'kss-markup-mode',
-    detailsClass: 'kss-markup'
-  });
-</script>
+<h1>Colours</h1>
+<div class="colour-preview play-color-light">$play-color-light: #94c5da;</div>
+<div class="colour-preview play-color">$play-color: #299dcf;</div>
+<div class="colour-preview logo-color">$logo-color: #17385e;</div>
 
 
+<h1>Logo</h1>
+<img class="logo-png" src="logo3.png"><h1 class="logo">ShareWave</h1>
+<!-- <h1 class="logo">ShareWave</h1> -->
+<h1>Inline SVG Logo</h1>
+<svg width="82" height="82" viewbox="0 0 102 102" xmlns="http://www.w3.org/2000/svg"><title>ShareWave</title>
+<g transform="scale(0.07)">
+<path fill="#17385e" d="M917 2.1C839.3 11 770.5 59.8 736 130.4c-16.3 33.4-23.2 63.5-23.4 102.8l-.1 21.7-32 19.7C640.8 299 542.3 360 443.7 421.2l-74.8 46.5-11.2-7.5c-12.8-8.5-34.6-19.4-49.3-24.5-41.4-14.5-87.6-17-129.9-7C130.1 440.1 86 467.4 53.8 506c-25.6 30.7-43.4 69.4-50.2 109.5-11 64.2 6.8 131.8 48.1 183 37.7 46.7 90.9 76.3 152.3 84.6 12.2 1.6 42.7 1.6 55 0 33.8-4.5 67.9-16.6 95.3-33.9l9.4-5.9 12.1 7.3c6.6 3.9 20 11.6 29.8 17 37.4 20.4 82.9 47.6 133.8 79.8 13.2 8.3 57.5 35.2 98.5 59.7l74.6 44.6.1 21.4c.2 36.2 5.8 63.6 19.5 94.7 12.1 27.3 28.5 50.9 50.5 72.2 71.3 69.2 177.3 85.2 265.8 40.2 68.3-34.7 115.3-102.3 124.6-179.2 1.5-12.2 1.5-40.8 0-53-6.5-53.7-30.9-102.6-69.7-140-18.7-18-36.4-30.3-59.8-41.6-54.1-26.1-114.7-30.1-171.5-11.4-35.6 11.7-62.7 28-88.7 53.3l-11.2 10.9-3.3-1.9c-1.8-1.1-40.6-25.1-86.3-53.5-79.9-49.6-163.3-101-208.6-128.6L452.3 722l2.4-8.8c10.3-38.3 10.3-82.4-.1-119.7-1.4-4.9-2.2-9.2-1.8-9.6.4-.3 42.1-25.3 92.7-55.5 50.6-30.1 103-61.8 116.5-70.3 41.5-26.2 110.5-68.1 112.3-68.1.2 0 3.9 3.4 8.3 7.6 58.4 56.1 139.6 77.7 217.8 58 42.2-10.7 78.2-31.8 109.7-64.2 62.8-64.8 81.5-161.5 47.4-246.4-11.7-29.1-28.6-54.3-52-77.5-36-35.8-82.2-58.2-133.8-65C958.9.9 929.8.7 917 2.1zM165 515.5c11.6 5.8 210.8 117.9 212.7 119.8 4.1 3.7 7.3 11.6 7.3 17.6 0 6.6-3.2 14.2-7.6 18.2-3.8 3.5-213.5 120.8-218.2 122.1-6.5 1.8-16-1.1-20.9-6.4-1.2-1.2-3.1-4.3-4.2-6.8-2-4.5-2.1-5.9-2.1-127.1V530.4l2.5-5.1c3-6 8.1-10.2 14.5-11.9 5.4-1.5 10-.9 16 2.1z"/>
+</path></g></svg>
+<h1>PNG Logo</h1>
+<img class="logo-png" src="logo3.png">
 
-<!-- Automatically built using <a href="https://github.com/kss-node/kss-node">kss-node</a>. -->
+<h1>Typography</h1>
+<h1 class="heading">This is an h1 Heading</h1>
+<h2 class="heading">This is an h2 Heading</h2>
+<h3 class="heading">This is an h3 Heading</h3>
+<p>This is a p tag</p>
+<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+
+<h1>Input Forms</h1>
+Search: <input class="search-box" placeholder="Track, artist or album..."><svg class="icon icon-search" viewBox="0 0 32 32"><path d="M31.008 27.231l-7.58-6.447c-0.784-0.705-1.622-1.029-2.299-0.998 1.789-2.096 2.87-4.815 2.87-7.787 0-6.627-5.373-12-12-12s-12 5.373-12 12 5.373 12 12 12c2.972 0 5.691-1.081 7.787-2.87-0.031 0.677 0.293 1.515 0.998 2.299l6.447 7.58c1.104 1.226 2.907 1.33 4.007 0.23s0.997-2.903-0.23-4.007zM12 20c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"></path></svg>
+
+<h1>Buttons</h1>
+
+<button class="btn">button</button><br><br>
+<button class="btn btn--main btn--large">btn--main btn--large</button>
+<button class="btn btn--main">btn--main</button><br><br>
+<button class="btn btn--secondary btn--large">btn--secondary btn--large</button>
+<button class="btn btn--secondary ">btn--secondary</button><br><br>
+<button class="btn btn--disabled">btn--disabled</button>
+
+<h1>Tags</h1>
+<div class="tag">#hip hop</div>
+<div class="tag">#dnb</div>
+<div class="tag">#chill</div>
+<div class="tag">#disco</div>
+
 </body>
 </html>
