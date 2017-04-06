@@ -35,15 +35,18 @@
       </div>
     </div>
     <span v-show="Object.keys(waveSongs).length === 1">
-      Your friends Wave's will appear above.<br>
+      Your friends Wave's will appear above.
+        <br>
       Add some Friends to get started.
     </span>
     <button class="btn btn--secondary margin block" @click="friendsClicked = !friendsClicked">
       Add Friends <svg class="icon icon-user-plus"><use xlink:href="#icon-user-plus"></use></svg>
     </button>
-    <div v-if="friendsClicked">
-      <list-users v-on:userClicked="addFriend"></list-users>
-    </div>
+    <transition name="fade">
+      <div v-show="friendsClicked">
+          <list-users v-on:userClicked="addFriend"></list-users>
+      </div>
+    </transition>
     <h3>Add Songs:</h3>
     <!-- <a class="btn btn--secondary" @click="searchClicked = !searchClicked">Search Spotify and iTunes</a> -->
     <search v-on:addToWave="addToWave"></search>
@@ -57,7 +60,7 @@
       <div v-else>
         <transition-group name="fade">
           <div class="recently-played" v-for="song in recentlyPlayed" :key="song.track.id">
-            <span>{{ song.track.name }} - {{ song.track.artists[0].name }}</span>
+            <span>{{ song.track.artists[0].name }} - {{ song.track.name }}</span>
             <span class="recently-played--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
           </div>
         </transition-group>
@@ -70,10 +73,11 @@
         <h3 class="white">Now Playing</h3>
         <div>
           <span class="now-playing--track">{{playing.artist}} - {{playing.title}}</span>
-          <img v-bind:href="playing.url"
-               v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
-               class="service--badge"
-               :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
+          <a v-bind:href="playing.url">
+            <img v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
+                 class="service--badge"
+                 :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
+          </a>
         </div>
       </div>
     </div>

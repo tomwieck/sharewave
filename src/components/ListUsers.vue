@@ -4,7 +4,7 @@
       <div class="users--user" v-for="user in users" :key="user.display_name">
         <img class="users--profile-pic" :src="user.img_url || placeholderUrl">
         <span>{{ user.display_name }}</span>
-        <small>{{ user.email }}</small>
+        <small class="users--email">{{ user.email }}</small>
         <span class="users--add-user" @click="userClicked(user)">Add to Friends</span>
       </div>
   </div>
@@ -52,6 +52,7 @@ span {
 .users--user {
   display: inline-block;
   padding-bottom: 10px;
+  margin: 5px;
 }
 
 .users--add-user {
@@ -68,5 +69,13 @@ span {
   display: inline-block;
   margin: auto;
   width: 70px;
+}
+
+.users--email {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 150px;
 }
 </style>

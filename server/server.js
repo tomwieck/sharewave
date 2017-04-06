@@ -11,7 +11,7 @@ const handleLogin = require('./handleLogin');
 const spotify = require('./spotifyFunctions');
 const setupVar = require('./setupVariables');
 
-// Google Setup 
+// Google Setup
 var youTube = new YouTube();
 youTube.setKey(setupVar.googleKey);
 youTube.addParam('videoCategoryId', '10');
@@ -35,7 +35,7 @@ admin.initializeApp({
 });
 
 // Express Setup
-var express = require('express'); 
+var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 app.use(express.static(path.join(__dirname, '../dist')))
@@ -80,9 +80,9 @@ app.get('/clientCredential', function(req, res) {
 	    grant_type: 'client_credentials'
 	  });
 	let headers = {
-	    headers: { 
+	    headers: {
 	    	'Authorization': 'Basic ' + base64string,
-	    	'Content-Type': 'application/x-www-form-urlencoded' 
+	    	'Content-Type': 'application/x-www-form-urlencoded'
 	    }
 	};
 	axios.post(clientUrl, grantType, headers)
@@ -129,12 +129,12 @@ function extractData(response) {
 }
 
 function makeAllCalls(services, searchTerm) {
-  return Promise.all(services.map(function(s) {return makeCalls(s, searchTerm)}));  
+  return Promise.all(services.map(function(s) {return makeCalls(s, searchTerm)}));
 }
 
 function makeCalls(s, searchTerm) {
 	if (s === 'Spotify') {
-		return spotifyApi.searchTracks(searchTerm); 
+		return spotifyApi.searchTracks(searchTerm);
 	}
 	else if (s === 'iTunes') {
 		return axios.get(`http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/wa/wsSearch?country=GB&limit=20&entity=musicTrack&term=${searchTerm}`)
@@ -155,7 +155,7 @@ function extractSpotifyData(data) {
 		spotifyData.spotify[i] = {
 			album: data[i].album.name,
 			artist: data[i].artists[0].name,
-			artwork: data[i].album.images[2].url,
+			artwork: data[i].album.images[1].url,
 			id: data[i].id,
 			previewUrl: data[i].preview_url,
 			service: 'spotify',

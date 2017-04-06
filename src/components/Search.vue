@@ -2,9 +2,10 @@
   <div id="search">
     <div class="search-area">
       <p class="search-area_text"> Search for a Song:</p>
-      <input class="search-box" v-model="searchTerm">
-      <svg class="icon icon-search"><use xlink:href="#icon-search"></use></svg>
-
+      <div class="search-area--container">
+        <input class="search-box" v-model="searchTerm">
+        <svg class="icon icon-search"><use xlink:href="#icon-search"></use></svg>
+      </div>
       <div class="search-area_checkbox">
         <label for="Spotify">Spotify</label>
         <input type="checkbox" id="checkbox" value="Spotify" v-model="checked">
@@ -17,8 +18,12 @@
       <p>{{ searchPlaceholder }}</p>
     </div>
 
-    <transition-group name="fade">
+    <button v-show="sSearchResults" @click="show('spotify')" v-bind:class="[ selected === 'spotify' ? 'btn--secondary' : 'btn--disabled']" class="btn result-select">Spotify Results</button>
+    <button v-show="iSearchResults" @click="show('itunes')" v-bind:class="[ selected === 'itunes' ? 'btn--secondary' : 'btn--disabled']" class="btn result-select">iTunes Results</button>
+
+    <transition-group name="fade" mode="out-in">
       <s-search-table
+        class="visible spotify"
         v-on:parentPlay="playAudio"
         v-on:tableToSearch="addToWave"
         v-if="sSearchResults"
@@ -27,8 +32,10 @@
         :parentWidth = "parentWidth"
         service="Spotify">
       </s-search-table>
+      <!-- If no other result, width 100? -->
 
       <i-search-table
+        class="hidden itunes"
         v-on:parentPlay="playAudio"
         v-on:tableToSearch="addToWave"
         v-if="iSearchResults"
@@ -73,6 +80,7 @@ export default {
       searchPlaceholder: 'Please enter a search term',
       searchResults: '',
       timer: false,
+      selected: 'spotify',
       iSearchResults: false,
       sSearchResults: false,
       ySearchResults: false,
@@ -164,7 +172,7 @@ export default {
       // if data is empty, either add to table or set to null so nothing is rendered
       !isEmpty(data.spotify) ? this.sSearchResults = data.spotify : this.sSearchResults = null;
       !isEmpty(data.itunes) ? this.iSearchResults = data.itunes : this.iSearchResults = null;
-      !isEmpty(data.youtube) ? this.ySearchResults = data.youtube : this.ySearchResults = null;
+      // !isEmpty(data.youtube) ? this.ySearchResults = data.youtube : this.ySearchResults = null;
     },
     playAudio: function(url, e) {
       let target = e.target;
@@ -187,6 +195,22 @@ export default {
           target.innerText = 'Preview';
         });
       }
+    },
+    show(service) {
+      this.selected = service;
+      let itunes = document.getElementsByClassName('itunes');
+      let spotify = document.getElementsByClassName('spotify');
+      let hiddenClass = itunes[0].classList.contains('hidden') ? itunes[0].classList : spotify[0].classList;
+      let visibleClass = itunes[0].classList.contains('hidden') ? spotify[0].classList : itunes[0].classList;
+      if (hiddenClass.contains(service)) {
+        hiddenClass.remove('hidden');
+        hiddenClass.add('visible');
+        visibleClass.remove('visible');
+        visibleClass.add('hidden');
+      }
+      // if (service === 'spotify') {
+      //   spotify.classList.add('show')
+      // }
     },
     // playYoutube: function(id, e) {
     //   // Stop other audio object playing
@@ -240,11 +264,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/sass/colors.scss";
 
 .search-area_textbox {
   padding: 5px;
   margin-bottom: 10px;
   width: 35%;
+}
+
+.search-area--container {
+  position: relative;
+  display: inline-block;
 }
 
 .icon {
@@ -254,9 +284,30 @@ export default {
   stroke-width: 0;
   stroke: currentColor;
   fill: currentColor;
-  position: relative;
-  right: 30px;
+  position: absolute;
+  right: 5px;
   top: 5px;
+}
+
+.result-select {
+  display: none;
+  @media screen and (max-width: $break-tablet) {
+    display: inline-block;
+    width: 49%;
+  }
+}
+
+.visible {
+  @media screen and (max-width: $break-tablet) {
+    display: block;
+  }
+}
+.hidden {
+  display: inline-block;
+  @media screen and (max-width: $break-tablet) {
+    display: none;
+    position: absolute;
+  }
 }
 
 </style>
