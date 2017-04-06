@@ -48,12 +48,9 @@ export default {
 span {
   display: block;
 }
-.users { 
-  height: 300px;
-  overflow: scroll;
-}
 
 .users--user {
+  display: inline-block;
   padding-bottom: 10px;
 }
 
@@ -68,7 +65,7 @@ span {
 
 .users--profile-pic {
   border-radius: 50%;
-  display: block;
+  display: inline-block;
   margin: auto;
   width: 70px;
 }

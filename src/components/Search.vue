@@ -2,17 +2,18 @@
   <div id="search">
     <div class="search-area">
       <p class="search-area_text"> Search for a Song:</p>
-      <input class="search-area_textbox" v-model="searchTerm">
-      
+      <input class="search-box" v-model="searchTerm">
+      <svg class="icon icon-search"><use xlink:href="#icon-search"></use></svg>
+
       <div class="search-area_checkbox">
         <label for="Spotify">Spotify</label>
         <input type="checkbox" id="checkbox" value="Spotify" v-model="checked">
         <label for="iTunes">iTunes</label>
         <input type="checkbox" id="checkbox" value="iTunes" v-model="checked">
-        <label for="iTunes">YouTube</label>
-        <input type="checkbox" id="checkbox" value="YouTube" v-model="checked">
+<!--         <label for="iTunes">YouTube</label>
+        <input type="checkbox" id="checkbox" value="YouTube" v-model="checked"> -->
       </div>
-      <youtube :video-id="videoId" @cued="cued" @ready="ready" @playing="playing" player-width="0" player-height="0" :player-vars="{ start: 30}"></youtube>
+      <!-- <youtube :video-id="videoId" @cued="cued" @ready="ready" @playing="playing" player-width="0" player-height="0" :player-vars="{ start: 30}"></youtube> -->
       <p>{{ searchPlaceholder }}</p>
     </div>
 
@@ -21,32 +22,36 @@
         v-on:parentPlay="playAudio"
         v-on:tableToSearch="addToWave"
         v-if="sSearchResults"
-        v-bind:key="sSearchResults" 
+        v-bind:key="sSearchResults"
         :searchResults="sSearchResults"
         :parentWidth = "parentWidth"
-        service="Spotify"> 
+        service="Spotify">
       </s-search-table>
 
-      <i-search-table 
+      <i-search-table
         v-on:parentPlay="playAudio"
         v-on:tableToSearch="addToWave"
         v-if="iSearchResults"
-        v-bind:key="iSearchResults" 
-        :searchResults="iSearchResults" 
+        v-bind:key="iSearchResults"
+        :searchResults="iSearchResults"
         :parentWidth = "parentWidth"
-        service="iTunes"> 
+        service="iTunes">
       </i-search-table>
 
-      <y-search-table 
+<!--       <y-search-table
         v-on:parentPlay="playYoutube"
         v-on:tableToSearch="addToWave"
         v-if="ySearchResults"
-        v-bind:key="ySearchResults" 
-        :searchResults="ySearchResults" 
+        v-bind:key="ySearchResults"
+        :searchResults="ySearchResults"
         :parentWidth = "parentWidth"
-        service="YouTube"> 
-      </y-search-table>
+        service="YouTube">
+      </y-search-table> -->
     </transition-group>
+    <symbol id="icon-search" viewBox="0 0 32 32">
+      <title>search</title>
+      <path d="M31.008 27.231l-7.58-6.447c-0.784-0.705-1.622-1.029-2.299-0.998 1.789-2.096 2.87-4.815 2.87-7.787 0-6.627-5.373-12-12-12s-12 5.373-12 12 5.373 12 12 12c2.972 0 5.691-1.081 7.787-2.87-0.031 0.677 0.293 1.515 0.998 2.299l6.447 7.58c1.104 1.226 2.907 1.33 4.007 0.23s0.997-2.903-0.23-4.007zM12 20c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"></path>
+    </symbol>
   </div>
 </template>
 
@@ -183,44 +188,44 @@ export default {
         });
       }
     },
-    playYoutube: function(id, e) {
-      // Stop other audio object playing
-      let target = e.target;
-      if (target.classList.contains('playing')) {
-        this.stopVideo();
-      } else {
-        this.videoId = id;
-        target.classList.add('playing');
-        target.innerText = 'Playing';
-        if (this.youtubeTarget !== '') {
-          this.playingToPreview();
-        }
-        this.youtubeTarget = target;
-      }
-    },
-    cued() {
-      this.player.seekTo(30, true);
-      this.player.playVideo();
-    },
-    ready (player) {
-      this.player = player;
-    },
-    playing (player) {
-      clearTimeout(this.timer);
-      this.timer = setTimeout(this.stopVideo, 15000);
-    },
-    stopVideo() {
-      console.log('stop video called');
-      clearTimeout(this.timer);
-      this.videoId = '';
-      this.playingToPreview();
-      this.youtubeTarget = '';
-    },
-    playingToPreview() {
-      console.log('playing2preview', this.youtubeTarget);
-      this.youtubeTarget.classList.remove('playing');
-      this.youtubeTarget.innerText = 'Preview';
-    },
+    // playYoutube: function(id, e) {
+    //   // Stop other audio object playing
+    //   let target = e.target;
+    //   if (target.classList.contains('playing')) {
+    //     this.stopVideo();
+    //   } else {
+    //     this.videoId = id;
+    //     target.classList.add('playing');
+    //     target.innerText = 'Playing';
+    //     if (this.youtubeTarget !== '') {
+    //       this.playingToPreview();
+    //     }
+    //     this.youtubeTarget = target;
+    //   }
+    // },
+    // cued() {
+    //   this.player.seekTo(30, true);
+    //   this.player.playVideo();
+    // },
+    // ready (player) {
+    //   this.player = player;
+    // },
+    // playing (player) {
+    //   clearTimeout(this.timer);
+    //   this.timer = setTimeout(this.stopVideo, 15000);
+    // },
+    // stopVideo() {
+    //   console.log('stop video called');
+    //   clearTimeout(this.timer);
+    //   this.videoId = '';
+    //   this.playingToPreview();
+    //   this.youtubeTarget = '';
+    // },
+    // playingToPreview() {
+    //   console.log('playing2preview', this.youtubeTarget);
+    //   this.youtubeTarget.classList.remove('playing');
+    //   this.youtubeTarget.innerText = 'Preview';
+    // },
     addToWave(result) {
       this.$emit('addToWave', result);
     }
@@ -228,8 +233,8 @@ export default {
   // instantiate two tables, one for Spotify and one for iTunes
   components: {
     'i-search-table': SearchTable,
-    's-search-table': SearchTable,
-    'y-search-table': SearchTable
+    's-search-table': SearchTable
+    // 'y-search-table': SearchTable
   }
 }
 </script>
@@ -240,6 +245,18 @@ export default {
   padding: 5px;
   margin-bottom: 10px;
   width: 35%;
+}
+
+.icon {
+  color: #17385e;
+  height: 20px;
+  width: 20px;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+  position: relative;
+  right: 30px;
+  top: 5px;
 }
 
 </style>

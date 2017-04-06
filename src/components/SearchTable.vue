@@ -33,7 +33,7 @@
           <a @click="addToWave(result)"> Add to myWave </a>
         </div>
       </div>
-    </div>   
+    </div>
   </div>
 </template>
 
@@ -43,7 +43,7 @@ export default {
   name: 'search-table',
   data: () => ({
     itunesBadge: '../static/itunes.svg',
-    spotifyBadge: '../static/spotifytext.png'
+    spotifyBadge: '../static/spotifyBadge.svg'
   }),
   props: ['service', 'searchResults', 'parentWidth'],
   methods: {
@@ -68,7 +68,7 @@ table {
 td {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .search-table {
@@ -153,10 +153,10 @@ td {
   padding: 7px;
   margin-right: 10px;
   text-decoration: none;
-  width: 96px; 
+  width: 96px;
 }
 
 .login-slot--link {
- 
+
 }
 </style>

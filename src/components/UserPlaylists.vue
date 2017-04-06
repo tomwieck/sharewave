@@ -40,7 +40,7 @@ export default {
     }
   },
   mixins: [SpotifyMixin],
-  mounted: function () {
+  mounted() {
     this.getPlaylists(callback => {
       if (callback.status === 401) {
         this.error = true;
@@ -50,24 +50,23 @@ export default {
     });
   },
   methods: {
-    loadMore: function() {
+    loadMore() {
       let nextUrl = this.playlists.next;
       if (nextUrl) {
         this.loadMoreText = 'Loading...'
-        let vm = this;
         let config = {
           headers: { Authorization: 'Bearer ' + this.$cookie.get('access_token') }
         };
-        vm.axios.get(nextUrl, config)
-        .then(function (response) {
+        this.axios.get(nextUrl, config)
+        .then(response => {
           response = response.data;
-          vm.playlists.next = response.next;
-          vm.playlists.items.push(...response.items);
-          vm.loadMoreText = 'Load more...';
-          vm.playlists.limit += response.items.length;
+          this.playlists.next = response.next;
+          this.playlists.items.push(...response.items);
+          this.loadMoreText = 'Load more...';
+          this.playlists.limit += response.items.length;
         })
-        .catch(function (error) {
-          vm.searchPlaceholder = 'Could not reach the API. ' + error
+        .catch(error => {
+          this.searchPlaceholder = 'Could not reach the API. ' + error
         })
       } else {
         this.loadMoreText = '';

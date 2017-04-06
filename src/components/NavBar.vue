@@ -76,14 +76,16 @@ export default {
   color: #fff;
   font-size: 20px;
   text-decoration: none;
-}
-
-.nav-bar--login {
-  float: right;
+  transition: 0.2s;
 }
 
 .nav-bar--link:hover {
   border-bottom: 2px solid #17375c;
+  transition: 0.2s;
+}
+
+.nav-bar--login {
+  float: right;
 }
 
 .active {
@@ -94,7 +96,7 @@ export default {
 .nav-bar {
   background-color: $play-color;
   margin: 0;
-  padding: 10px 1%;
+  padding: 5px 1%;
   width: 98%;
 }
 
@@ -143,6 +145,6 @@ export default {
 .nav-bar--logo {
   float: left;
   padding-right: 10px;
-  width: 50px;
+  width: 42px;
 }
 </style>

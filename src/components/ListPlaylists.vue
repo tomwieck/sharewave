@@ -4,7 +4,7 @@
     <div>
       <span class="block">Search by Tags: </span>
       <span v-for="tag in tags" @click="addToSearch(tag)">
-        <span class="button">#{{tag}}</span>
+        <span class="tag">#{{tag}}</span>
       </span>
     </div>
     <transition-group name="fade">
@@ -13,7 +13,7 @@
         <img class="playlist-art" v-bind:src="playlist.imgUrl">
           <span class="block" v-show="playlist.tags">
             <span v-for="tag in playlist.tags">
-              <span class="button" @click="addToSearch(tag)">#{{tag}}</span>
+              <span class="tag" @click="addToSearch(tag)">#{{tag}}</span>
             </span>
           </span>
         <a class="playlist-text" v-bind:href="createSpotifyLink(playlist.owner, playlist.id)">Open in Spotify</a>
@@ -109,12 +109,25 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .playlist--search {
   padding: 5px;
   margin-bottom: 10px;
   width: 35%;
+}
+
+.tag {
+  font-family: 'Raleway', sans-serif;
+  background-color: #299dcf;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  letter-spacing: 1px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 6px 10px;
+  margin: 2px;
 }
 
 /*.button:first-child {

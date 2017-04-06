@@ -1,62 +1,99 @@
 <template>
   <div class="wave">
     <div class="wave-container--background">
-      <div class="wave-container--all">
+      <div id="wave-container-all" class="wave-container--all">
         <!-- v-show when complete variable? -->
-        <div v-bind:class="{ 'my-wave': userId === value.id }" class="wave-container--user" v-for="(value, key) in waveSongs">
-          <img class="wave--profile-pic" v-bind:class="{ 'wave-true': waveSongs[key].songs.length !== 0, 'wave-false': waveSongs[key].songs.length === 0}" @click="playWave($event, key)" :src="value.imgUrl || placeholderUrl">
-          <span class="wave--name">{{ value.name }}</span>
-          <!-- {{ key }} : {{ value }} -->
-        </div>
+        <span v-bind:class="{ 'my-wave': userId === value.id }" class="wave-container--user" v-for="(value, key) in waveSongs">
+          <div v-if="userId === value.id"><b>My Wave</b></div>
+          <div v-else>{{ value.name }}</div>
+          <div class='timer'>
+            <img class="wave--profile-pic"
+                 v-bind:class="{ 'wave-true pulse': waveSongs[key].songs.length !== 0, 'wave-false': waveSongs[key].songs.length === 0}"
+                 @click="playWave($event, key)"
+                 :src="value.imgUrl || placeholderUrl">
+            <div class='timer--rect timer--left'>
+              <div v-bind:class='key'></div>
+            </div>
+            <div class='timer--rect timer--right'>
+              <div v-bind:class='key'></div>
+            </div>
+          </div>
+          <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
+        </span>
       </div>
-    </div>
-    <div v-if="playing.title">
-      <h3>Now Playing</h3>
-      <div>
-        <span>{{playing.title}} - {{playing.artist}}</span>
-        <br>
-        <a class="wave-playing--link" v-bind:href="playing.url">Open in {{correctCasing(playing.service)}}</a>
-        <span v-if="userId === playing.ownerId">
-          <div @click="deleteWave(playing.id)">
-            <svg class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
-           </div>
+      <div v-bind:class="{'slideup': !detailsOpen, 'slidedown': detailsOpen}">
+        <span v-if="details.songs ? details.songs.length === 0 : false"> You have no songs, add some below. </span>
+        <span v-else>
+          <span><b>All Songs</b></span>
+          <div v-for="(song, key) in details.songs">
+            <span v-if="userId === details.name">
+              <svg class="icon icon-bin" @click="deleteWave(song.id, key)"><use xlink:href="#icon-bin"></use></svg>
+            </span>
+            {{ song.song_artist }} - {{ song.song_title }}
+          </div>
         </span>
       </div>
     </div>
-    <h3> Add Songs </h3>
-    <div class="wave-add-songs--container">
-      <a class="wave-add-songs--link" @click="searchClicked = !searchClicked">
-        Search on Spotify and iTunes
-      </a>
-      <div v-if="searchClicked">
-        <search v-on:addToWave="addToWave"></search>
+    <span v-show="Object.keys(waveSongs).length === 1">
+      Your friends Wave's will appear above.<br>
+      Add some Friends to get started.
+    </span>
+    <button class="btn btn--secondary margin block" @click="friendsClicked = !friendsClicked">
+      Add Friends <svg class="icon icon-user-plus"><use xlink:href="#icon-user-plus"></use></svg>
+    </button>
+    <div v-if="friendsClicked">
+      <list-users v-on:userClicked="addFriend"></list-users>
+    </div>
+    <h3>Add Songs:</h3>
+    <!-- <a class="btn btn--secondary" @click="searchClicked = !searchClicked">Search Spotify and iTunes</a> -->
+    <search v-on:addToWave="addToWave"></search>
+    <a class="btn btn--secondary" v-if="spotify" @click="spotifyRecentlyPlayed">
+      See your recent Spotify tracks
+    </a>
+    <div v-if="recentlyPlayedClicked">
+      <div v-if="recentlyPlayed.length === 0">
+        {{ recentlyPlayedText }}
       </div>
-      <br>
-      <a class="wave-add-songs--link" v-if="spotify" @click="spotifyRecentlyPlayed">
-        See your recently played Spotify tracks
-      </a>
-      <div v-if="recentlyPlayedClicked">
-        <div v-if="recentlyPlayed === []">
-          Loading...
-        </div>
-        <div v-else>
-          <transition-group name="fade">
-            <div class="track-container" v-for="song in recentlyPlayed" :key="song.track.id">
-              <span>{{ song.track.name }} - {{ song.track.artists[0].name }}</span>
-              <span class="track-container--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
-            </div>
-          </transition-group>
+      <div v-else>
+        <transition-group name="fade">
+          <div class="recently-played" v-for="song in recentlyPlayed" :key="song.track.id">
+            <span>{{ song.track.name }} - {{ song.track.artists[0].name }}</span>
+            <span class="recently-played--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
+          </div>
+        </transition-group>
+      </div>
+    </div>
+  <div id="nowPlaying" class="now-playing">
+    <a class="closebtn" @click="closeNowPlaying">&times;</a>
+    <div class="now-playing--details">
+      <div v-if="playing.title">
+        <h3 class="white">Now Playing</h3>
+        <div>
+          <span class="now-playing--track">{{playing.artist}} - {{playing.title}}</span>
+          <img v-bind:href="playing.url"
+               v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
+               class="service--badge"
+               :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
         </div>
       </div>
     </div>
-  <h3 class="wave-add-songs--link" @click="friendsClicked = !friendsClicked">Add Friends</h3>
-  <div v-if="friendsClicked">
-    <list-users v-on:userClicked="addFriend"></list-users>
+    <div class="now-playing--artwork">
+      <img :src="'../static/artplaceholder.png'">
+    </div>
   </div>
   <symbol id="icon-bin" viewBox="0 0 32 32">
     <title>bin</title>
     <path d="M4 10v20c0 1.1 0.9 2 2 2h18c1.1 0 2-0.9 2-2v-20h-22zM10 28h-2v-14h2v14zM14 28h-2v-14h2v14zM18 28h-2v-14h2v14zM22 28h-2v-14h2v14z"></path>
     <path d="M26.5 4h-6.5v-2.5c0-0.825-0.675-1.5-1.5-1.5h-7c-0.825 0-1.5 0.675-1.5 1.5v2.5h-6.5c-0.825 0-1.5 0.675-1.5 1.5v2.5h26v-2.5c0-0.825-0.675-1.5-1.5-1.5zM18 4h-6v-1.975h6v1.975z"></path>
+  </symbol>
+  <symbol id="icon-arrow" viewBox="0 0 32 32">
+    <title>ctrl</title>
+    <path d="M23 14c-0.278 0-0.555-0.116-0.753-0.341l-6.247-7.14-6.247 7.14c-0.364 0.416-0.995 0.458-1.411 0.094s-0.458-0.995-0.094-1.411l7-8c0.19-0.217 0.464-0.341 0.753-0.341s0.563 0.125 0.753 0.341l7 8c0.364 0.416 0.322 1.047-0.094 1.411-0.19 0.166-0.424 0.247-0.658 0.247z"></path>
+  </symbol>
+  <symbol id="icon-user-plus" viewBox="0 0 32 32">
+    <title>user-plus</title>
+    <path d="M12 23c0-4.726 2.996-8.765 7.189-10.319 0.509-1.142 0.811-2.411 0.811-3.681 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h12.416c-0.271-0.954-0.416-1.96-0.416-3z"></path>
+    <path d="M23 14c-4.971 0-9 4.029-9 9s4.029 9 9 9c4.971 0 9-4.029 9-9s-4.029-9-9-9zM28 24h-4v4h-2v-4h-4v-2h4v-4h2v4h4v2z"></path>
   </symbol>
   </div>
 </template>
@@ -73,19 +110,25 @@ export default {
   data () {
     return {
       audioObject: null,
+      details: {},
+      detailsOpen: false,
       imgUrl: '',
       friendsClicked: false,
       placeholderUrl: '../static/placeholder.png',
       playing: {},
+      previousTarget: '',
       recentlyPlayed: [],
       recentlyPlayedClicked: false,
+      recentlyPlayedText: '',
       searchClicked: false,
       spotify: false,
       userId: '',
       userRef: false,
       wave: false,
       waveRef: '',
-      waveSongs: {}
+      waveSongs: {},
+      itunesBadge: '../static/itunes.svg',
+      spotifyBadge: '../static/spotifyBadge.svg'
     }
   },
   mixins: [SpotifyMixin],
@@ -98,6 +141,7 @@ export default {
   },
   methods: {
     // Add LOADING...
+    // When redirected to this page after login, user may not be created in DB in time (emit event?)
     // SET UP
     getUser() {
       // Get logged in user and check if wave
@@ -105,6 +149,7 @@ export default {
         if (user === null) {
           // Not logged in
         } else {
+          // this.userId = user.uid;
           this.userId = user.uid.replace(/\%2E/g, '.');
           this.checkWaveTrue(user.uid);
           // Add listener to see if wave added for user
@@ -118,12 +163,16 @@ export default {
       // Could set listeners for all friends so that if they are added updated in real time
       this.userRef = Firebase.database().ref(`users/${userId}`);
       this.userRef.once('value', snapshot => {
-        let friends = snapshot.val().friends;
-        this.spotify = snapshot.val().spotify;
-        this.wave = snapshot.val().wave;
-        for (var user in friends) {
-          // Should be non blocking, make each call to wave seperately after getting friend list ?
-          this.checkFriendsWaves(user)
+        if (snapshot.child('friends').exists()) {
+          let friends = snapshot.val().friends;
+          this.spotify = snapshot.val().spotify;
+          this.wave = snapshot.val().wave;
+          for (var user in friends) {
+            // Should be non blocking, make each call to wave seperately after getting friend list ?
+            this.checkFriendsWaves(user)
+          }
+        } else {
+
         }
       })
     },
@@ -162,6 +211,29 @@ export default {
       userRef.songs = [];
     },
     // END OF SET UP
+    showDetails(key, e) {
+      // If clicked on the <use> tag, still apply class to svg
+      let target = e.target.tagName === 'use' ? e.target.parentNode : e.target;
+      // if clicked on the same rotate
+      console.log(this.details.name, this.waveSongs[key].id);
+      if (this.details.name === this.waveSongs[key].id) {
+        setTimeout(() => { this.details = {}; }, 400);
+        this.detailsOpen = false;
+        target.classList.remove('rotate');
+      } else {
+        let el = document.getElementsByClassName('rotate');
+        if (el.length > 0) {
+          el[0].classList.remove('rotate');
+        }
+        target.classList.add('rotate');
+        this.detailsOpen = true;
+        let songs = this.waveSongs[key].songs.slice(0);
+        this.details.name = this.waveSongs[key].id;
+        this.details.songs = songs;
+        console.log(songs);
+      }
+      this.$forceUpdate();
+    },
     // ADD / DELETE WAVE
     addRecentToWave(song) {
       // If album is needed, could make API call here, or when retrieving album art
@@ -199,22 +271,25 @@ export default {
         this.wave = true;
       }
       console.log('add');
+      this.details.songs = this.waveSongs[userId].songs;
       VueNotifications.success({message: `Added to Wave`});
       this.$forceUpdate();
     },
-    deleteWave(id) {
+    deleteWave(id, key) {
       // Pause and reset playing
       this.ifPlayingPause();
       this.playing = {};
       var userId = this.userId.replace(/\./g, '%2E');
+
+      // Remove locally
+      let userRef = this.waveSongs[userId];
+      userRef.songs.splice(key, 1);
+      this.checkEmpty(this.userId.replace(/\./g, '%2E'));
+      console.log(this.waveSongs[userId])
       // Remove from DB
       this.waveRef = Firebase.database().ref(`wave/${userId}`);
       this.waveRef.child(id).remove();
-      // Remove locally
-      let userRef = this.waveSongs[userId];
-      userRef.counter--;
-      userRef.songs.splice(userRef.counter, 1);
-      this.checkEmpty(this.userId.replace(/\./g, '%2E'));
+      this.details.songs = this.waveSongs[userId].songs;
       VueNotifications.error({message: `Removed from Wave`});
       this.$forceUpdate();
     },
@@ -230,9 +305,14 @@ export default {
       if (this.recentlyPlayedClicked === true) {
         this.recentlyPlayedClicked = false;
       } else {
+        this.recentlyPlayedClicked = true;
+        this.recentlyPlayedText = 'Loading...'
         this.getRecentlyPlayed(callback => {
-          this.recentlyPlayed = callback.items;
-          this.recentlyPlayedClicked = true;
+          if (callback.items.length === 0) {
+            this.recentlyPlayedText = 'No results, try searching for a song instead';
+          } else {
+            this.recentlyPlayed = callback.items;
+          }
         })
       }
     },
@@ -253,11 +333,15 @@ export default {
       let waveRef = this.waveSongs[id];
       let counter = waveRef.counter;
       target.classList.add('wave--playing');
+      target.classList.remove('pulse');
+      console.log(id);
+      this.resetClasses(id);
       if (counter === waveRef.songs.length) {
         waveRef.counter = 0;
         this.ifPlayingPause();
         this.removeClass(target);
         this.playing = {};
+        this.closeNowPlaying();
         this.$forceUpdate();
       } else {
         this.setPlaying(waveRef.songs[counter], id);
@@ -265,6 +349,14 @@ export default {
         this.playAudio(url, target, id);
         waveRef.counter++;
       }
+    },
+    resetClasses(id) {
+      let classes = Array.from(document.getElementsByClassName(id));
+      classes.forEach((elm) => {
+        elm.classList.add('fill');
+        var newone = elm.cloneNode(true);
+        elm.parentNode.replaceChild(newone, elm);
+      })
     },
     setPlaying(song, id) {
       this.playing = {
@@ -275,9 +367,11 @@ export default {
         service: song.service,
         url: song.url
       }
+      this.openNowPlaying();
     },
     removeClass(target) {
       target.classList.remove('wave--playing');
+      // target.classList.remove('pulse');
     },
     resetOtherCounters(id) {
       for (let key in this.waveSongs) {
@@ -297,7 +391,7 @@ export default {
     },
     addFriend(user) {
       console.log(user);
-      if (this.userId !== user.id.replace(/\./g, '%2E')) {
+      if (this.userId.replace(/\./g, '%2E') !== user.id) {
         let friendsRef = Firebase.database().ref(`users/${this.userId.replace(/\./g, '%2E')}/friends`);
         friendsRef.child(user.id).set(true);
         VueNotifications.success({message: `Added ${user.display_name}`});
@@ -315,6 +409,14 @@ export default {
         case 'youtube':
           return 'YouTube'
       };
+    },
+    openNowPlaying() {
+      document.getElementById('wave-container-all').classList.add('wave-container--now-playing');
+      document.getElementById('nowPlaying').classList.add('now-playing--open');
+    },
+    closeNowPlaying() {
+      document.getElementById('wave-container-all').classList.remove('wave-container--now-playing');
+      document.getElementById('nowPlaying').classList.remove('now-playing--open');
     }
   },
   components: {
@@ -326,6 +428,11 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
+// Wave Styles START
+.wave {
+  // height of now playing
+  margin-bottom: 125px;
+}
 
 .wave-container--background {
   background-color: #e8e8e8;
@@ -335,61 +442,122 @@ export default {
 
 .wave-container--all {
   display: inline-block;
+  height: 160px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .wave-container--user {
   display: inline-block;
-  float: right;
 }
 
 .wave-add-songs--link,
 .wave-playing--link {
   color: $logo-color;
   cursor: pointer;
-  display: block;
   font-weight: bold;
   text-decoration: underline;
 }
 
-.my-wave {
-  float: left;
-}
-
 .wave--profile-pic {
   border-radius: 50%;
-  display: inline-block;
-  // margin: auto;
-  margin-right: 10px;
+  left: 5px;
+  position: absolute;
+  top: 5px;
   width: 100px;
-}
-
-.wave--name {
-  display: block;
-}
-
-.wave-false {
-  border: 5px solid grey;
-  pointer-events: none;
-  opacity: 0.8;
-  background: #CCC;
+  z-index: 1;
 }
 
 .wave-true {
   border: 5px solid $play-color;
+  top: 0;
+  left: 0;
   cursor: pointer;
 }
 
-.wave--playing {
-  -webkit-animation:spin 2s linear infinite;
-  -moz-animation:spin 2s linear infinite;
-  animation:spin 2s linear infinite;
+.wave-false {
+  border: 5px solid grey;
+  top: 0;
+  left: 0;
 }
 
+// Spin effect keyframes
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
-.track-container {
+.wave--playing {
+  border: none;
+  top: 5px;
+  left: 5px;
+  -webkit-animation:spin 2s linear infinite;
+  -moz-animation:spin 2s linear infinite;
+  animation:spin 2s linear infinite;
+}
+// Wave Styles END
+
+// Timer START
+.timer {
+  background-size: 100px 100px;
+  background-repeat: no-repeat;
+  border-radius: 100%;
+  width: 110px;
+  height: 110px;
+  position: relative;
+  z-index: 1;
+  margin: 0 5px;
+}
+
+.timer--rect {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  clip: rect(0px, 110px, 110px, 55px);
+  border-radius: 100%;
+  background-color: $play-color;
+}
+
+.fill {
+  background-color: $logo-color;
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 100%;
+  clip: rect(0px, 55px, 110px, 0px);
+}
+
+@keyframes left { 0%{-webkit-transform:rotate(0deg);} 100%{transform:rotate(180deg);} }
+@-webkit-keyframes left { 0%{-webkit-transform:rotate(0deg);} 100%{-webkit-transform:rotate(180deg);}}
+
+.timer--left .fill {
+  -webkit-animation: left 15s linear ;
+  -moz-animation: left 15s linear ;
+  animation: left 15s linear both;
+}
+
+.timer--right {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+@keyframes right { 0%{-webkit-transform:rotate(0deg);} 100%{transform:rotate(180deg);} }
+@-webkit-keyframes right { 0% {transform: rotate(0deg);} 100% {transform: rotate(180deg);} }
+
+.timer--right .fill {
+  -webkit-animation: right 15s linear ;
+  -moz-animation: right 15s linear ;
+  animation: right 15s linear both ;
+  -webkit-animation-delay: 15s;
+  -moz-animation-delay: 15s;
+  animation-delay: 15s;
+}
+// Timer END
+
+// Recently Played START
+.recently-played {
   border: 2px solid $play-color;
   border-radius: 5px;
   display: block;
@@ -399,15 +567,16 @@ export default {
   margin-bottom: 5px;
 }
 
-.track-container--add {
+.recently-played--add {
   color: $logo-color;
   cursor: pointer;
   display: block;
   font-weight: bold;
 }
+// Recently Played END
 
+// Icons START
 .icon {
-  display: block;
   margin: auto;
   width: 1em;
   height: 1em;
@@ -416,4 +585,154 @@ export default {
   fill: currentColor;
   cursor: pointer;
 }
+
+.icon-arrow {
+  display: block;
+  fill: $logo-light-color;
+  font-size: 40px;
+  margin-top: -18px;
+  transform: rotate(180deg);
+  // transition: 0.2s;
+}
+
+.icon-user-plus {
+  font-size: 21px;
+  margin-bottom: -5px;
+}
+// Icons END
+
+// More Details START
+.slideup, .slidedown {
+    max-height: 0;
+    overflow-y: hidden;
+    -webkit-transition: max-height 0.4s ease-in-out;
+    -moz-transition: max-height 0.4s ease-in-out;
+    -o-transition: max-height 0.4s ease-in-out;
+    transition: max-height 0.4s ease-in-out;
+}
+
+.slidedown {
+    max-height: 300px;
+}
+
+// Rotate on arrow icon
+@-moz-keyframes rotate { 100% { -moz-transform: rotate(180deg); } }
+@-webkit-keyframes rotate { 100% { -webkit-transform: rotate(180deg); } }
+@keyframes rotate { 100% { -webkit-transform: rotate(180deg); transform:rotate(180deg); } }
+
+.rotate {
+  margin-top: 0;
+  transform: rotate(0deg);
+}
+// More Details END
+
+// Pulse START
+.pulse {
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 0 rgba(41,157,207, 0.4);
+}
+
+@-webkit-keyframes pulse {
+  0% { -webkit-box-shadow: 0 0 0 0 rgba(41,157,207, 0.4);}
+  70% {-webkit-box-shadow: 0 0 0 10px rgba(41,157,207, 0);}
+  100% { -webkit-box-shadow: 0 0 0 0 rgba(41,157,207, 0);}
+}
+@keyframes pulse {
+  0% { -moz-box-shadow: 0 0 0 0 rgba(41,157,207, 0.4); box-shadow: 0 0 0 0 rgba(41,157,207, 0.4);}
+  70% { -moz-box-shadow: 0 0 0 10px rgba(41,157,207, 0); box-shadow: 0 0 0 10px rgba(41,157,207, 0);}
+  100% { -moz-box-shadow: 0 0 0 0 rgba(41,157,207, 0); box-shadow: 0 0 0 0 rgba(41,157,207, 0);}
+}
+// Pulse END
+
+// Now Playing START
+.now-playing {
+    height: 125px;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    bottom: 0;
+    right: 0;
+    opacity: 0.95;
+    background-color: $logo-color;
+    overflow-y: hidden;
+    transition: 0.4s;
+    transition-timing-function: cubic-bezier(0.61, 0.12, 0.43, 0.99);
+}
+
+
+.now-playing a , .now-playing span, .now-playing div{
+    text-decoration: none;
+    color: white;
+    opacity: 0;
+}
+
+.now-playing--open {
+  div {
+    transition: 0.2s;
+    -webkit-transition-delay: 0.3s;
+    transition-delay: 0.3s;
+  }
+  width: 100%;
+}
+
+.now-playing--open {
+  a, span, div {
+    opacity: 1;
+  }
+}
+
+
+.now-playing a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
+
+
+.now-playing .closebtn {
+  cursor: pointer;
+  font-size: 38px;
+  left: 5px;
+  padding: 0;
+  position: absolute;
+  top: -5px;
+  transition: 0.3s;
+}
+
+.now-playing .closebtn:hover {
+  color: $play-color;
+}
+
+.now-playing--details {
+  display: inline-block;
+  float: left;
+  max-width: calc(100% - 160px);
+  padding: 5px;
+  padding-top: 5px;
+  padding-left: 30px;
+  text-align: left;
+}
+
+.now-playing--track {
+  display: block;
+  max-height: 45px;
+  overflow-x: scroll;
+}
+
+.now-playing--artwork {
+  display: inline-block;
+  float: right;
+  max-width: 28%;
+}
+
+.now-playing--artwork img {
+  height: 125px;
+  width: 125px;
+}
+
+.service--badge {
+  display: block;
+  height: 40px;
+  width: 110px;
+}
+
+// Now Playing END
 </style>

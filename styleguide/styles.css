@@ -46,11 +46,6 @@ body {
 	font-size: 14px;
 }
 
-.search-box:focus {
-	/*border-bottom: 2px solid #299dcf;*/
-	/*outline: 0;*/
-}
-
 .search-box::-webkit-input-placeholder {
   color: #94c5da;
 }

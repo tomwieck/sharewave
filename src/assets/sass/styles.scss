@@ -1,4 +1,87 @@
 @import './colors.scss';
+// Reusable
+.margin {
+  margin: 10px;
+}
+
+.white {
+  color: white;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.block {
+  display: block;
+  margin: 10px auto;
+}
+
+.btn {
+  font-family: 'Raleway', sans-serif;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 2px;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 18px;
+  padding: 6px 10px;
+}
+
+.btn--main {
+  background-color: #006692;
+  border: 2px solid #17385e;
+  color: white;
+}
+
+.btn--secondary {
+  background-color: #299dcf;
+  border: 2px solid #006692;
+  color: white;
+}
+
+.btn--disabled {
+  background-color: white;
+  border: 2px solid #94c5da;
+  color: #94c5da;
+}
+
+.btn--large {
+  font-size: 18px;
+  padding: 8px 10px;
+}
+
+.tag {
+  font-family: 'Raleway', sans-serif;
+  background-color: #299dcf;
+  /*border: 2px solid #006692;*/
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  letter-spacing: 1px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 6px 10px;
+  margin-right: 10px;
+}
+
+.search-box {
+  border: 0;
+  border: 1px solid #299dcf;
+  border-radius: 2px;
+  padding: 5px;
+  width: 250px;
+  font-size: 14px;
+}
+
+.search-box::-webkit-input-placeholder {
+  color: #94c5da;
+}
+.search-box::-moz-placeholder {
+  color: #94c5da;
+}
+
 // verifying class
 .help.is-danger {
   color: red;

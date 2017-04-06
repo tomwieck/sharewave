@@ -22,7 +22,7 @@ export default {
 
 <style lang="scss">
 @import "./assets/sass/styles.scss";
-@import url('https://fonts.googleapis.com/css?family=Comfortaa');
+@import url('https://fonts.googleapis.com/css?family=Comfortaa|Raleway');
 .block {
   display: block;
 }
@@ -56,6 +56,11 @@ export default {
 
 body {
   margin: 0;
+}
+
+h1, h2, h3 {
+  font-family: 'Raleway', sans-serif;
+  margin: 5px 0;
 }
 
 /*logo*/
