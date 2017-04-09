@@ -1,10 +1,10 @@
 <template>
   <div class="nav-login">
     <div v-if="username" class="login--username">
-        <a href="/#/myPlaylists">
+        <a :href="`/#/user/${encodeURIComponent(userId.replace(/\%2E/g, '.'))}`">
           <img class="profile-img" :src="imgUrl || placeholderUrl">
         </a>
-        <span class="profile-name"><a v-on:logout="signout" v-on:click="signout">Logout</a></span>
+        <!-- <span class="profile-name"><a v-on:logout="signout" v-on:click="signout">Logout</a></span> -->
     </div>
     <a v-else @click="showModal = true" class="login--link">
       <span>Login</span>
@@ -23,6 +23,7 @@
 <script>
 import SpotifyMixin from './spotifyMixin.js'
 import Firebase from './firebaseMixin.js'
+import { EventBus } from './eventBus.js';
 import Modal from './Modal.vue'
 
 export default {
@@ -41,6 +42,7 @@ export default {
   },
   mixins: [SpotifyMixin],
   mounted() {
+    this.setupListener();
     if (!this.stateChange) {
       this.registerStateChange();
     }
@@ -50,6 +52,11 @@ export default {
     this.$on('logout', this.signout);
   },
   methods: {
+    setupListener() {
+      EventBus.$on('logout', () => {
+        this.signout();
+      });
+    },
     spotifyRedirect() {
       this.axios.get('http://localhost:8888/login')
         .then(response => {
@@ -164,7 +171,7 @@ export default {
 
 .profile-img {
   border-radius: 50%;
-  height: 32px;
+  height: 44px;
 }
 
 .profile-name {

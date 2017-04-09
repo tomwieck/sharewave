@@ -13,10 +13,10 @@
         <input class="upload-playlist--name-input" v-bind:class="{ 'padding-right': resetButton }" v-model="playlistName">
         <span class="upload-playlist--icon-container">
           <transition name="fade">
-            <svg @click="resetChanges" v-show="resetButton" class="icon icon-spinner11"><use xlink:href="#icon-spinner11"></use></svg>
+            <svg @click="resetChanges" v-show="resetButton" class="icon icon-undo"><use xlink:href="#icon-undo"></use></svg>
           </transition>
-          <symbol id="icon-spinner11" viewBox="0 0 32 32">
-            <title>spinner11</title>
+          <symbol id="icon-undo" viewBox="0 0 32 32">
+            <title>undo</title>
             <path d="M32 12h-12l4.485-4.485c-2.267-2.266-5.28-3.515-8.485-3.515s-6.219 1.248-8.485 3.515c-2.266 2.267-3.515 5.28-3.515 8.485s1.248 6.219 3.515 8.485c2.267 2.266 5.28 3.515 8.485 3.515s6.219-1.248 8.485-3.515c0.189-0.189 0.371-0.384 0.546-0.583l3.010 2.634c-2.933 3.349-7.239 5.464-12.041 5.464-8.837 0-16-7.163-16-16s7.163-16 16-16c4.418 0 8.418 1.791 11.313 4.687l4.687-4.687v12z"></path>
           </symbol>
         </span>
@@ -80,6 +80,7 @@ export default {
   mounted() {
     this.getUser();
     this.loading = true;
+    // https://developer.spotify.com/web-api/console/get-users-profile/#complete
     this.owner = this.$route.params.user;
     this.playlistId = this.$route.params.playlist;
     this.getPlaylist()
@@ -144,6 +145,7 @@ export default {
           console.log(callback);
         });
       }
+      // Also add to user database, keep list of playlists
       Firebase.database().ref('playlists/' + this.playlistId).set({
         date_added: new Date().getTime(),
         tags: this.tags,
@@ -164,7 +166,7 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
-.icon-spinner11 {
+.icon-undo {
   color: red;
   cursor: pointer;
   width: 12px;
@@ -235,14 +237,6 @@ export default {
 
 .upload-playlist--button:hover {
   color: $play-color;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-  opacity: 0;
-  transition: opacity 0.2s
 }
 
 </style>

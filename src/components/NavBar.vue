@@ -3,15 +3,12 @@
     <a v-bind:href="loggedIn ? '/#/wave' : '/#/'"><img class="nav-bar--logo" src="../assets/logo3.png">
       <h1 class="nav-bar--heading logo-font">ShareWave</h1>
     </a>
-    <span v-if="loggedIn">
-      <ul class="nav-links-ul">
-        <li><a class="nav-bar--link" v-bind:class="checkRoute('wave') ? 'active' : ''" href="#/wave">Wave</a></li>
-        <li><a class="nav-bar--link" v-bind:class="checkRoute('myPlaylists') ? 'active' : ''" href="#/myPlaylists">My Playlists</a></li>
-        <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">All Playlists</a></li>
-        <!-- <li><a class="nav-bar--link" @click="emitLogout">Logout</a></li> -->
-
-      </ul>
-    </span>
+    <ul v-if="loggedIn" class="nav-links-ul">
+      <li><a class="nav-bar--link" v-bind:class="checkRoute('wave') ? 'active' : ''" href="#/wave">Wave</a></li>
+      <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">Playlists</a></li>
+      <!-- <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">All Playlists</a></li> -->
+      <!-- <li><a class="nav-bar--link nav-bar--link__logout" @click="emitLogout">Logout</a></li> -->
+    </ul>
     <login ref="loginRef"></login>
   </div>
 </template>
@@ -79,6 +76,10 @@ export default {
   transition: 0.2s;
 }
 
+.nav-bar--link__logout {
+  float: right;
+}
+
 .nav-bar--link:hover {
   border-bottom: 2px solid #17375c;
   transition: 0.2s;
@@ -110,6 +111,11 @@ export default {
   // @media screen and (max-width: $break-tablet) {
   //   display: none;
   // }
+  @media screen and (max-width: $break-tablet) {
+    float: none;
+    margin-top: 8px;
+    padding-left: 0;
+  }
   display: inline-block;
   float: left;
   list-style-type: none;
@@ -119,10 +125,6 @@ export default {
 
 .nav-links-ul li {
   display: inline-block;
-}
-
-.nav-bar--heading {
-  float: left;
 }
 
 .login:hover {
@@ -137,14 +139,15 @@ export default {
   color: #fff;
   display: inline-block;
   font-size: 49px;
+  float: left;
   text-decoration: none;
   font-weight: normal;
   margin: 0;
+  padding-left: 10px;
 }
 
 .nav-bar--logo {
   float: left;
-  padding-right: 10px;
   width: 42px;
 }
 </style>

@@ -16,8 +16,8 @@
           <!-- Need to refactor playing logic for icon <svg class="icon icon-play3"><use xlink:href="#icon-play3"></use></svg> -->
           <a>Preview</a>
         </div>
-        <div class="btn btn--main search-table--container-add">
-          <a @click="addToWave(result)">
+        <div @click="addToWave(result)" class="btn btn--main search-table--container-add">
+          <a>
             <svg class="icon icon-plus"><use xlink:href="#icon-plus"></use></svg>
             Add to Wave
           </a>

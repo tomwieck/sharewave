@@ -30,7 +30,7 @@
         v-bind:key="sSearchResults"
         :searchResults="sSearchResults"
         :parentWidth = "parentWidth"
-        service="Spotify">
+        :service="'Spotify'">
       </s-search-table>
       <!-- If no other result, width 100? -->
 
@@ -42,7 +42,7 @@
         v-bind:key="iSearchResults"
         :searchResults="iSearchResults"
         :parentWidth = "parentWidth"
-        service="iTunes">
+        :service="'iTunes'">
       </i-search-table>
 
 <!--       <y-search-table

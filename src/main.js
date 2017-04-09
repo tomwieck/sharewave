@@ -7,7 +7,7 @@ import axios from 'axios'
 import VeeValidate from 'vee-validate';
 import VueAxios from 'vue-axios'
 import VueCookie from 'vue-cookie'
-import VueYouTubeEmbed from 'vue-youtube-embed'
+// import VueYouTubeEmbed from 'vue-youtube-embed'
 import VueNotifications from 'vue-notifications'
 import miniToastr from 'mini-toastr'
 
@@ -25,7 +25,7 @@ const options = {
 Vue.use(VeeValidate);
 Vue.use(VueAxios, axios);
 Vue.use(VueCookie);
-Vue.use(VueYouTubeEmbed);
+// Vue.use(VueYouTubeEmbed);
 Vue.use(VueNotifications, options)
 
 /* eslint-disable no-new */

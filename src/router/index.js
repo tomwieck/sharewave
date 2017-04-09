@@ -8,6 +8,7 @@ import Search from 'components/Search'
 import UserPlaylists from 'components/UserPlaylists'
 import UploadPlaylist from 'components/UploadPlaylist'
 import ViewPlaylist from 'components/ViewPlaylist'
+import ViewUser from 'components/ViewUser'
 import Wave from 'components/Wave'
 // import SpotifyLogin from 'components/SpotifyLogin'
 
@@ -49,6 +50,11 @@ export default new Router({
       path: '/search',
       name: 'Search',
       component: Search
+    },
+    {
+      path: '/user/:user',
+      name: 'User',
+      component: ViewUser
     },
     {
       path: '/emailLogin',

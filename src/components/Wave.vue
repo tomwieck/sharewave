@@ -3,7 +3,27 @@
     <div class="wave-container--background">
       <div id="wave-container-all" class="wave-container--all">
         <!-- v-show when complete variable? -->
-        <span v-bind:class="{ 'my-wave': userId === value.id }" class="wave-container--user" v-for="(value, key) in waveSongs">
+        <div class="my-wave">
+          <div class="wave-container--user" v-for="(value, key) in waveSongs" v-if="userId === value.id">
+            <b>My Wave</b>
+            <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
+            <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
+          </div>
+        </div>
+        <div class="friend-wave float-left">
+          <div class="wave-container--user"v-for="(value, key) in waveSongs" v-if="userId !== value.id && waveSongs[key].songs.length !== 0">
+           <div class="wave-container--user-name">{{ value.name }}</div>
+            <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
+            <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
+          </div>
+        </div>
+        <div class="friend-wave">
+          <div class="wave-container--user"v-bind:class="{ 'float-left': waveSongs[key].songs.length !== 0 }" v-for="(value, key) in waveSongs" v-if="userId !== value.id && waveSongs[key].songs.length === 0">
+            <div class="wave-container--user-name">{{ value.name }}</div>
+            <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
+          </div>
+        </div>
+        <!-- <span v-bind:class="[ userId === value.id ? 'my-wave' : 'friend-wave' ]" class="wave-container--user" v-for="(value, key) in waveSongs">
           <div v-if="userId === value.id"><b>My Wave</b></div>
           <div v-else>{{ value.name }}</div>
           <div class='timer'>
@@ -18,18 +38,18 @@
               <div v-bind:class='key'></div>
             </div>
           </div>
-          <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
-        </span>
+        </span> -->
+        <!-- Without -->
       </div>
       <div v-bind:class="{'slideup': !detailsOpen, 'slidedown': detailsOpen}">
         <span v-if="details.songs ? details.songs.length === 0 : false"> You have no songs, add some below. </span>
         <span v-else>
           <span><b>All Songs</b></span>
           <div v-for="(song, key) in details.songs">
+            {{ song.song_artist }} - {{ song.song_title }}
             <span v-if="userId === details.name">
               <svg class="icon icon-bin" @click="deleteWave(song.id, key)"><use xlink:href="#icon-bin"></use></svg>
             </span>
-            {{ song.song_artist }} - {{ song.song_title }}
           </div>
         </span>
       </div>
@@ -37,14 +57,14 @@
     <span v-show="Object.keys(waveSongs).length === 1">
       Your friends Wave's will appear above.
         <br>
-      Add some Friends to get started.
+      Follow some Friends to get started.
     </span>
     <button class="btn btn--secondary margin block" @click="friendsClicked = !friendsClicked">
-      Add Friends <svg class="icon icon-user-plus"><use xlink:href="#icon-user-plus"></use></svg>
+      Follow Friends <svg class="icon icon-user-plus white"><use xlink:href="#icon-user-plus"></use></svg>
     </button>
     <transition name="fade">
       <div v-show="friendsClicked">
-          <list-users v-on:userClicked="addFriend"></list-users>
+        <list-users :add="true" v-on:userClicked="addFriend"></list-users>
       </div>
     </transition>
     <h3>Add Songs:</h3>
@@ -107,6 +127,7 @@ import SpotifyMixin from './spotifyMixin.js'
 import Firebase from './firebaseMixin.js'
 import ListUsers from './ListUsers.vue'
 import Search from './Search.vue'
+import WaveUser from './WaveUser.vue'
 import VueNotifications from 'vue-notifications'
 
 export default {
@@ -173,6 +194,7 @@ export default {
           this.wave = snapshot.val().wave;
           for (var user in friends) {
             // Should be non blocking, make each call to wave seperately after getting friend list ?
+            console.log(user);
             this.checkFriendsWaves(user)
           }
         } else {
@@ -183,15 +205,15 @@ export default {
     checkFriendsWaves(userId) {
       let friendRef = Firebase.database().ref(`users/${userId}`)
       friendRef.once('value', snapshot => {
-        let friendWave = snapshot.child('wave').val();
-        if (friendWave) {
-          let user = {
-            displayName: snapshot.val().display_name,
-            photoURL: snapshot.val().img_url,
-            uid: userId
-          }
-          this.regsiterChildAdded(user);
+        // let friendWave = snapshot.child('wave').val();
+        // if (friendWave) {
+        let user = {
+          displayName: snapshot.val().display_name,
+          photoURL: snapshot.val().img_url,
+          uid: userId
         }
+        this.regsiterChildAdded(user);
+        // }
       })
     },
     regsiterChildAdded(user) {
@@ -202,10 +224,14 @@ export default {
       this.setUpUser(userRef, user);
       // get wave DB entry for specifc user and register child added
       this.waveRef = Firebase.database().ref(`wave/${userId}`);
-      this.waveRef.orderByChild(`date_added`).on('child_added', snapshot => {
+      let day = 60 * 60 * 24 * 1000;
+      let yesterday = new Date().getTime() - day;
+      this.waveRef.orderByChild(`date_added`).startAt(yesterday).on('child_added', snapshot => {
         userRef.songs.unshift(snapshot.val());
         this.$forceUpdate();
       });
+      console.log('here?');
+      this.$forceUpdate();
     },
     setUpUser(userRef, user) {
       userRef.counter = 0;
@@ -425,7 +451,8 @@ export default {
   },
   components: {
     'list-users': ListUsers,
-    'search': Search
+    'search': Search,
+    'wave-user': WaveUser
   }
 }
 </script>
@@ -439,13 +466,13 @@ export default {
 }
 
 .wave-container--background {
-  background-color: #e8e8e8;
+  background-color: $light-grey;
   padding-top: 10px;
   width: 100%;
+  margin: auto;
 }
 
 .wave-container--all {
-  display: inline-block;
   height: 160px;
   overflow-x: scroll;
   overflow-y: hidden;
@@ -455,6 +482,17 @@ export default {
 
 .wave-container--user {
   display: inline-block;
+  width: 120px;
+  // margin: auto;
+}
+
+.wave-container--user-name {
+  display: inline-block;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  width: 125px;
+  vertical-align: top;
 }
 
 .wave-add-songs--link,
@@ -465,100 +503,20 @@ export default {
   text-decoration: underline;
 }
 
-.wave--profile-pic {
-  border-radius: 50%;
-  left: 5px;
-  position: absolute;
-  top: 5px;
-  width: 100px;
-  z-index: 1;
+.my-wave,
+.friend-wave {
+  // float: left;
+  display: inline-block;
 }
 
-.wave-true {
-  border: 5px solid $play-color;
-  top: 0;
-  left: 0;
-  cursor: pointer;
+.friend-wave {
+  dispay: flex;
 }
 
-.wave-false {
-  border: 5px solid grey;
-  top: 0;
-  left: 0;
-}
-
-// Spin effect keyframes
-@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
-
-.wave--playing {
-  border: none;
-  top: 5px;
-  left: 5px;
-  -webkit-animation:spin 2s linear infinite;
-  -moz-animation:spin 2s linear infinite;
-  animation:spin 2s linear infinite;
-}
+// .friend-wave:last-of-type {
+//   padding-right: 110px;
+// }
 // Wave Styles END
-
-// Timer START
-.timer {
-  background-size: 100px 100px;
-  background-repeat: no-repeat;
-  border-radius: 100%;
-  width: 110px;
-  height: 110px;
-  position: relative;
-  z-index: 1;
-  margin: 0 5px;
-}
-
-.timer--rect {
-  position: absolute;
-  width: 110px;
-  height: 110px;
-  clip: rect(0px, 110px, 110px, 55px);
-  border-radius: 100%;
-  background-color: $play-color;
-}
-
-.fill {
-  background-color: $logo-color;
-  position: absolute;
-  width: 110px;
-  height: 110px;
-  border-radius: 100%;
-  clip: rect(0px, 55px, 110px, 0px);
-}
-
-@keyframes left { 0%{-webkit-transform:rotate(0deg);} 100%{transform:rotate(180deg);} }
-@-webkit-keyframes left { 0%{-webkit-transform:rotate(0deg);} 100%{-webkit-transform:rotate(180deg);}}
-
-.timer--left .fill {
-  -webkit-animation: left 15s linear ;
-  -moz-animation: left 15s linear ;
-  animation: left 15s linear both;
-}
-
-.timer--right {
-  -webkit-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  transform: rotate(180deg);
-}
-
-@keyframes right { 0%{-webkit-transform:rotate(0deg);} 100%{transform:rotate(180deg);} }
-@-webkit-keyframes right { 0% {transform: rotate(0deg);} 100% {transform: rotate(180deg);} }
-
-.timer--right .fill {
-  -webkit-animation: right 15s linear ;
-  -moz-animation: right 15s linear ;
-  animation: right 15s linear both ;
-  -webkit-animation-delay: 15s;
-  -moz-animation-delay: 15s;
-  animation-delay: 15s;
-}
-// Timer END
 
 // Recently Played START
 .recently-played {
@@ -630,37 +588,19 @@ export default {
 }
 // More Details END
 
-// Pulse START
-.pulse {
-  animation: pulse 2s infinite;
-  box-shadow: 0 0 0 rgba(41,157,207, 0.4);
-}
-
-@-webkit-keyframes pulse {
-  0% { -webkit-box-shadow: 0 0 0 0 rgba(41,157,207, 0.4);}
-  70% {-webkit-box-shadow: 0 0 0 10px rgba(41,157,207, 0);}
-  100% { -webkit-box-shadow: 0 0 0 0 rgba(41,157,207, 0);}
-}
-@keyframes pulse {
-  0% { -moz-box-shadow: 0 0 0 0 rgba(41,157,207, 0.4); box-shadow: 0 0 0 0 rgba(41,157,207, 0.4);}
-  70% { -moz-box-shadow: 0 0 0 10px rgba(41,157,207, 0); box-shadow: 0 0 0 10px rgba(41,157,207, 0);}
-  100% { -moz-box-shadow: 0 0 0 0 rgba(41,157,207, 0); box-shadow: 0 0 0 0 rgba(41,157,207, 0);}
-}
-// Pulse END
-
 // Now Playing START
 .now-playing {
-    height: 125px;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    bottom: 0;
-    right: 0;
-    opacity: 0.95;
-    background-color: $logo-color;
-    overflow-y: hidden;
-    transition: 0.4s;
-    transition-timing-function: cubic-bezier(0.61, 0.12, 0.43, 0.99);
+  height: 125px;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  bottom: 0;
+  right: 0;
+  opacity: 0.95;
+  background-color: $logo-color;
+  overflow-y: hidden;
+  transition: 0.4s;
+  transition-timing-function: cubic-bezier(0.61, 0.12, 0.43, 0.99);
 }
 
 
@@ -687,7 +627,7 @@ export default {
 
 
 .now-playing a:hover, .offcanvas a:focus{
-    color: #f1f1f1;
+  color: #f1f1f1;
 }
 
 
@@ -724,7 +664,6 @@ export default {
 .now-playing--artwork {
   display: inline-block;
   float: right;
-  max-width: 28%;
 }
 
 .now-playing--artwork img {
@@ -737,6 +676,14 @@ export default {
   height: 40px;
   width: 110px;
 }
-
 // Now Playing END
+
+.white {
+  color: white;
+}
+
+.float-left {
+  // float: left;
+  order: -1;
+}
 </style>

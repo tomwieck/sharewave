@@ -1,9 +1,9 @@
 <template>
   <div class="view-playlist">
     <span v-if="uploader">
-    <h2> {{ title }} </h2>
       <div>
         <img class="view-playlist--cover" v-bind:src="imgUrl">
+          <h2> {{ title }} </h2>
         <div>
           <p>Uploaded: {{ dateAdded }}</p>
           <p>Uploaded By: {{ uploader }}</p>
@@ -83,7 +83,7 @@ export default {
     },
     convertTime(epoch) {
       let date = new Date(epoch);
-      return date.toLocaleDateString();
+      return date.toLocaleDateString('en-GB');
     },
     getPlaylistImage() {
       const options = {
