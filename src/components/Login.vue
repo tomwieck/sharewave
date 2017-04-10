@@ -89,7 +89,6 @@ export default {
                 userId: this.userId
               });
             }
-            console.log('updated');
             // If user doesnt already exist in user database, add them
             Firebase.database().ref('/users/' + this.userId).once('value')
               .then(snapshot => {

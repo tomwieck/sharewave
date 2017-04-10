@@ -23,7 +23,7 @@ export default new Router({
     },
     {
       path: '/loggedin/:access_token/:refresh_token/:firebase_token',
-      name: 'Logged in',
+      name: 'Wave',
       component: Wave
     },
     {

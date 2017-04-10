@@ -40,6 +40,7 @@ export default {
       ownPlaylist: false,
       imgUrl: '',
       owner: '',
+      tags: '',
       title: '',
       uploader: '',
       user: '',
@@ -76,6 +77,7 @@ export default {
           this.dateAdded = this.convertTime(snapshot.val().date_added);
           this.owner = snapshot.val().owner;
           this.title = snapshot.val().title;
+          this.tags = snapshot.val().tags;
           this.uploader = snapshot.val().uploader.replace(/\%2E/g, '.');
           if (this.user === this.uploader) { this.ownPlaylist = true };
           this.getPlaylistImage();
@@ -96,10 +98,16 @@ export default {
       });
     },
     deletePlaylist() {
+      if (this.tags) {
+        let updates = {}
+        this.tags.forEach(tag => {
+          updates[`${tag}/${this.playlistUri}`] = null;
+        })
+        Firebase.database().ref('tags/').update(updates);
+      }
       this.playlistRef.remove();
       VueNotifications.error({message: `Playlist deleted from ShareWave`});
       this.$router.push(`/allPlaylists`);
-      // this.waveRef.child(id).remove();
     }
   }
 }

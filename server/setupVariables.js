@@ -1,7 +1,7 @@
 if(!process.env.CLIENT_SECRET && !process.env.GOOGLE_SECRET) {
   var env = require('./secret.js')
 }
-//State Key cookie 
+//State Key cookie
 var stateKey = 'spotify_auth_state';
 
 //Spotify API Setup

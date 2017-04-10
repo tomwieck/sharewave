@@ -58,7 +58,7 @@ body {
   margin: 0;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   font-family: 'Raleway', sans-serif;
   margin: 5px 0;
 }

@@ -4,8 +4,8 @@
       <h1 class="nav-bar--heading logo-font">ShareWave</h1>
     </a>
     <ul v-if="loggedIn" class="nav-links-ul">
-      <li><a class="nav-bar--link" v-bind:class="checkRoute('wave') ? 'active' : ''" href="#/wave">Wave</a></li>
-      <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">Playlists</a></li>
+      <li><a class="nav-bar--link" v-bind:class="checkRoute('Wave') ? 'active' : ''" href="#/wave">Wave</a></li>
+      <li><a class="nav-bar--link" v-bind:class="checkRoute('All Playlists') ? 'active' : ''" href="#/allPlaylists">Playlists</a></li>
       <!-- <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">All Playlists</a></li> -->
       <!-- <li><a class="nav-bar--link nav-bar--link__logout" @click="emitLogout">Logout</a></li> -->
     </ul>
@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     checkRoute(route) {
-      return route === this.$route.path.substring(1);
+      return route === this.$route.name;
     },
     registerStateChange() {
       // console.log(this.$route)

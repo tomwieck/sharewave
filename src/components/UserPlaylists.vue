@@ -1,20 +1,23 @@
 <template>
   <div class="user-playlists">
-   <div v-if="playlists" class="playlist-list">
-      <transition appear name="fade">
-      <div>
-        <div>Showing {{ playlists.items.length }} of {{ playlists.total }} playlists</div>
-        <div class="playlist-container" v-for="playlist in playlists.items">
-          <span class="playlist-title"><b>{{ playlist.name }} </b></span>
-          <img class="playlist-art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">
-          <a class="playlist-text" v-bind:href="playlist.uri">Open in Spotify</a>
-          <a class="playlist-upload" v-bind:href="generateLink(playlist.owner.id, playlist.id)">Add to ShareWave</a>
+   <div v-if="playlists" class="playlist--list">
+      <div>Showing {{ playlists.items.length }} of {{ playlists.total }} playlists</div>
+      <transition-group appear class="playlist--all-containers" name="fade">
+        <div class="playlist--container" v-for="playlist in playlists.items" :key="playlist.name">
+          <img class="playlist--art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">
+          <span class="playlist--title"><b>{{ playlist.name }} </b></span>
+          <a v-bind:href="playlist.uri"><img class="playlist--spotify" :src="spotifyBadge"></a>
+          <!-- <a class="playlist--text" v-bind:href="">Open in Spotify</a> -->
+          <div class="playlist--spotify-upload">
+            <a class="playlist--upload" v-bind:href="generateLink(playlist.owner.id, playlist.id)">
+              <button class="btn btn--main">Upload</button>
+            </a>
+          </div>
         </div>
-        <h2 v-show="playlists.total > 20" class="playlist-load-more"><a v-on:click="loadMore">{{ loadMoreText }}</a></h2>
-      </div>
-      </transition>
+      </transition-group>
+      <h2 v-show="playlists.total > 20" class="playlist--load-more"><a v-on:click="loadMore">{{ loadMoreText }}</a></h2>
     </div>
-    <div v-else class="playlist-error">
+    <div v-else class="playlist--error">
       <div v-if="error">
         <p> Please login to see your playlists </p>
       </div>
@@ -36,7 +39,8 @@ export default {
       error: null,
       loadMoreText: 'Load more...',
       placeholder: '../static/artplaceholder.png',
-      playlists: null
+      playlists: null,
+      spotifyBadge: '../static/spotifyBadge.svg'
     }
   },
   mixins: [SpotifyMixin],
@@ -82,24 +86,16 @@ export default {
 
 <style lang="scss" scoped>
 
-.playlist-list {
+.playlist--list {
   padding-top: 10px;
 }
 
-.playlist-load-more {
+.playlist--load-more {
   cursor: pointer;
 }
 
-.playlist-load-more:hover {
+.playlist--load-more:hover {
   color: #17385e;
 }
-
-// .fade-enter-active, .fade-leave-active {
-//   transition: opacity 0.5s
-// }
-// .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-//   opacity: 0;
-//   transition: opacity 0.5s
-// }
 
 </style>

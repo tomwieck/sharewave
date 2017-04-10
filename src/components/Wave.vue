@@ -5,21 +5,21 @@
         <!-- v-show when complete variable? -->
         <div class="my-wave">
           <div class="wave-container--user" v-for="(value, key) in waveSongs" v-if="userId === value.id">
-            <b>My Wave</b>
+            <a :href="'/#/user/' + value.id"><b>My Wave</b></a>
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
             <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
           </div>
         </div>
         <div class="friend-wave float-left">
           <div class="wave-container--user"v-for="(value, key) in waveSongs" v-if="userId !== value.id && waveSongs[key].songs.length !== 0">
-           <div class="wave-container--user-name">{{ value.name }}</div>
+            <div class="wave-container--user-name"><a :href="'/#/user/' + value.id">{{ value.name }}</a></div>
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
             <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
           </div>
         </div>
         <div class="friend-wave">
           <div class="wave-container--user"v-bind:class="{ 'float-left': waveSongs[key].songs.length !== 0 }" v-for="(value, key) in waveSongs" v-if="userId !== value.id && waveSongs[key].songs.length === 0">
-            <div class="wave-container--user-name">{{ value.name }}</div>
+            <div class="wave-container--user-name"><a :href="'/#/user/' + value.id">{{ value.name }}</a></div>
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
           </div>
         </div>
@@ -70,9 +70,9 @@
     <h3>Add Songs:</h3>
     <!-- <a class="btn btn--secondary" @click="searchClicked = !searchClicked">Search Spotify and iTunes</a> -->
     <search v-on:addToWave="addToWave"></search>
-    <a class="btn btn--secondary" v-if="spotify" @click="spotifyRecentlyPlayed">
+    <span class="btn btn--secondary" v-if="spotify" @click="spotifyRecentlyPlayed">
       See your recent Spotify tracks
-    </a>
+    </span>
     <div v-if="recentlyPlayedClicked">
       <div v-if="recentlyPlayed.length === 0">
         {{ recentlyPlayedText }}
@@ -164,6 +164,13 @@ export default {
   mounted() {
     this.getUser();
   },
+  watch: {
+    playing() {
+      if (Object.keys(this.playing).length === 0) {
+        this.closeNowPlaying();
+      }
+    }
+  },
   methods: {
     // Add LOADING...
     // When redirected to this page after login, user may not be created in DB in time (emit event?)
@@ -230,7 +237,6 @@ export default {
         userRef.songs.unshift(snapshot.val());
         this.$forceUpdate();
       });
-      console.log('here?');
       this.$forceUpdate();
     },
     setUpUser(userRef, user) {
@@ -336,7 +342,10 @@ export default {
         this.recentlyPlayedClicked = false;
       } else {
         this.recentlyPlayedClicked = true;
-        this.recentlyPlayedText = 'Loading...'
+        this.recentlyPlayedText = 'Loading...';
+        this.getCurrentlyPlaying(callback => {
+          console.log(callback);
+        })
         this.getRecentlyPlayed(callback => {
           if (callback.items.length === 0) {
             this.recentlyPlayedText = 'No results, try searching for a song instead';
@@ -459,6 +468,16 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
+
+a {
+  color: $logo-color;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+a:hover {
+  color: $play-color;
+}
 // Wave Styles START
 .wave {
   // height of now playing

@@ -45,6 +45,8 @@
       <div class="upload-playlist--tags">
         <span v-for="tag in tags">
           <div>{{tag}}</div>
+        </span>
+        <span v-show="errorMessage">{{ errorMessage }}</span>
       </div>
 
       <a class="upload-playlist--button" @click="addToDatabase"> Upload </a>
@@ -62,6 +64,7 @@ export default {
   data () {
     return {
       addButton: false,
+      errorMessage: false,
       loading: false,
       imgUrl: '',
       originalPlaylistName: '',
@@ -136,14 +139,30 @@ export default {
       return this.playlistName !== this.originalPlaylistName;
     },
     addTag() {
-      this.tags.push(this.tag.toLowerCase());
-      this.tag = '';
+      let reg = new RegExp(/\/|\$|\#|\.|\[|\]/);
+      if (reg.test(this.tag)) {
+        this.errorMessage = 'Tags cannot contain ".", "#", "$", "/", "[", or "]"';
+      } else {
+        this.tags.push(this.tag.toLowerCase());
+        this.tag = '';
+        this.errorMessage = false;
+      }
     },
     addToDatabase: function() {
       if (this.ownPlaylist && this.playlistNameChanged()) {
         this.updatePlaylistName(this.owner, this.playlistId, this.playlistName, function(callback) {
           console.log(callback);
         });
+      }
+      // https://firebase.googleblog.com/2015/09/introducing-multi-location-updates-and_86.html
+      if (this.tags.length !== 0) {
+        let updates = {}
+        this.tags.forEach(tag => {
+          updates[`${tag}/${this.playlistId}`] = true;
+        });
+        console.log(updates);
+        Firebase.database().ref('tags/').update(updates);
+        // Firebase.database().ref('tags/' + this.tags[0]).update(obj);
       }
       // Also add to user database, keep list of playlists
       Firebase.database().ref('playlists/' + this.playlistId).set({
@@ -162,7 +181,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 

@@ -3,7 +3,7 @@
     <!-- <input class="users--search" placeholder="Search..." v-model="searchTerm"> -->
     <div class="users--user" v-for="user in addedFriends" :key="user.display_name">
       <img class="users--profile-pic" :src="user.img_url || placeholderUrl">
-      <span>{{ user.display_name }}</span>
+      <span><a :href="'/#/user/' + user.id">{{ user.display_name }}</a></span>
       <small class="users--email">{{ user.email }}</small>
       <button @click="userClicked(user)" v-show="add" class="btn btn--secondary users--button">
         Follow
@@ -79,6 +79,16 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
+a {
+  color: $logo-color;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+a:hover {
+  color: $play-color;
+}
+
 span {
   display: block;
 }
@@ -86,6 +96,7 @@ span {
 .users {
   background-color: $light-grey;
   max-height: 500px;
+  overflow-y: scroll;
 }
 
 .users--user {

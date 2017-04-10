@@ -77,13 +77,7 @@ export default {
       //   });
     }
     // getWave() {
-    //   let safeUser = 'tom.wieck'.replace(/\./g, '%2E');
-    //   this.waveRef = Firebase.database().ref(`wave/${safeUser}`);
-    //   // seconds * minutes * hours * milliseconds = 1 day
-    //   console.log(yesterday);
-    //   this.waveRef.orderByChild(`date_added`).startAt(yesterday).on('child_added', snapshot => {
-    //     console.log(snapshot.val());
-    //   });
+
     // }
   },
   components: {
