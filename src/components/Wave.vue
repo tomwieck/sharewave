@@ -178,9 +178,9 @@ export default {
       // Could set listeners for all friends so that if they are added updated in real time
       this.userRef = Firebase.database().ref(`users/${userId}`);
       this.userRef.once('value', snapshot => {
+        this.spotify = snapshot.val().spotify;
         if (snapshot.child('friends').exists()) {
           let friends = snapshot.val().friends;
-          this.spotify = snapshot.val().spotify;
           this.wave = snapshot.val().wave;
           for (var user in friends) {
             // Should be non blocking, make each call to wave seperately after getting friend list ?
