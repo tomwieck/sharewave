@@ -251,7 +251,9 @@ export default {
     //   this.youtubeTarget.innerText = 'Preview';
     // },
     addToWave(result) {
-      this.audioObject.pause();
+      if (this.audioObject) {
+        this.audioObject.pause();
+      }
       this.$emit('addToWave', result);
     }
   },

@@ -83,8 +83,8 @@
       </div>
     </div>
     <div v-if="Object.keys(playing).length !== 0" class="now-playing--artwork">
-      <transition appear name="fade">
-        <img :src="playing.artwork ? playing.artwork : getArtwork(playing.id)">
+      <transition mode="out-in" name="fade">
+        <img :key="playing.artwork" :src="playing.artwork ? playing.artwork : getArtwork(playing.id)">
       </transition>
     </div>
   </div>
