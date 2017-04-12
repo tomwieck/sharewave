@@ -105,6 +105,17 @@ app.get('/refreshToken', function(req, res) {
 	});
 });
 
+app.get('/trackArtwork', function(req, res) {
+	spotifyApi.getTrack(req.query.trackId)
+	.then(function(data) {
+	  let images = data.body.album.images;
+	  res.send(images[1] ? images[1].url : images[0].url);
+	},
+	function(err) {
+	  res.status(err.statusCode).send(err);
+	});
+});
+
 app.get('/search', function(req, res) {
 	let searchTerm = req.query.searchTerm;
 	let servicesArr = req.query.services.split(' ');

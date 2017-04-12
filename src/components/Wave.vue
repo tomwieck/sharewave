@@ -23,23 +23,6 @@
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
           </div>
         </div>
-        <!-- <span v-bind:class="[ userId === value.id ? 'my-wave' : 'friend-wave' ]" class="wave-container--user" v-for="(value, key) in waveSongs">
-          <div v-if="userId === value.id"><b>My Wave</b></div>
-          <div v-else>{{ value.name }}</div>
-          <div class='timer'>
-            <img class="wave--profile-pic"
-                 v-bind:class="{ 'wave-true pulse': waveSongs[key].songs.length !== 0, 'wave-false': waveSongs[key].songs.length === 0}"
-                 @click="playWave($event, key)"
-                 :src="value.imgUrl || placeholderUrl">
-            <div class='timer--rect timer--left'>
-              <div v-bind:class='key'></div>
-            </div>
-            <div class='timer--rect timer--right'>
-              <div v-bind:class='key'></div>
-            </div>
-          </div>
-        </span> -->
-        <!-- Without -->
       </div>
       <div v-bind:class="{'slideup': !detailsOpen, 'slidedown': detailsOpen}">
         <span v-if="details.songs ? details.songs.length === 0 : false"> You have no songs, add some below. </span>
@@ -55,9 +38,7 @@
       </div>
     </div>
     <span v-show="Object.keys(waveSongs).length === 1">
-      Your friends Wave's will appear above.
-        <br>
-      Follow some Friends to get started.
+      Your friends Wave's will appear above. <br> Follow some Friends to get started.
     </span>
     <button class="btn btn--secondary margin block" @click="friendsClicked = !friendsClicked">
       Follow Friends <svg class="icon icon-user-plus white"><use xlink:href="#icon-user-plus"></use></svg>
@@ -101,8 +82,10 @@
         </div>
       </div>
     </div>
-    <div class="now-playing--artwork">
-      <img :src="'../static/artplaceholder.png'">
+    <div v-if="Object.keys(playing).length !== 0" class="now-playing--artwork">
+      <transition appear name="fade">
+        <img :src="playing.artwork ? playing.artwork : getArtwork(playing.id)">
+      </transition>
     </div>
   </div>
   <symbol id="icon-bin" viewBox="0 0 32 32">
@@ -134,12 +117,12 @@ export default {
   name: 'Wave',
   data () {
     return {
+      artPlaceholder: '../static/artplaceholder.png',
       audioObject: null,
       details: {},
       detailsOpen: false,
       imgUrl: '',
       friendsClicked: false,
-      placeholderUrl: '../static/placeholder.png',
       playing: {},
       previousTarget: '',
       recentlyPlayed: [],
@@ -272,7 +255,8 @@ export default {
     },
     // ADD / DELETE WAVE
     addRecentToWave(song) {
-      // If album is needed, could make API call here, or when retrieving album art
+      // If album art is needed, could make API call here, or when retrieving album art
+      console.log(song);
       const result = {
         album: null,
         artist: song.artists[0].name,
@@ -285,9 +269,10 @@ export default {
       this.addToWave(result);
     },
     addToWave(result) {
-      console.log('added to wave');
-      this.ifPlayingPause();
       let userId = this.userId.replace(/\./g, '%2E');
+      this.ifPlayingPause();
+      this.waveSongs[userId].counter = 0;
+      this.closeNowPlaying();
       Firebase.database().ref(`wave/${userId}/${result.id}`).update({
         artwork_url: (result.service === 'itunes' ? result.artwork : null),
         date_added: new Date().getTime(),
@@ -306,7 +291,6 @@ export default {
         });
         this.wave = true;
       }
-      console.log('add');
       this.details.songs = this.waveSongs[userId].songs;
       VueNotifications.success({message: `Added to Wave`});
       this.$forceUpdate();
@@ -321,7 +305,7 @@ export default {
       let userRef = this.waveSongs[userId];
       userRef.songs.splice(key, 1);
       this.checkEmpty(this.userId.replace(/\./g, '%2E'));
-      console.log(this.waveSongs[userId])
+      this.waveSongs[userId].counter = 0;
       // Remove from DB
       this.waveRef = Firebase.database().ref(`wave/${userId}`);
       this.waveRef.child(id).remove();
@@ -343,9 +327,6 @@ export default {
       } else {
         this.recentlyPlayedClicked = true;
         this.recentlyPlayedText = 'Loading...';
-        this.getCurrentlyPlaying(callback => {
-          console.log(callback);
-        })
         this.getRecentlyPlayed(callback => {
           if (callback.items.length === 0) {
             this.recentlyPlayedText = 'No results, try searching for a song instead';
@@ -398,8 +379,10 @@ export default {
       })
     },
     setPlaying(song, id) {
+      console.log(song);
       this.playing = {
         artist: song.song_artist,
+        artwork: song.artwork_url || null,
         id: song.id,
         ownerId: id.replace(/\%2E/g, '.'),
         title: song.song_title,
@@ -407,6 +390,16 @@ export default {
         url: song.url
       }
       this.openNowPlaying();
+    },
+    getArtwork(trackId) {
+      this.playing.artwork = this.artPlaceholder;
+      this.axios.get(`http://localhost:8888/trackArtwork?trackId=${trackId}`)
+      .then(response => {
+        this.playing.artwork = response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      })
     },
     removeClass(target) {
       target.classList.remove('wave--playing');
