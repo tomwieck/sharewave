@@ -56,9 +56,10 @@ app.get('/callback', function(req, res) {
 	    // spotifyApi.setRefreshToken(callback.refresh_token);
 	  	spotify.getMe(spotifyApi, function(me) {
 	  		const safeId = me.id.replace(/\./g, '%2E');
+	  		console.log(safeId);
 			createFirebaseToken(safeId)
 			.then(function(firebaseToken) {
-				res.redirect(`#/loggedin/${callback.access_token}/${callback.refresh_token}/${firebaseToken}`);
+				res.redirect(`https://tomwieck.github.io/sharewave/#/loggedin/${callback.access_token}/${callback.refresh_token}/${firebaseToken}`);
 			});
 		});
 	});
