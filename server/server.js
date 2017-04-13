@@ -58,7 +58,7 @@ app.get('/callback', function(req, res) {
 	  		const safeId = me.id.replace(/\./g, '%2E');
 			createFirebaseToken(safeId)
 			.then(function(firebaseToken) {
-				res.redirect(`http://localhost:8080/#/loggedin/${callback.access_token}/${callback.refresh_token}/${firebaseToken}`);
+				res.redirect(`#/loggedin/${callback.access_token}/${callback.refresh_token}/${firebaseToken}`);
 			});
 		});
 	});

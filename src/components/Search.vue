@@ -121,7 +121,7 @@ export default {
     },
     clientCredentials: function() {
       var vm = this;
-      vm.axios.get('http://localhost:8888/clientCredential')
+      vm.axios.get('http://sharewave.bitnamiapp.com/clientCredential')
       .then(function (response) {
         vm.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
       })
@@ -146,7 +146,7 @@ export default {
             let accessToken = this.$cookie.get('access_token') || this.$cookie.get('client_access_token')
             let accessTokenString = '&access_token=' + accessToken;
             var vm = this;
-            vm.axios.get('http://localhost:8888/search?searchTerm=' + this.searchTerm + services + accessTokenString)
+            vm.axios.get('http://sharewave.bitnamiapp.com/search?searchTerm=' + this.searchTerm + services + accessTokenString)
             .then(function (response) {
               vm.updateTables(response.data);
             })

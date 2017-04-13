@@ -393,7 +393,7 @@ export default {
     },
     getArtwork(trackId) {
       this.playing.artwork = this.artPlaceholder;
-      this.axios.get(`http://localhost:8888/trackArtwork?trackId=${trackId}`)
+      this.axios.get(`http://sharewave.bitnamiapp.com/trackArtwork?trackId=${trackId}`)
       .then(response => {
         this.playing.artwork = response.data;
       })

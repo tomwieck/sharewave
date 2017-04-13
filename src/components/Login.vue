@@ -58,7 +58,7 @@ export default {
       });
     },
     spotifyRedirect() {
-      this.axios.get('http://localhost:8888/login')
+      this.axios.get('http://sharewave.bitnamiapp.com/login')
         .then(response => {
           if (response.data) {
             window.location.href = response.data;
