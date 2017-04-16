@@ -8,7 +8,7 @@
           <input class="email-login--password" placeholder="Password" type="password" v-model="password">
         </span>
         <div class="help.is-danger" v-show="errorMessage">Incorrect Password, try again</div>
-        <button class="email-login--submit">Submit</button>
+        <button class="btn btn--main">Submit</button>
       </div>
     </form>
   </div>

@@ -2,9 +2,16 @@
   <div class="view-user">
     <img class="view-user--profile-pic" v-bind:src="imgUrl || placeholder ">
     <h1 class="view-user--name">{{ displayName }}</h1>
-    <div v-show="ownProfile" class="view-user--logout" @click="logout"><a>Logout</a></div<>
+    <div v-show="ownProfile" class="view-user--logout" @click="logout">
+      <svg class="icon icon-exit"><use xlink:href="#icon-exit"></use></svg>
+      <a>Logout
+    </a></div>
     <h2>Friends</h2>
     <list-users :friendList="friendsArr" :remove="ownProfile" v-on:userClicked="removeFriend"></list-users>
+    <symbol id="icon-exit" viewBox="0 0 32 32">
+      <title>exit</title>
+      <path d="M24 20v-4h-10v-4h10v-4l6 6zM22 18v8h-10v6l-12-6v-26h22v10h-2v-8h-16l8 4v18h8v-6z"></path>
+    </symbol>
   </div>
 </template>
 
@@ -88,6 +95,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.icon-exit {
+  margin-top: -4px;
+}
+
 .view-user {
   margin-top: 10px;
 }

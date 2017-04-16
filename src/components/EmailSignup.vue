@@ -4,37 +4,37 @@
     <form @submit.prevent="validateBeforeSubmit">
       <div class="email-signup--container">
         <span :class="{ 'control': true }">
-          <input 
-            class="email-signup--usr" 
+          <input
+            class="email-signup--usr"
             data-vv-delay="500"
-            name="username" 
+            name="username"
             placeholder="Name"
-            v-model="username" 
-            v-validate="'required|min:6'" 
+            v-model="username"
+            v-validate="'required|min:6'"
             >
           <transition name="fade">
             <span v-show="errors.has('username')" class="help is-danger">{{ errors.first('username') }}</span>
           </transition>
 
-          <input 
-            class="email-signup--email" 
+          <input
+            class="email-signup--email"
             data-vv-delay="500"
-            name="email" 
+            name="email"
             placeholder="Email"
-            type="text" 
-            v-model="email" 
-            v-validate="'required|email'" 
+            type="text"
+            v-model="email"
+            v-validate="'required|email'"
             >
           <transition name="fade">
             <span v-show="errors.has('email')" class="help is-danger">{{ errors.first('email') }}</span>
           </transition>
 
-          <input 
+          <input
             class="email-signup--password"
-            name="password" 
+            name="password"
             placeholder="Password"
             type="password"
-            v-model="password" 
+            v-model="password"
             v-validate="{ rules: { required: true, min: 6, regex: /\d.*[A-Z]|[A-Z].*\d/}}"
             >
           <transition name="fade">
@@ -50,7 +50,7 @@
           </span>
         </span>
         <div class="help is-danger"v-if="errorMessage"> {{ errorMessage }}</div>
-        <button class="email-signup--submit"> Submit </button>
+        <button class="btn btn--main"> Submit </button>
       </div>
     </form>
   </div>
@@ -160,7 +160,7 @@ export default {
   margin: auto;
   padding: 10px;
   text-decoration: none;
-  width: 96px; 
+  width: 96px;
 }
 
 .email-signup--submit:hover {

@@ -1,13 +1,13 @@
-<template>  
+<template>
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container" @click="$emit('close')">
 
-          <div class="modal-default-button">
-            Close
+          <div>
+            <svg class="icon icon-cancel-circle"><use xlink:href="#icon-cancel-circle"></use></svg>
           </div>
-          
+
           <div class="modal-header">
             <slot name="header">
               <h2>Default header</h2>
@@ -16,7 +16,7 @@
 
           <div class="modal-body">
             <slot name="body">
-              <a>default body</a> 
+              <a>default body</a>
             </slot>
           </div>
 
@@ -26,6 +26,11 @@
           </div>
         </div>
       </div>
+    <symbol id="icon-cancel-circle" viewBox="0 0 32 32">
+      <title>cancel-circle</title>
+      <path d="M16 0c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16zM16 29c-7.18 0-13-5.82-13-13s5.82-13 13-13 13 5.82 13 13-5.82 13-13 13z"></path>
+      <path d="M21 8l-5 5-5-5-3 3 5 5-5 5 3 3 5-5 5 5 3-3-5-5 5-5z"></path>
+    </symbol>
     </div>
   </transition>
 </template>
@@ -37,6 +42,11 @@ export default {
 </script>
 
 <style scoped>
+.icon-cancel-circle {
+  position: absolute;
+  left: 10px;
+  font-size: 18px;
+}
 .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -55,6 +65,7 @@ export default {
 }
 
 .modal-container {
+  position: relative;
   width: 300px;
   margin: 0px auto;
   padding: 10px;
@@ -65,8 +76,8 @@ export default {
   font-family: Helvetica, Arial, sans-serif;
 }
 
-.modal-header h3 {
-  margin-top: 0;
+.modal-header {
+  margin: 18px 0;
   color: black;
 }
 
@@ -81,6 +92,7 @@ export default {
 }
 
 .modal-default-button {
+  color: #e74c3c;
   float: right;
 }
 

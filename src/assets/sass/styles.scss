@@ -30,10 +30,16 @@
 }
 
 .btn--main {
-  background-color: $logo-light-color;
-  border: 2px solid $logo-color;
+  background-color: $logo-color;
+  border: 2px solid $play-color;
   color: white;
 }
+
+.btn--main span, .btn--secondary a {
+  color: white;
+  text-decoration: none;
+}
+
 
 .btn--main:hover {
   background-color: $play-color;
@@ -152,6 +158,15 @@
   float: left;
   margin: auto;
   width: 100px;
+}
+
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
 }
 // Reusable playlist container END
 

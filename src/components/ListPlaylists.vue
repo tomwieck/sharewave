@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a href="/#/myPlaylists"><button class="btn btn--secondary playlist--upload">Upload a Playlist to ShareWave</a></button>
+    <a href="/#/myPlaylists"><button class="btn btn--secondary playlist--upload">Upload a Playlist to ShareWave</button></a>
     <div><input class="playlist--search search-box" placeholder="Search..." v-model="search"></div>
     <div>
       <span v-for="tag in tags" @click="addToSearch(tag)">
