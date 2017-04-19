@@ -75,7 +75,8 @@ export default {
   data () {
     return {
       audioObject: null,
-      checked: ['Spotify', 'iTunes', 'YouTube'],
+      checked: ['Spotify', 'iTunes'],
+      // checked: ['Spotify', 'iTunes', 'YouTube'],
       searchTerm: '',
       searchPlaceholder: '',
       searchResults: '',

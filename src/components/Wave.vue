@@ -219,7 +219,7 @@ export default {
       this.userRef = Firebase.database().ref(`users/${userId}`);
       this.userRef.once('value', snapshot => {
         console.log(snapshot.val())
-        // this.spotify = snapshot.val().spotify;
+        this.spotify = snapshot.val().spotify;
         if (snapshot.child('friends').exists()) {
           let friends = snapshot.val().friends;
           this.wave = snapshot.val().wave;
