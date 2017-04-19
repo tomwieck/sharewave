@@ -39,6 +39,7 @@ export default {
   position: absolute;
   top: 5px;
   width: 100px;
+  height: 100px;
   z-index: 1;
 }
 

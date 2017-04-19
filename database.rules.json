@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "playlists": {
+      ".read": "auth !== null",
+      ".write": "auth !== null",
+      ".indexOn": "title"
+    },
+  	"wave": {
+      ".read": "auth !== null",
+      "$uid": {
+        ".indexOn": "date_added",
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "users": {
+      ".read": "auth !== null",
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "tags": {
+      ".read": "auth !== null",
+      ".write": "auth !== null"
+    }
+  }
+}

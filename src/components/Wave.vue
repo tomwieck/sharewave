@@ -435,7 +435,7 @@ export default {
     },
     getArtwork(trackId) {
       this.playing.artwork = this.artPlaceholder;
-      this.axios.get(`https://sharewave.herokuapp.com/trackArtwork?trackId=${trackId}`)
+      this.axios.get(`http://localhost:8888/trackArtwork?trackId=${trackId}`)
       .then(response => {
         this.playing.artwork = response.data;
       })

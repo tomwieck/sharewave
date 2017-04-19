@@ -83,7 +83,7 @@ export default {
       return `/upload/${owner}/${id}`;
     },
     youtubeLogin() {
-      this.axios.get('https://sharewave.herokuapp.com/generateUri')
+      this.axios.get('http://localhost:8888/generateUri')
       .then(function (response) {
         if (response.data) {
           window.location.href = response.data;
