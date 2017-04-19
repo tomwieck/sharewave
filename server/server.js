@@ -5,17 +5,40 @@ var path = require('path')
 var Promise = require('promise');
 var querystring = require('querystring');
 var admin = require("firebase-admin");
-var YouTube = require('youtube-node');
+// var YouTube = require('youtube-node');
+
+var google = require('googleapis');
+var OAuth2Client = google.auth.OAuth2;
+var readline = require('readline');
+// Client ID and client secret are available at
+// https://code.google.com/apis/console
+var CLIENT_ID = '905795275395-inn9u5ft2hefoumubfnti1oajeiikeac.apps.googleusercontent.com';
+var CLIENT_SECRET = '-BhBzjAWBl-XWx1zQMDMKEXq';
+var REDIRECT_URL = 'http://localhost:8888/redirect';
+
+var oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+
+var youtube = google.youtube({
+  version: 'v3',
+  auth: oauth2Client
+});
+
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 const handleLogin = require('./handleLogin');
 const spotify = require('./spotifyFunctions');
 const setupVar = require('./setupVariables');
 
+
+
 // Google Setup
-var youTube = new YouTube();
-youTube.setKey(setupVar.googleKey);
-youTube.addParam('videoCategoryId', '10');
-youTube.addParam('type', 'video');
+// var youTube = new YouTube();
+// youTube.setKey(setupVar.googleKey);
+// youTube.addParam('videoCategoryId', '10');
+// youTube.addParam('type', 'video');
 
 //Spotify Setup
 var SpotifyWebApi = require('spotify-web-api-node');
@@ -63,6 +86,59 @@ app.get('/callback', function(req, res) {
 		});
 	});
 });
+
+app.get('/generateUri', function(req, res) {
+	var url = oauth2Client.generateAuthUrl({
+    access_type: 'offline', // will return a refresh token
+    scope: 'https://www.googleapis.com/auth/youtube' // can be a space-delimited string or an array of scopes
+  });
+  // console.log('Visit the url: ', url);
+  res.send(url);
+
+	// // retrieve an access token
+	// getAccessToken(oauth2Client, function () {
+	//   // retrieve user profile
+	//   youtube.playlists.list({
+	//     part: 'id,snippet',
+	//     mine: 'true'
+	//   }, function (err, data, response) {
+	//     if (err) {
+	//       console.error('Error: ' + err);
+	//     }
+	//     if (data) {
+	//       console.log(data);
+	//     }
+	//     if (response) {
+	//       console.log('Status code: ' + response.statusCode);
+	//     }
+	//     callback(err, data, response);
+	//   });
+	// });
+	// console.log(`https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.readonly&access_type=offline&include_granted_scopes=true&state=state_parameter_passthrough_value&redirect_uri=http%3A%2F%2Flocalhost%2Foauth2callback&response_type=code&client_id=client_id`);
+});
+
+app.get('/redirect', function(req, res) {
+	res.redirect(`http://localhost:8080/#/loggedin/`);
+	console.log(req);
+	console.log('here');
+});
+
+function getAccessToken (oauth2Client, callback) {
+  // generate consent page url
+
+  rl.question('Enter the code here:', function (code) {
+    // request access token
+    oauth2Client.getToken(code, function (err, tokens) {
+      if (err) {
+        return callback(err);
+      }
+      // set tokens to the client
+      // TODO: tokens should be set by OAuth2 client.
+      oauth2Client.setCredentials(tokens);
+      callback();
+    });
+  });
+}
 
 app.get('/getMe', function(req, res) {
 	//currently not being used
@@ -136,7 +212,7 @@ app.get('/search', function(req, res) {
 function extractData(response) {
 	if (response.data) { return extractItunesData(response.data.results) }
 	if (response.body) { return extractSpotifyData(response.body.tracks.items) }
-	if (response.items) { return extractYoutubeData(response.items) }
+	// if (response.items) { return extractYoutubeData(response.items) }
 }
 
 function makeAllCalls(services, searchTerm) {
@@ -150,14 +226,14 @@ function makeCalls(s, searchTerm) {
 	else if (s === 'iTunes') {
 		return axios.get(`http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/wa/wsSearch?country=GB&limit=20&entity=musicTrack&term=${searchTerm}`)
 	}
-	else if (s === 'YouTube') {
-		return new Promise(function (resolve, reject) {
-			youTube.search(searchTerm, 20, function(err, res) {
-				if (err) reject(err);
-				else resolve(res);
-			})
-		});
-	}
+	// else if (s === 'YouTube') {
+	// 	return new Promise(function (resolve, reject) {
+	// 		youTube.search(searchTerm, 20, function(err, res) {
+	// 			if (err) reject(err);
+	// 			else resolve(res);
+	// 		})
+	// 	});
+	// }
 }
 
 function extractSpotifyData(data) {
@@ -194,20 +270,20 @@ function extractItunesData(data) {
 	return itunesData;
 }
 
-function extractYoutubeData(data) {
-	var youtubeData = {youtube: {}}
-	for (i = 0; i < data.length; i++) {
-		youtubeData.youtube[i] = {
-			artwork: data[i].snippet.thumbnails.default.url,
-			id: data[i].id.videoId,
-			previewUrl: data[i].preview_url,
-			service: 'youtube',
-			title: data[i].snippet.title,
-			url: `https://www.youtube.com/watch?${data[i].id.videoId}`
-		}
-	}
-	return youtubeData;
-}
+// function extractYoutubeData(data) {
+// 	var youtubeData = {youtube: {}}
+// 	for (i = 0; i < data.length; i++) {
+// 		youtubeData.youtube[i] = {
+// 			artwork: data[i].snippet.thumbnails.default.url,
+// 			id: data[i].id.videoId,
+// 			previewUrl: data[i].preview_url,
+// 			service: 'youtube',
+// 			title: data[i].snippet.title,
+// 			url: `https://www.youtube.com/watch?${data[i].id.videoId}`
+// 		}
+// 	}
+// 	return youtubeData;
+// }
 
 function removeOuterArray(array) {
 	let objectData = {};

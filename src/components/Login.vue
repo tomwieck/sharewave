@@ -11,20 +11,20 @@
     </a>
     <modal v-if="showModal" @close="showModal=false">
       <h3 slot="header">Login</h3>
-        <button slot="body" class="btn btn--secondary block" v-on:click="spotifyRedirect">
+        <button slot="body" class="btn btn--main block" v-on:click="spotifyRedirect">
           <svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
           With Spotify
         </button>
-        <a class="modal-link" slot="body" href="/#/emailLogin"><button class="btn btn--secondary block">
+        <a class="modal-link" slot="body" href="/#/emailLogin"><button class="btn btn--main block">
           <svg class="icon icon-sharewave"><use xlink:href="#icon-sharewave"></use></svg>
           With ShareWave
         </button></a>
       <h3 slot="footer">Don't have an account?</h3>
-        <a class="modal-link" slot="footer" href="https://www.spotify.com/signup/"><button class="btn btn--main block">
+        <a class="modal-link" slot="footer" href="https://www.spotify.com/signup/"><button class="btn btn--secondary block">
           <svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
           <span>Sign up for a Spotify Account</span>
         </button></a>
-        <a class="modal-link" slot="footer" href="/#/emailSignup"> <button  class="btn btn--main block">
+        <a class="modal-link" slot="footer" href="/#/emailSignup"> <button  class="btn btn--secondary block">
           <svg class="icon icon-sharewave"><use xlink:href="#icon-sharewave"></use></svg>
           Sign up for a Sharewave Account
         </button></a>
@@ -105,6 +105,8 @@ export default {
         Firebase.auth().signInWithCustomToken(token)
           .then(user => {
             // If Spotify email, img, id or email do not match whats on the server, update them
+            console.log('imgUrl', this.imgUrl);
+            console.log('userPhoto', user.photoURL);
             if (this.username !== user.displayName || this.imgUrl !== user.photoURL || this.userId !== user.userId || this.email !== user.email) {
               user.updateProfile({
                 displayName: this.username,
@@ -119,8 +121,8 @@ export default {
                 if (snapshot.val() === null) {
                   this.addToUserDatabase();
                 };
+                this.$emit('loginEmit');
               })
-            this.$emit('loginEmit');
           });
       });
     },
@@ -190,7 +192,7 @@ export default {
   width: 100%;
 }
 
-.btn--main {
+.btn--secondary {
   font-size: 16px;
 }
 

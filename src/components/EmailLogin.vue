@@ -1,21 +1,25 @@
 <template>
   <div class="email-login">
-  <h2>Login with ShareWave</h2>
-    <form @submit.prevent="emailLogin">
+  <form v-show="!signUp" @submit.prevent="emailLogin">
+    <h2>Login with ShareWave</h2>
+
       <div class="email-login--container">
         <span>
-          <input class="email-login--email" placeholder="Email" v-model="email">
+          <input ref="emailInput" class="email-login--email" placeholder="Email" v-model="email">
           <input class="email-login--password" placeholder="Password" type="password" v-model="password">
         </span>
         <div class="help.is-danger" v-show="errorMessage">Incorrect Password, try again</div>
         <button class="btn btn--main">Submit</button>
       </div>
     </form>
+  <div>Don't have an account? <button class="btn btn--secondary block" @click="signUp = !signUp">Sign up</button></div>
+  <email-signup v-show="signUp"></email-signup>
   </div>
 </template>
 
 <script>
 import Firebase from './firebaseMixin.js'
+import EmailSignup from './EmailSignup.vue'
 
 export default {
   name: 'EmailLogin',
@@ -25,8 +29,14 @@ export default {
       errorMessage: '',
       password: '',
       regex: '\d.*[A-Z]|[A-Z].*\d',
+      signUp: false,
       username: ''
     }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.$refs.emailInput.focus();
+    })
   },
   methods: {
     emailLogin() {
@@ -39,6 +49,9 @@ export default {
         this.errorMessage = error.message;
       });
     }
+  },
+  components: {
+    'email-signup': EmailSignup
   }
 }
 </script>
@@ -89,6 +102,14 @@ export default {
 }
 
 .email-login--submit:hover {
+  text-decoration: underline;
+}
+
+.signup--link {
+  color: $logo-color;
+  display: block;
+  font-size: 22px;
+  transition: 0.3s;
   text-decoration: underline;
 }
 

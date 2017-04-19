@@ -11,6 +11,7 @@
             placeholder="Name"
             v-model="username"
             v-validate="'required|min:6'"
+            ref="emailInput"
             >
           <transition name="fade">
             <span v-show="errors.has('username')" class="help is-danger">{{ errors.first('username') }}</span>
@@ -68,6 +69,11 @@ export default {
       password: '',
       username: ''
     }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.$refs.emailInput.focus();
+    })
   },
   methods: {
     // ADD LOADING...

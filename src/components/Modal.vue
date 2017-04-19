@@ -2,9 +2,9 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-wrapper">
-        <div class="modal-container" @click="$emit('close')">
+        <div class="modal-container" >
 
-          <div>
+          <div @click="$emit('close')">
             <svg class="icon icon-cancel-circle"><use xlink:href="#icon-cancel-circle"></use></svg>
           </div>
 
@@ -14,13 +14,13 @@
             </slot>
           </div>
 
-          <div class="modal-body">
+          <div @click="$emit('close')" class="modal-body">
             <slot name="body">
               <a>default body</a>
             </slot>
           </div>
 
-          <div class="modal-footer">
+          <div @click="$emit('close')" class="modal-footer">
             <slot name="footer">
             </slot>
           </div>

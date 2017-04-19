@@ -1,5 +1,6 @@
 <template>
   <div class="user-playlists">
+  <button @click="youtubeLogin">YouTube Login</button>
    <div v-if="playlists" class="playlist--list">
       <div>Showing {{ playlists.items.length }} of {{ playlists.total }} playlists</div>
       <transition-group appear class="playlist--all-containers" name="fade">
@@ -45,6 +46,7 @@ export default {
   },
   mixins: [SpotifyMixin],
   mounted() {
+    console.log(this.$route);
     this.getPlaylists(callback => {
       if (callback.status === 401) {
         this.error = true;
@@ -76,9 +78,23 @@ export default {
         this.loadMoreText = '';
       }
     },
-    generateLink: function(owner, id) {
+    generateLink(owner, id) {
       owner = encodeURIComponent(owner);
-      return `/#/upload/${owner}/${id}`;
+      return `/upload/${owner}/${id}`;
+    },
+    youtubeLogin() {
+      this.axios.get('http://localhost:8888/generateUri')
+      .then(function (response) {
+        if (response.data) {
+          window.location.href = response.data;
+        } else {
+          console.log(response);
+        }
+        // vm.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
     }
   }
 }

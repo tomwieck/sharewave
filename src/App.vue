@@ -27,10 +27,6 @@ export default {
   display: block;
 }
 
-.logo-font {
-  font-family: 'Comfortaa', cursive;
-}
-
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

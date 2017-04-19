@@ -1,9 +1,17 @@
 <template>
   <div class="wave">
-    <div class="wave-container--background">
+    <div id="background" class="wave-container--background">
       <div id="wave-container-all" class="wave-container--all">
         <!-- v-show when complete variable? -->
         <div class="my-wave">
+          <span id="buttons">
+            <span @click="scroll('left')"class="wave--scroll-button wave--scroll-button__left">
+              <svg class="icon icon-arrow icon-arrow--left"><use xlink:href="#icon-arrow"></use></svg>
+            </span>
+            <span @click="scroll()" class="wave--scroll-button wave--scroll-button__right">
+              <svg class="icon icon-arrow icon-arrow--right "><use xlink:href="#icon-arrow"></use></svg>
+            </span>
+          </span>
           <div class="wave-container--user" v-for="(value, key) in waveSongs" v-if="userId === value.id">
             <a :href="'/#/user/' + value.id"><b>My Wave</b></a>
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
@@ -40,7 +48,7 @@
     <span v-show="Object.keys(waveSongs).length === 1">
       Your friends Wave's will appear above. <br> Follow some Friends to get started.
     </span>
-    <button class="btn btn--secondary margin block" @click="friendsClicked = !friendsClicked">
+    <button class="btn btn--main margin block" @click="friendsClicked = !friendsClicked">
       Follow Friends <svg class="icon icon-user-plus white"><use xlink:href="#icon-user-plus"></use></svg>
     </button>
     <transition name="fade">
@@ -49,11 +57,12 @@
       </div>
     </transition>
     <h3>Add Songs:</h3>
-    <!-- <a class="btn btn--secondary" @click="searchClicked = !searchClicked">Search Spotify and iTunes</a> -->
+    <!-- <a class="btn btn--main" @click="searchClicked = !searchClicked">Search Spotify and iTunes</a> -->
     <search v-on:addToWave="addToWave"></search>
-    <span class="btn btn--secondary" v-if="spotify" @click="spotifyRecentlyPlayed">
+    <button class="btn btn--main recently-played--btn" v-if="spotify" @click="spotifyRecentlyPlayed">
       See your recent Spotify tracks
-    </span>
+      <svg class="icon icon-arrow white"><use xlink:href="#icon-arrow"></use></svg>
+    </button>
     <div v-if="recentlyPlayedClicked">
       <div v-if="recentlyPlayed.length === 0">
         {{ recentlyPlayedText }}
@@ -112,6 +121,7 @@ import ListUsers from './ListUsers.vue'
 import Search from './Search.vue'
 import WaveUser from './WaveUser.vue'
 import VueNotifications from 'vue-notifications'
+import debounce from 'lodash/debounce'
 
 export default {
   name: 'Wave',
@@ -130,6 +140,7 @@ export default {
       recentlyPlayedText: '',
       searchClicked: false,
       spotify: false,
+      totalScroll: 0,
       userId: '',
       userRef: false,
       wave: false,
@@ -146,6 +157,10 @@ export default {
   },
   mounted() {
     this.getUser();
+    // window.addEventListener('resize', this.handleResize)
+    window.addEventListener('resize', this.updateLayout, false);
+
+// Add the event listener
   },
   watch: {
     playing() {
@@ -154,7 +169,32 @@ export default {
       }
     }
   },
+  beforeDestroy: function () {
+    window.removeEventListener('resize', this.handleResize)
+  },
   methods: {
+    updateLayout: debounce(() => {
+      // let vm = this;
+      var adiv = document.getElementById('wave-container-all');
+      var buttons = document.getElementsByClassName('wave--scroll-button')
+      if (adiv.scrollWidth > window.innerWidth) {
+        buttons[0].style.display = 'block';
+        buttons[1].style.display = 'block';
+        adiv.classList.add('lr-padding');
+      } else {
+        buttons[0].style.display = 'none';
+        buttons[1].style.display = 'none';
+        adiv.classList.remove('lr-padding');
+      }
+    }, 100),
+    scroll(amount) {
+      var adiv = document.getElementById('wave-container-all');
+      amount === 'left' ? amount = -Math.abs(window.innerWidth) : amount = window.innerWidth;
+      if (adiv.scrollWidth > this.totalScroll + amount) {
+        this.totalScroll += amount
+      }
+      adiv.scrollLeft = this.totalScroll;
+    },
     // Add LOADING...
     // When redirected to this page after login, user may not be created in DB in time (emit event?)
     // SET UP
@@ -178,7 +218,8 @@ export default {
       // Could set listeners for all friends so that if they are added updated in real time
       this.userRef = Firebase.database().ref(`users/${userId}`);
       this.userRef.once('value', snapshot => {
-        this.spotify = snapshot.val().spotify;
+        console.log(snapshot.val())
+        // this.spotify = snapshot.val().spotify;
         if (snapshot.child('friends').exists()) {
           let friends = snapshot.val().friends;
           this.wave = snapshot.val().wave;
@@ -221,6 +262,7 @@ export default {
         this.$forceUpdate();
       });
       this.$forceUpdate();
+      this.updateLayout();
     },
     setUpUser(userRef, user) {
       userRef.counter = 0;
@@ -479,15 +521,17 @@ a:hover {
 
 .wave-container--background {
   background-color: $light-grey;
-  padding-top: 10px;
-  width: 100%;
   margin: auto;
+  padding-top: 10px;
+  position: relative;
+  width: 100%;
 }
 
 .wave-container--all {
   height: 160px;
   overflow-x: scroll;
   overflow-y: hidden;
+  transition: 0.5s;
   white-space: nowrap;
   width: 100%;
 }
@@ -532,13 +576,14 @@ a:hover {
 
 // Recently Played START
 .recently-played {
-  border: 2px solid $play-color;
-  border-radius: 5px;
+  background-color: $play-color;
+  border: 2px solid $play-light-color;
+  border-top: none;
+  color: white;
   display: block;
   margin: auto;
-  max-width: 200px;
-  padding: 2px 2px;
-  margin-bottom: 5px;
+  max-width: 265px;
+  padding: 5px 2px;
 }
 
 .recently-played--add {
@@ -546,6 +591,10 @@ a:hover {
   cursor: pointer;
   display: block;
   font-weight: bold;
+}
+
+.recently-played--btn {
+  margin-top: 16px;
 }
 // Recently Played END
 
@@ -558,6 +607,7 @@ a:hover {
   stroke: currentColor;
   fill: currentColor;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .icon-arrow {
@@ -572,6 +622,14 @@ a:hover {
 .icon-user-plus {
   font-size: 21px;
   margin-bottom: -5px;
+}
+
+.icon-bin {
+  margin-bottom: -3px;
+}
+
+.icon-bin:hover {
+  fill: red;
 }
 // Icons END
 
@@ -692,10 +750,61 @@ a:hover {
 
 .white {
   color: white;
+  fill: white;
 }
 
 .float-left {
   // float: left;
   order: -1;
+}
+
+.wave--scroll-button {
+  position: absolute;
+  top: 40%;
+  z-index: 999;
+  background-color: $logo-color;
+  opacity: 0.5;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  // display: hidden;
+  transition: 0.3s;
+}
+
+.wave--scroll-button:hover {
+  opacity: 1;
+}
+
+.wave--scroll-button svg {
+  fill: white;
+  margin-top: 0;
+}
+
+.wave--scroll-button__left {
+  left: 2px;
+  transform: rotate(90deg);
+}
+
+.wave--scroll-button__right {
+  right: 2px;
+  transform: rotate(270deg);
+}
+
+.icon-arrow--left {
+  position: absolute;
+  top: -12px;
+  left: -5px;
+}
+
+.icon-arrow--right {
+  position: absolute;
+  top: -12px;
+  left: -5px;
+}
+
+.lr-padding {
+  padding: 0px 28px;
+  width: calc(100% - 56px)
 }
 </style>

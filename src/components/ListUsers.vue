@@ -95,7 +95,7 @@ span {
 
 .users {
   background-color: $light-grey;
-  max-height: 500px;
+  max-height: 460px;
   overflow-y: scroll;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div id="search">
+  <div class="search" id="search">
     <div class="search-area">
       <p class="search-area_text"> Search for a Song:</p>
       <div class="search-area--container">
@@ -77,7 +77,7 @@ export default {
       audioObject: null,
       checked: ['Spotify', 'iTunes', 'YouTube'],
       searchTerm: '',
-      searchPlaceholder: 'Please enter a search term',
+      searchPlaceholder: '',
       searchResults: '',
       timer: false,
       selected: 'spotify',
@@ -268,7 +268,9 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
-
+.search {
+  border-bottom: 2px solid #e8e8e8;
+}
 .search-area_textbox {
   padding: 5px;
   margin-bottom: 10px;

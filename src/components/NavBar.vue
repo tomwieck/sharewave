@@ -141,7 +141,6 @@ export default {
   font-size: 49px;
   float: left;
   text-decoration: none;
-  font-weight: normal;
   margin: 0;
   padding-left: 10px;
 }
