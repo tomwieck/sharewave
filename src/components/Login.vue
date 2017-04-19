@@ -82,7 +82,7 @@ export default {
       });
     },
     spotifyRedirect() {
-      this.axios.get('http://localhost:8888/login')
+      this.axios.get('https://sharewave.herokuapp.com/login')
         .then(response => {
           if (response.data) {
             window.location.href = response.data;

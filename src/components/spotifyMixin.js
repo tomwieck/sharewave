@@ -15,7 +15,7 @@ export default {
         return check();
       } else {
         let refreshToken = vm.$cookie.get('refresh_token')
-        vm.axios.get(`http://localhost:8888/refreshToken?refreshToken=${refreshToken}`)
+        vm.axios.get(`https://sharewave.herokuapp.com/refreshToken?refreshToken=${refreshToken}`)
           .then(function (response) {
             vm.$cookie.set('access_token', response.data, { expires: '1h' });
             vm.spotifyApi.setAccessToken(response.data);
