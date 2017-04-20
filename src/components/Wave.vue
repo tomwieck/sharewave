@@ -153,14 +153,13 @@ export default {
   mixins: [SpotifyMixin],
   beforeRouteLeave(to, from, next) {
     this.ifPlayingPause();
+    window.removeEventListener('resize', this.updateLayout)
     next();
   },
   mounted() {
     this.getUser();
     // window.addEventListener('resize', this.handleResize)
     window.addEventListener('resize', this.updateLayout, false);
-
-// Add the event listener
   },
   watch: {
     playing() {
@@ -168,9 +167,6 @@ export default {
         this.closeNowPlaying();
       }
     }
-  },
-  beforeDestroy: function () {
-    window.removeEventListener('resize', this.handleResize)
   },
   methods: {
     updateLayout: debounce(() => {

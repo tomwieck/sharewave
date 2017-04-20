@@ -5,11 +5,11 @@
     </a>
     <ul v-if="loggedIn" class="nav-links-ul">
       <li><a class="nav-bar--link" v-bind:class="checkRoute('Wave') ? 'active' : ''" href="#/wave">Wave</a></li>
-      <li><a class="nav-bar--link" v-bind:class="checkRoute('All Playlists') ? 'active' : ''" href="#/allPlaylists">Playlists</a></li>
+      <li v-show="showPlaylists" v-bind:class="!showPlaylists ? 'no-margin' : ''"><a class="nav-bar--link" v-bind:class="checkRoute('All Playlists') ? 'active' : ''" href="#/allPlaylists">Playlists</a></li>
       <!-- <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">All Playlists</a></li> -->
       <!-- <li><a class="nav-bar--link nav-bar--link__logout" @click="emitLogout">Logout</a></li> -->
     </ul>
-    <login ref="loginRef"></login>
+    <login ref="loginRef" v-on:loginEmit="checkSpotify"></login>
   </div>
 </template>
 
@@ -23,15 +23,19 @@ export default {
     return {
       loggedIn: false,
       isActive: false,
-      route: false
+      route: false,
+      showPlaylists: false
     }
   },
   mounted() {
     this.checkRoute();
+    this.checkSpotify();
     this.registerStateChange();
   },
   beforeRouteLeave(to, from, next) {
     this.checkRoute();
+    console.log(this.checkSpotify());
+    this.checkSpotify();
     next();
   },
   methods: {
@@ -42,19 +46,37 @@ export default {
       // console.log(this.$route)
       Firebase.auth().onAuthStateChanged(user => {
         if (user === null) {
+          console.log('loggedin = false')
           this.loggedIn = false;
         } else {
+          console.log(user.displayName);
           if (user.displayName !== null) {
+            console.log(user.uid);
             this.loggedIn = true;
+            this.$forceUpdate();
+            // unsubscribe();
           }
         }
       });
     },
-    loginTrue() {
-      this.loggedIn = true;
-    },
+    // checkSpotify() {
+    //   let userRef = Firebase.database().ref(`users/${this.user.replace(/\./g, '%2E')}`);
+    //   userRef.once('value')
+    //   .then(snapshot => {
+    //     if (!this.imgUrl) {
+    //       this.imgUrl = snapshot.child('img_url').exists ? snapshot.val().img_url : null
+    //     }
+    //   })
+    // },
     emitLogout() {
       this.$refs.loginRef.signout()
+    },
+    checkSpotify() {
+      this.loggedIn = true;
+      // console.log(this.$cookie.get('access_token'))
+      if (this.$cookie.get('access_token')) {
+        this.showPlaylists = true;
+      }
     }
   },
   components: {
@@ -66,6 +88,10 @@ export default {
 <style lang="scss">
 @import "../assets/sass/colors.scss";
 
+.hidden {
+  display: none;
+}
+
 .nav-bar--link {
   border-bottom: 2px solid white;
   float: left;
@@ -74,6 +100,10 @@ export default {
   font-size: 20px;
   text-decoration: none;
   transition: 0.2s;
+}
+
+.no-margin {
+  margin-left: -10px;
 }
 
 .nav-bar--link__logout {

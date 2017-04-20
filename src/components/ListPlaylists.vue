@@ -1,7 +1,7 @@
 <template>
   <div>
     <a href="/#/myPlaylists"><button class="btn btn--secondary playlist--upload">Upload a Playlist to ShareWave</button></a>
-    <div><input class="playlist--search search-box" placeholder="Search..." v-model="search"></div>
+    <div><input class="playlist--search input-box" placeholder="Search..." v-model="search"></div>
     <div>
       <span v-for="tag in tags" @click="addToSearch(tag)">
         <span class="tag">#{{tag}}</span>
@@ -59,9 +59,8 @@ export default {
   },
   computed: {
     searchResults() {
-      // returns elements that return true
+      // returns true if tag or title
       return this.playlists.filter(el => {
-        // Should return TRUE or FALSE only
         let tagCheck = false;
         if (el.tags) {
           el.tags.filter(v => {
@@ -75,7 +74,6 @@ export default {
   },
   methods: {
     getPlaylists() {
-      // this.setAccessToken();
       this.playlistRef = Firebase.database().ref('playlists/');
       this.playlistRef.orderByChild('date_added').on('child_added', snapshot => {
         let childData = snapshot.val();
@@ -99,11 +97,9 @@ export default {
       const options = {
         user: playlist.owner,
         playlist: playlist.id,
-        fields: 'images,name'
-        // fields: 'name'
+        fields: 'images'
       }
       this.getSinglePlaylist(options, callback => {
-        // console.log('callback', callback);
         if (callback.images) {
           playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
         } else {
@@ -112,7 +108,6 @@ export default {
       });
     },
     addToSearch(tag) {
-      console.log(this.search);
       if (this.search.includes(tag)) {
         this.search = this.search.replace(tag + ' ', '');
       } else {
@@ -166,14 +161,13 @@ export default {
   text-decoration: none;
 }
 
-.playlist--more:hover {
-  color: $play-color;
-}
-
 .playlist--search {
   padding: 5px;
   margin: 10px;
   width: 35%;
+  @media screen and (max-width: $break-tablet) {
+    width: 90%;
+  }
 }
 
 .icon {
@@ -185,15 +179,4 @@ export default {
   fill: currentColor;
   cursor: pointer;
 }
-
-.icon-arrow {
-  position: absolute;
-  top: 0;
-  right: 0;
-  fill: $logo-color;
-  font-size: 30px;
-  margin-top: -5px;
-  transform: rotate(180deg);
-}
-
 </style>

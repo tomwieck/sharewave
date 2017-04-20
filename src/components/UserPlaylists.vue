@@ -80,7 +80,7 @@ export default {
     },
     generateLink(owner, id) {
       owner = encodeURIComponent(owner);
-      return `/upload/${owner}/${id}`;
+      return `/#/upload/${owner}/${id}`;
     },
     youtubeLogin() {
       this.axios.get('http://localhost:8888/generateUri')

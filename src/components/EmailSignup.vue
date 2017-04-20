@@ -5,24 +5,24 @@
       <div class="email-signup--container">
         <span :class="{ 'control': true }">
           <input
-            class="email-signup--usr"
+            class="email-signup--usr input-box"
             data-vv-delay="500"
             name="username"
-            placeholder="Name"
+            placeholder="Username"
             v-model="username"
             v-validate="'required|min:6'"
-            ref="emailInput"
+            ref="userInput"
             >
           <transition name="fade">
             <span v-show="errors.has('username')" class="help is-danger">{{ errors.first('username') }}</span>
           </transition>
 
           <input
-            class="email-signup--email"
+            class="email-signup--email input-box"
             data-vv-delay="500"
             name="email"
             placeholder="Email"
-            type="text"
+            type="email"
             v-model="email"
             v-validate="'required|email'"
             >
@@ -31,7 +31,7 @@
           </transition>
 
           <input
-            class="email-signup--password"
+            class="email-signup--password input-box"
             name="password"
             placeholder="Password"
             type="password"
@@ -72,7 +72,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.$refs.emailInput.focus();
+      this.$refs.userInput.focus();
     })
   },
   methods: {
@@ -80,7 +80,7 @@ export default {
     emailSignup() {
       Firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
       .then(response => {
-        var user = Firebase.auth().currentUser;
+        let user = Firebase.auth().currentUser;
         this.updateProfile(user);
         this.addToUserDb(user);
       })
@@ -102,12 +102,13 @@ export default {
         spotify: false,
         wave: false
       })
+      // Small hack to trigger signing in properly
       .then(() => {
         Firebase.auth().signOut()
           .then(() => {
             Firebase.auth().signInWithEmailAndPassword(this.email, this.password)
               .then(() => {
-                this.$router.push(`/`);
+                this.$router.push(`/#/wave`);
               });
           });
       });

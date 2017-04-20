@@ -3,7 +3,7 @@
     <!-- <input class="users--search" placeholder="Search..." v-model="searchTerm"> -->
     <div class="users--user" v-for="user in addedFriends" :key="user.display_name">
       <img class="users--profile-pic" :src="user.img_url || placeholderUrl">
-      <span><a :href="'/#/user/' + user.id">{{ user.display_name }}</a></span>
+      <span><a class="user--username" :href="'/#/user/' + user.id">{{ user.display_name }}</a></span>
       <small class="users--email">{{ user.email }}</small>
       <button @click="userClicked(user)" v-show="add" class="btn btn--secondary users--button">
         Follow
@@ -48,6 +48,9 @@ export default {
   mounted() {
     this.getUsers();
   },
+  deactivated() {
+    console.log('deactivated');
+  },
   computed: {
     addedFriends() {
       if (this.friendList) {
@@ -79,18 +82,14 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
-a {
+.user--username {
   color: $logo-color;
   text-decoration: none;
   transition: 0.3s;
 }
 
-a:hover {
+.user--username:hover {
   color: $play-color;
-}
-
-span {
-  display: block;
 }
 
 .users {
@@ -107,19 +106,10 @@ span {
   width: 150px;
 }
 
-.users--add-user {
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.users--add-user:hover {
-  text-decoration: underline;
-}
-
 .users--profile-pic {
   border: 2px solid $play-color;
   border-radius: 50%;
-  display: inline-block;
+  display: block;
   margin: auto;
   width: 70px;
 }

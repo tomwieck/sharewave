@@ -1,20 +1,11 @@
 <template>
   <div class="search" id="search">
     <div class="search-area">
-      <p class="search-area_text"> Search for a Song:</p>
+      <p class="search-area_text"> Search Spotify and iTunes:</p>
       <div class="search-area--container">
-        <input class="search-box" v-model="searchTerm">
+        <input class="search-area--textbox input-box" v-model="searchTerm">
         <svg class="icon icon-search"><use xlink:href="#icon-search"></use></svg>
       </div>
-      <div class="search-area_checkbox">
-        <label for="Spotify">Spotify</label>
-        <input type="checkbox" id="checkbox" value="Spotify" v-model="checked">
-        <label for="iTunes">iTunes</label>
-        <input type="checkbox" id="checkbox" value="iTunes" v-model="checked">
-<!--         <label for="iTunes">YouTube</label>
-        <input type="checkbox" id="checkbox" value="YouTube" v-model="checked"> -->
-      </div>
-      <!-- <youtube :video-id="videoId" @cued="cued" @ready="ready" @playing="playing" player-width="0" player-height="0" :player-vars="{ start: 30}"></youtube> -->
       <p>{{ searchPlaceholder }}</p>
     </div>
 
@@ -29,7 +20,6 @@
         v-if="sSearchResults"
         v-bind:key="sSearchResults"
         :searchResults="sSearchResults"
-        :parentWidth = "parentWidth"
         :service="'Spotify'">
       </s-search-table>
       <!-- If no other result, width 100? -->
@@ -41,19 +31,8 @@
         v-if="iSearchResults"
         v-bind:key="iSearchResults"
         :searchResults="iSearchResults"
-        :parentWidth = "parentWidth"
         :service="'iTunes'">
       </i-search-table>
-
-<!--       <y-search-table
-        v-on:parentPlay="playYoutube"
-        v-on:tableToSearch="addToWave"
-        v-if="ySearchResults"
-        v-bind:key="ySearchResults"
-        :searchResults="ySearchResults"
-        :parentWidth = "parentWidth"
-        service="YouTube">
-      </y-search-table> -->
     </transition-group>
     <symbol id="icon-search" viewBox="0 0 32 32">
       <title>search</title>
@@ -76,7 +55,6 @@ export default {
     return {
       audioObject: null,
       checked: ['Spotify', 'iTunes'],
-      // checked: ['Spotify', 'iTunes', 'YouTube'],
       searchTerm: '',
       searchPlaceholder: '',
       searchResults: '',
@@ -86,7 +64,6 @@ export default {
       sSearchResults: false,
       ySearchResults: false,
       youtubeTarget: '',
-      parentWidth: 49,
       videoId: ''
     }
   },
@@ -168,8 +145,6 @@ export default {
     500),
     updateTables: function (data) {
       this.searchPlaceholder = ' ';
-      // if two tables, split width
-      this.checked.length === 3 ? this.parentWidth = 49 : this.parentWidth = 98;
       // if data is empty, either add to table or set to null so nothing is rendered
       !isEmpty(data.spotify) ? this.sSearchResults = data.spotify : this.sSearchResults = null;
       !isEmpty(data.itunes) ? this.iSearchResults = data.itunes : this.iSearchResults = null;
@@ -209,48 +184,7 @@ export default {
         visibleClass.remove('visible');
         visibleClass.add('hidden');
       }
-      // if (service === 'spotify') {
-      //   spotify.classList.add('show')
-      // }
     },
-    // playYoutube: function(id, e) {
-    //   // Stop other audio object playing
-    //   let target = e.target;
-    //   if (target.classList.contains('playing')) {
-    //     this.stopVideo();
-    //   } else {
-    //     this.videoId = id;
-    //     target.classList.add('playing');
-    //     target.innerText = 'Playing';
-    //     if (this.youtubeTarget !== '') {
-    //       this.playingToPreview();
-    //     }
-    //     this.youtubeTarget = target;
-    //   }
-    // },
-    // cued() {
-    //   this.player.seekTo(30, true);
-    //   this.player.playVideo();
-    // },
-    // ready (player) {
-    //   this.player = player;
-    // },
-    // playing (player) {
-    //   clearTimeout(this.timer);
-    //   this.timer = setTimeout(this.stopVideo, 15000);
-    // },
-    // stopVideo() {
-    //   console.log('stop video called');
-    //   clearTimeout(this.timer);
-    //   this.videoId = '';
-    //   this.playingToPreview();
-    //   this.youtubeTarget = '';
-    // },
-    // playingToPreview() {
-    //   console.log('playing2preview', this.youtubeTarget);
-    //   this.youtubeTarget.classList.remove('playing');
-    //   this.youtubeTarget.innerText = 'Preview';
-    // },
     addToWave(result) {
       if (this.audioObject) {
         this.audioObject.pause();
@@ -269,18 +203,21 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
-.search {
-  border-bottom: 2px solid #e8e8e8;
-}
-.search-area_textbox {
+
+.search-area--textbox {
   padding: 5px;
   margin-bottom: 10px;
-  width: 35%;
+  @media screen and (max-width: $break-tablet) {
+    width: 90%;
+  }
 }
 
 .search-area--container {
   position: relative;
   display: inline-block;
+  @media screen and (max-width: $break-tablet) {
+    width: 98%;
+  }
 }
 
 .icon {
@@ -291,7 +228,7 @@ export default {
   stroke: currentColor;
   fill: currentColor;
   position: absolute;
-  right: 5px;
+  right: 5%;
   top: 5px;
 }
 

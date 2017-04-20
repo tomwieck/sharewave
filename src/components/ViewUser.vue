@@ -55,11 +55,13 @@ export default {
       this.userRef.once('value')
       .then(snapshot => {
         if (!this.imgUrl) {
-          this.imgUrl = snapshot.child('img_url').exists ? snapshot.val().img_url : null
+          this.imgUrl = snapshot.child('img_url').exists() ? snapshot.val().img_url : null
         }
         this.displayName = snapshot.val().display_name;
         // this.friends = snapshot.val().friends;
-        this.friendsArr = Object.keys(snapshot.val().friends).map((k) => k)
+        if (snapshot.child('friends').exists()) {
+          this.friendsArr = Object.keys(snapshot.val().friends).map((k) => k)
+        }
       })
     },
     removeFriend(user) {

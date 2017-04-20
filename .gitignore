@@ -7,3 +7,4 @@ selenium-debug.log
 server/secret.js
 server/serviceAccountKey.json
 server/node_modules/
+dist/

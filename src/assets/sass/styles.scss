@@ -25,13 +25,18 @@
 .btn {
   font-family: 'Raleway', sans-serif;
   background-color: white;
-  border: 2px solid black;
+  border: 2px solid $play-color;
   border-radius: 2px;
+  color: $logo-color;
   cursor: pointer;
   display: inline-block;
   font-size: 18px;
   padding: 6px 10px;
   transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: $play-color;
 }
 
 .btn--main {
@@ -86,7 +91,7 @@
   color: $logo-color;
 }
 
-.search-box {
+.input-box {
   border: 0;
   border: 1px solid #299dcf;
   border-radius: 2px;
@@ -95,10 +100,10 @@
   font-size: 14px;
 }
 
-.search-box::-webkit-input-placeholder {
+.input-box::-webkit-input-placeholder {
   color: #94c5da;
 }
-.search-box::-moz-placeholder {
+.input-box::-moz-placeholder {
   color: #94c5da;
 }
 
