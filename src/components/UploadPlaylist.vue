@@ -25,7 +25,6 @@
 
       <span v-else>
         <span class="upload-playlist--name-span"> {{ playlistName }}</span>
-        <!-- <span class="help is-danger">Playlist names can only be changed if you own them</span> -->
       </span>
 
       <div>
@@ -48,9 +47,17 @@
         </span>
         <span v-show="errorMessage">{{ errorMessage }}</span>
       </div>
-
-      <a class="upload-playlist--button" @click="addToDatabase"> Upload </a>
+      <a @click="addToDatabase">
+        <button class="btn btn--main upload-playlist--button">
+          <svg class="icon icon-cloud-upload"><use xlink:href="#icon-cloud-upload"></use></svg>
+          Upload to ShareWave
+        </button>
+      </a>
     </div>
+    <symbol id="icon-cloud-upload" viewBox="0 0 32 32">
+      <title>cloud-upload</title>
+      <path d="M27.883 12.078c0.076-0.347 0.117-0.708 0.117-1.078 0-2.761-2.239-5-5-5-0.444 0-0.875 0.058-1.285 0.167-0.775-2.417-3.040-4.167-5.715-4.167-2.73 0-5.033 1.823-5.76 4.318-0.711-0.207-1.462-0.318-2.24-0.318-4.418 0-8 3.582-8 8s3.582 8 8 8h4v6h8v-6h7c2.761 0 5-2.239 5-5 0-2.46-1.777-4.505-4.117-4.922zM18 20v6h-4v-6h-5l7-7 7 7h-5z"></path>
+    </symbol>
   </div>
 </template>
 
@@ -184,29 +191,34 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
-.icon-undo {
-  color: red;
+.icon {
   cursor: pointer;
   width: 12px;
   height: 12px;
   stroke-width: 0;
   stroke: currentColor;
   fill: currentColor;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
   position: absolute;
+}
+
+.icon-undo {
+  color: red;
+}
+
+.icon-plus,
+.icon-undo {
   top: 6px;
   right: 7px;
 }
 
-.icon-plus {
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  stroke-width: 0;
-  stroke: currentColor;
-  fill: currentColor;
-  position: absolute;
-  top: 6px;
-  right: 7px;
+.icon-cloud-upload {
+  bottom: 5px;
+  left: 6px;
+  height: 20px;
+  width: 20px;
 }
 
 .padding-right {
@@ -240,21 +252,9 @@ export default {
 }
 
 .upload-playlist--button {
-  display: block;
-  margin: auto;
-  border: 2px solid $play-color;
-  border-radius: 5px;
-  color: $logo-color;
-  cursor: pointer;
-  display: block;
-  padding: 10px;
-  margin: auto;
-  text-decoration: none;
-  width: 200px;
+  position: relative;
+  padding-left: 30px;
 }
 
-.upload-playlist--button:hover {
-  color: $play-color;
-}
 
 </style>

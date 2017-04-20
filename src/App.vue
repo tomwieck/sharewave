@@ -58,8 +58,4 @@ h1, h2, h3, h4 {
   font-family: 'Raleway', sans-serif;
   margin: 5px 0;
 }
-
-/*logo*/
-/* play - 299dcf */
-/* 17375c */
 </style>
