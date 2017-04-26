@@ -530,11 +530,17 @@ a:hover {
   transition: 0.5s;
   white-space: nowrap;
   width: 100%;
+  @media screen and (max-width: $break-tablet) {
+    height: 140px;
+  }
 }
 
 .wave-container--user {
   display: inline-block;
   width: 120px;
+  @media screen and (max-width: $break-tablet) {
+    width: 92px
+  }
   // margin: auto;
 }
 

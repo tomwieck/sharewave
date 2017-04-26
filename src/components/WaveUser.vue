@@ -1,9 +1,9 @@
 <template>
   <div class='timer'>
-    <img class="wave--profile-pic"
+    <div class="wave--profile-pic"
          v-bind:class="[ waveTrue ? 'wave-true pulse' : 'wave-false']"
          @click="playWave($event, userKey)"
-         :src="imgUrl || placeholderUrl">
+         :style="cssObject(imgUrl || placeholderUrl)"/>
     <div class='timer--rect timer--left'>
       <div v-bind:class='userKey'></div>
     </div>
@@ -25,6 +25,15 @@ export default {
   methods: {
     playWave(event, key) {
       this.$emit('playWave', event, key)
+    },
+    cssObject(img) {
+      // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
+      return {
+        background: `url(${img})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPositionY: 'top'
+      }
     }
   }
 }
@@ -41,6 +50,10 @@ export default {
   width: 100px;
   height: 100px;
   z-index: 1;
+  @media screen and (max-width: $break-tablet) {
+    width: 78px;
+    height: 78px;
+  }
 }
 
 .wave-true {
@@ -48,6 +61,9 @@ export default {
   top: 0;
   left: 0;
   cursor: pointer;
+  @media screen and (max-width: $break-tablet) {
+    border: 3px solid $play-color;
+  }
 }
 
 .wave-false {
@@ -55,6 +71,9 @@ export default {
   top: 0;
   left: 0;
   pointer-events: none;
+  @media screen and (max-width: $break-tablet) {
+    border: 3px solid grey;
+  }
 }
 
 // Pulse START
@@ -87,6 +106,10 @@ export default {
   -webkit-animation:spin 2s linear infinite;
   -moz-animation:spin 2s linear infinite;
   animation:spin 2s linear infinite;
+  @media screen and (max-width: $break-tablet) {
+    top: 2.5px;
+    left: 3px;
+  }
 }
 
 // Timer START
@@ -99,6 +122,11 @@ export default {
   position: relative;
   z-index: 1;
   margin: 0 5px;
+  @media screen and (max-width: $break-tablet) {
+    background-size: 78px 78px;
+    width: 84px;
+    height: 84px;
+  }
 }
 
 .timer--rect {
@@ -108,6 +136,11 @@ export default {
   clip: rect(0px, 110px, 110px, 55px);
   border-radius: 100%;
   background-color: $play-color;
+  @media screen and (max-width: $break-tablet) {
+    clip: rect(0px, 84px, 84px, 42px);
+    width: 84px;
+    height: 84px;
+  }
 }
 
 .fill {
@@ -117,6 +150,11 @@ export default {
   height: 110px;
   border-radius: 100%;
   clip: rect(0px, 55px, 110px, 0px);
+  @media screen and (max-width: $break-tablet) {
+    clip: rect(0px, 42px, 84px, 0px);
+    width: 84px;
+    height: 84px;
+  }
 }
 
 @keyframes left { 0%{-webkit-transform:rotate(0deg);} 100%{transform:rotate(180deg);} }

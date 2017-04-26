@@ -74,9 +74,7 @@ export default {
     checkSpotify() {
       this.loggedIn = true;
       // console.log(this.$cookie.get('access_token'))
-      if (this.$cookie.get('access_token')) {
-        this.showPlaylists = true;
-      }
+      this.showPlaylists = true;
     }
   },
   components: {

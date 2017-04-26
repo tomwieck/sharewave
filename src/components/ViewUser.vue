@@ -1,6 +1,6 @@
 <template>
   <div class="view-user">
-    <img class="view-user--profile-pic" v-bind:src="imgUrl || placeholder ">
+    <div class="view-user--profile-pic" :style="cssObject(imgUrl || placeholder)"/>
     <h1 class="view-user--name">{{ displayName }}</h1>
     <div v-show="ownProfile" class="view-user--logout" @click="logout">
       <svg class="icon icon-exit"><use xlink:href="#icon-exit"></use></svg>
@@ -22,7 +22,7 @@ import { EventBus } from './eventBus.js';
 import VueNotifications from 'vue-notifications'
 
 export default {
-  name: 'Home',
+  name: 'ViewUser',
   data() {
     return {
       displayName: '',
@@ -36,36 +36,49 @@ export default {
   },
   beforeMount() {
     this.getUrlParam();
-    this.getuserDetails();
     // this.getWave();
+  },
+  watch: {
+    '$route' (to, from) {
+      console.log('h');
+      console.log(from.params);
+      if (from.params.user !== to.params.user) {
+        console.log('h2');
+        this.getUrlParam();
+      }
+    }
   },
   methods: {
     getUrlParam() {
       this.user = this.$route.params.user;
+      this.getUserDetails();
     },
-    getuserDetails() {
+    getUserDetails() {
       let unsubscribe = Firebase.auth().onAuthStateChanged(user => {
         if (this.user === user.uid.replace(/\%2E/g, '.')) {
           this.imgUrl = user.photoURL;
           this.ownProfile = true;
-        };
+        } else {
+          this.ownProfile = false;
+        }
         unsubscribe();
       });
       this.userRef = Firebase.database().ref(`users/${this.user.replace(/\./g, '%2E')}`);
       this.userRef.once('value')
       .then(snapshot => {
-        if (!this.imgUrl) {
-          this.imgUrl = snapshot.child('img_url').exists() ? snapshot.val().img_url : null
+        if (!this.ownProfile) {
+          this.imgUrl = snapshot.child('img_url').exists() ? snapshot.val().img_url : null;
         }
         this.displayName = snapshot.val().display_name;
         // this.friends = snapshot.val().friends;
         if (snapshot.child('friends').exists()) {
           this.friendsArr = Object.keys(snapshot.val().friends).map((k) => k)
+        } else {
+          this.friendsArr = [];
         }
       })
     },
     removeFriend(user) {
-      console.log(this.user.replace(/\./g, '%2E'));
       let index = this.friendsArr.indexOf(user.id);
       let safeUser = this.user.replace(/\./g, '%2E');
       let safeFriend = user.id.replace(/\./g, '%2E');
@@ -77,17 +90,12 @@ export default {
     },
     logout() {
       EventBus.$emit('logout');
-      // Firebase.auth().signOut()
-      //   .then(() => {
-      //     Login.resetDetails();
-      //     this.$cookie.delete('access_token', {domain: 'localhost'});
-      //     this.$cookie.delete('refresh_token', {domain: 'localhost'});
-      //     this.$router.push('/');
-      //   });
+    },
+    cssObject(img) {
+      return {
+        background: `url(${img}) top/cover no-repeat`
+      }
     }
-    // getWave() {
-
-    // }
   },
   components: {
     'list-users': ListUsers
@@ -108,6 +116,8 @@ export default {
 
 .view-user--profile-pic {
   border-radius: 50%;
+  height: 150px;
+  margin: auto;
   width: 150px;
 }
 

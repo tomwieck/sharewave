@@ -1,9 +1,9 @@
-<template>
+2<template>
   <div class="users">
     <!-- <input class="users--search" placeholder="Search..." v-model="searchTerm"> -->
     <div class="users--user" v-for="user in addedFriends" :key="user.display_name">
-      <img class="users--profile-pic" :src="user.img_url || placeholderUrl">
-      <span><a class="user--username" :href="'/#/user/' + user.id">{{ user.display_name }}</a></span>
+      <div class="users--profile-pic" :style="cssObject(user.img_url || placeholderUrl)"></div>
+      <span><a class="user--username" :href="'/#/user/' + user.id">{{ user.display_name || safe(user.id) }}</a></span>
       <small class="users--email">{{ user.email }}</small>
       <button @click="userClicked(user)" v-show="add" class="btn btn--secondary users--button">
         Follow
@@ -74,6 +74,18 @@ export default {
     },
     userClicked(user) {
       this.$emit('userClicked', user);
+    },
+    safe(id) {
+      return id.replace(/\%2E/g, '.');
+    },
+    cssObject(img) {
+      // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
+      return {
+        background: `url(${img})`,
+        backgroundSize: '70px',
+        backgroundRepeat: 'no-repeat',
+        backgroundPositionY: 'top'
+      }
     }
   }
 }
@@ -112,6 +124,7 @@ export default {
   display: block;
   margin: auto;
   width: 70px;
+  height: 70px;
 }
 
 .users--email {
