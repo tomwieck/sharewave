@@ -54,6 +54,7 @@ export default {
   computed: {
     addedFriends() {
       if (this.friendList) {
+        console.log(this.friendList)
         return this.users.filter(friend => {
           return this.friendList.includes(friend.id);
         })
@@ -81,10 +82,7 @@ export default {
     cssObject(img) {
       // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
       return {
-        background: `url(${img})`,
-        backgroundSize: '70px',
-        backgroundRepeat: 'no-repeat',
-        backgroundPositionY: 'top'
+        background: `url(${img}) top/cover no-repeat`
       }
     }
   }

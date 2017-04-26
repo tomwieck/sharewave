@@ -20,7 +20,7 @@
         </div>
         <div class="friend-wave float-left">
           <div class="wave-container--user"v-for="(value, key) in waveSongs" v-if="userId !== value.id && waveSongs[key].songs.length !== 0">
-            <div class="wave-container--user-name"><a :href="'/#/user/' + value.id">{{ value.name }}</a></div>
+            <div class="wave-container--user-name"><a :href="'/#/user/' + value.id">{{ value.name || value.id }}</a></div>
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
             <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
           </div>
@@ -53,6 +53,7 @@
     </button>
     <transition name="fade">
       <div v-show="friendsClicked">
+        <!-- <list-users :add="true" :friendList="Object.keys(waveSongs)" v-on:userClicked="addFriend"></list-users> -->
         <list-users :add="true" v-on:userClicked="addFriend"></list-users>
       </div>
     </transition>
@@ -461,24 +462,23 @@ export default {
     },
     addFriend(user) {
       console.log(user);
-      if (this.userId.replace(/\./g, '%2E') !== user.id) {
+      let safeId = this.userId.replace(/\./g, '%2E')
+      if (safeId !== user.id) {
         let friendsRef = Firebase.database().ref(`users/${this.userId.replace(/\./g, '%2E')}/friends`);
         friendsRef.child(user.id).set(true);
-        VueNotifications.success({message: `Added ${user.display_name}`});
+        console.log(user);
+        VueNotifications.success({message: `Added ${user.display_name || safeId}`});
         this.checkFriendsWaves(user.id);
       } else {
         VueNotifications.info({message: "Can't add yourself..."});
       }
     },
     correctCasing(service) {
-      switch (service) {
-        case 'itunes':
-          return 'iTunes'
-        case 'spotify':
-          return 'Spotify'
-        case 'youtube':
-          return 'YouTube'
-      };
+      if (service === 'itunes') {
+        return 'iTunes'
+      } else {
+        return 'Spotify'
+      }
     },
     openNowPlaying() {
       document.getElementById('wave-container-all').classList.add('wave-container--now-playing');

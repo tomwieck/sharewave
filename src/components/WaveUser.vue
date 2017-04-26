@@ -29,10 +29,7 @@ export default {
     cssObject(img) {
       // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
       return {
-        background: `url(${img})`,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPositionY: 'top'
+        background: `url(${img}) top/cover no-repeat`
       }
     }
   }
