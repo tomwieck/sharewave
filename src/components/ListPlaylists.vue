@@ -139,6 +139,11 @@ export default {
   span {
     text-decoration: underline;
   }
+  @media screen and (max-width: $break-tablet) {
+    display: block;
+    float: none;
+    padding-top: 4px;
+  }
 }
 
 .playlist--link, .playlist--link a {
@@ -148,6 +153,13 @@ export default {
 
 .playlist--link:hover {
   color: $play-color;
+}
+
+.playlist--spotify {
+  @media screen and (max-width: $break-tablet) {
+    display: block;
+    float: none;
+  }
 }
 
 .playlist--upload {

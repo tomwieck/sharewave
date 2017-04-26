@@ -5,29 +5,10 @@
         <img class="profile-img" :src="imgUrl || placeholderUrl">
       </a>
     </div>
-    <a v-else @click="showModal = true" class="login--link">
+    <a v-else @click="showModal = !showModal" class="login--link">
       <span>Login</span>
     </a>
-    <modal v-if="showModal" @close="showModal=false">
-      <h3 slot="header">Login</h3>
-        <button slot="body" class="btn btn--main block" v-on:click="spotifyRedirect">
-          <svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
-          With Spotify
-        </button>
-        <a class="modal-link" slot="body" href="/#/emailLogin"><button class="btn btn--main block">
-          <svg class="icon icon-sharewave"><use xlink:href="#icon-sharewave"></use></svg>
-          With ShareWave
-        </button></a>
-      <h3 slot="footer">Don't have an account?</h3>
-        <a class="modal-link" slot="footer" href="https://www.spotify.com/signup/"><button class="btn btn--secondary block">
-          <svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
-          <span>Sign up for a Spotify Account</span>
-        </button></a>
-        <a class="modal-link" slot="footer" href="/#/emailSignup"> <button  class="btn btn--secondary block">
-          <svg class="icon icon-sharewave"><use xlink:href="#icon-sharewave"></use></svg>
-          Sign up for a Sharewave Account
-        </button></a>
-    </modal>
+    <login-popup :show="showModal"></login-popup>
   <symbol id="icon-spotify" viewBox="0 0 32 32">
     <title>spotify</title>
     <path d="M16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.119-16-16-16zM23.363 23.119c-0.319 0.481-0.881 0.637-1.363 0.319-3.762-2.319-8.481-2.8-14.081-1.519-0.563 0.163-1.037-0.238-1.2-0.719-0.162-0.563 0.237-1.038 0.719-1.2 6.081-1.363 11.363-0.8 15.519 1.762 0.563 0.238 0.644 0.875 0.406 1.356zM25.281 18.719c-0.4 0.563-1.119 0.8-1.681 0.4-4.319-2.637-10.881-3.438-15.919-1.837-0.638 0.163-1.362-0.163-1.519-0.8-0.162-0.637 0.162-1.363 0.8-1.519 5.838-1.762 13.037-0.881 18 2.163 0.475 0.238 0.719 1.038 0.319 1.594zM25.438 14.238c-5.119-3.037-13.681-3.363-18.563-1.838-0.8 0.238-1.6-0.238-1.838-0.963-0.237-0.8 0.237-1.6 0.963-1.838 5.681-1.681 15.038-1.363 20.962 2.162 0.719 0.4 0.962 1.363 0.563 2.081-0.406 0.556-1.363 0.794-2.087 0.394z"></path>
@@ -44,8 +25,8 @@
 <script>
 import SpotifyMixin from './spotifyMixin.js'
 import Firebase from './firebaseMixin.js'
-import { EventBus } from './eventBus.js';
-import Modal from './Modal.vue'
+import { EventBus } from './eventBus.js'
+import LoginPopup from './LoginPopup.vue'
 
 export default {
   name: 'Login',
@@ -73,18 +54,10 @@ export default {
     setupListener() {
       EventBus.$on('logout', () => {
         this.signout();
-      });
-    },
-    spotifyRedirect() {
-      this.axios.get('http://localhost:8888/login')
-        .then(response => {
-          if (response.data) {
-            window.location.href = response.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
+      })
+      EventBus.$on('close', () => {
+        this.showModal = false;
+      })
     },
     updateHashParams() {
       this.$cookie.set('access_token', this.$route.params.access_token, { expires: '1h' });
@@ -179,7 +152,7 @@ export default {
     }
   },
   components: {
-    modal: Modal
+    'login-popup': LoginPopup
   }
 }
 </script>

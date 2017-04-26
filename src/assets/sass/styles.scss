@@ -86,6 +86,9 @@
   font-weight: bold;
   margin-right: 10px;
   transition: 0.3s;
+  @media screen and (max-width: $break-tablet) {
+    font-size: 11px;
+  }
 }
 .tag:hover {
   color: $logo-color;
@@ -147,11 +150,15 @@
   padding-top: 0;
   max-width: 200px;
   vertical-align: top;
+  @media screen and (max-width: $break-tablet) {
+    max-width: 130px;
+  }
 }
 
 .playlist--title {
-  display: block;
   color: $logo-color;
+  display: block;
+  font-size: 14px;
   max-width: 200px;
 }
 
@@ -161,6 +168,10 @@
   float: left;
   max-width: 200px;
   padding: 5px 0;
+  @media screen and (max-width: $break-tablet) {
+    height: 130px;
+    max-width: 130px;
+  }
 }
 
 .playlist--spotify {

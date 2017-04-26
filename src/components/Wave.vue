@@ -56,7 +56,7 @@
         <list-users :add="true" v-on:userClicked="addFriend"></list-users>
       </div>
     </transition>
-    <h3>Add Songs:</h3>
+    <h3 class="wave--add-songs">Add Songs to Your Wave: </h3>
     <!-- <a class="btn btn--main" @click="searchClicked = !searchClicked">Search Spotify and iTunes</a> -->
     <search v-on:addToWave="addToWave"></search>
     <button class="btn btn--main recently-played--btn" v-if="spotify" @click="spotifyRecentlyPlayed">
@@ -553,6 +553,11 @@ a:hover {
   vertical-align: top;
 }
 
+.wave--add-songs {
+  padding-bottom: 8px;
+  padding-top: 16px;
+}
+
 .wave-add-songs--link,
 .wave-playing--link {
   color: $logo-color;
@@ -614,7 +619,7 @@ a:hover {
 
 .icon-arrow {
   display: block;
-  fill: $logo-light-color;
+  fill: $logo-color;
   font-size: 40px;
   margin-top: -18px;
   transform: rotate(180deg);

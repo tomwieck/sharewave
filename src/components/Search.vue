@@ -1,39 +1,45 @@
 <template>
   <div class="search" id="search">
     <div class="search-area">
-      <p class="search-area_text"> Search Spotify and iTunes:</p>
       <div class="search-area--container">
-        <input class="search-area--textbox input-box" v-model="searchTerm">
+        <input class="search-area--textbox input-box" placeholder="Search Spotify and iTunes..."v-model="searchTerm">
         <svg class="icon icon-search"><use xlink:href="#icon-search"></use></svg>
       </div>
-      <p>{{ searchPlaceholder }}</p>
+      <p v-show="searchPlaceholder">{{ searchPlaceholder }}</p>
+    </div>
+
+    <div class="search--show-results" v-if="sSearchResults || iSearchResults" @click="showResults = !showResults">
+      <div v-show="showResults"><b>Hide Search Results</b></div>
+      <div v-show="!showResults"><b>Show Search Results</b></div>
     </div>
 
     <button v-show="sSearchResults" @click="show('spotify')" v-bind:class="[ selected === 'spotify' ? 'btn--secondary' : 'btn--disabled']" class="btn result-select">Spotify Results</button>
     <button v-show="iSearchResults" @click="show('itunes')" v-bind:class="[ selected === 'itunes' ? 'btn--secondary' : 'btn--disabled']" class="btn result-select">iTunes Results</button>
 
-    <transition-group name="fade" mode="out-in">
-      <s-search-table
-        class="visible spotify"
-        v-on:parentPlay="playAudio"
-        v-on:tableToSearch="addToWave"
-        v-if="sSearchResults"
-        v-bind:key="sSearchResults"
-        :searchResults="sSearchResults"
-        :service="'Spotify'">
-      </s-search-table>
-      <!-- If no other result, width 100? -->
+    <div v-show="showResults">
+      <transition-group name="fade" mode="out-in">
+        <s-search-table
+          class="visible spotify"
+          v-on:parentPlay="playAudio"
+          v-on:tableToSearch="addToWave"
+          v-if="sSearchResults"
+          v-bind:key="sSearchResults"
+          :searchResults="sSearchResults"
+          :service="'Spotify'">
+        </s-search-table>
+        <!-- If no other result, width 100? -->
 
-      <i-search-table
-        class="hidden itunes"
-        v-on:parentPlay="playAudio"
-        v-on:tableToSearch="addToWave"
-        v-if="iSearchResults"
-        v-bind:key="iSearchResults"
-        :searchResults="iSearchResults"
-        :service="'iTunes'">
-      </i-search-table>
-    </transition-group>
+        <i-search-table
+          class="hidden itunes"
+          v-on:parentPlay="playAudio"
+          v-on:tableToSearch="addToWave"
+          v-if="iSearchResults"
+          v-bind:key="iSearchResults"
+          :searchResults="iSearchResults"
+          :service="'iTunes'">
+        </i-search-table>
+      </transition-group>
+    </div>
     <symbol id="icon-search" viewBox="0 0 32 32">
       <title>search</title>
       <path d="M31.008 27.231l-7.58-6.447c-0.784-0.705-1.622-1.029-2.299-0.998 1.789-2.096 2.87-4.815 2.87-7.787 0-6.627-5.373-12-12-12s-12 5.373-12 12 5.373 12 12 12c2.972 0 5.691-1.081 7.787-2.87-0.031 0.677 0.293 1.515 0.998 2.299l6.447 7.58c1.104 1.226 2.907 1.33 4.007 0.23s0.997-2.903-0.23-4.007zM12 20c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"></path>
@@ -60,6 +66,7 @@ export default {
       searchResults: '',
       timer: false,
       selected: 'spotify',
+      showResults: true,
       iSearchResults: false,
       sSearchResults: false,
       ySearchResults: false,
@@ -207,20 +214,28 @@ export default {
 .search-area--textbox {
   padding: 5px;
   margin-bottom: 10px;
-  @media screen and (max-width: $break-tablet) {
-    width: 90%;
-  }
+  width: 90%;
 }
 
 .search-area--container {
   position: relative;
   display: inline-block;
+  width: 50%;
   @media screen and (max-width: $break-tablet) {
     width: 98%;
   }
 }
 
-.icon {
+.search--show-results {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.search--show-results:hover {
+  color: $play-color;
+}
+
+.icon-search {
   color: #17385e;
   height: 20px;
   width: 20px;

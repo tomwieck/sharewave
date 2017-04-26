@@ -1,49 +1,57 @@
 <template>
   <div class="homepage">
     <div class="left">
-      <h1 class="homepage--welcome homepage--welcome__left logo-font">Share</h1>
+      <h1 class="homepage--welcome homepage--welcome__left logo-font share">Share</h1>
+      <h1 class="homepage--welcome homepage--welcome__left logo-font wave-left">Wave</h1>
       <div class="text-container">
-        <h2 class="homepage--heading">Add songs to Your Wave</h2>
-        <h2 class="homepage--heading">Follow your friends to hear what they are listening to</h2>
+        <h2 class="homepage--text">Add songs to Your Wave</h2>
+        <h2 class="homepage--text">Follow your friends to hear what they are listening to</h2>
       </div>
-      <div v-show="!loggedIn" class="homepage--login-container">
-        <h3 class="homepage--heading">Create a free ShareWave Account, or, </h3>
-        <h3 class="homepage--heading">Login with Spotify</h3>
+      <div v-show="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--left hide-mobile">
+        <h3 class="homepage--text">Create a free ShareWave Account or </h3>
+        <h3 class="homepage--text hide-wide">Login with Spotify to get started</h3>
       </div>
       <div v-show="loggedIn" class="homepage--wave">
         <a href="/#/wave"><button class="btn">See Your Wave</button></a>
       </div>
     </div>
     <div class="right">
-      <h1 class="homepage--welcome homepage--welcome__right logo-font">Wave</h1>
+      <h1 class="homepage--welcome homepage--welcome__right logo-font wave-right">Wave</h1>
       <div class="text-container">
-        <h2 class="homepage--heading__right">Upload Playlists to ShareWave</h2>
-        <h2 class="homepage--heading__right">Or search for and discover new ones</h2>
+        <h2 class="homepage--text__right hide-wide">Upload Playlists to ShareWave</h2>
+        <h2 class="homepage--text__right">Or search for and discover new ones</h2>
         <small class="homepage--login">(Must login with Spotify)</small>
       </div>
-      <div v-show="!loggedIn" class="homepage--login-container">
-        <h3 class="homepage--heading__right">Create a free ShareWave Account, or, </h3>
-        <h3 class="homepage--heading__right">Login with Spotify</h3>
+      <div v-show="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--right">
+        <h3 class="homepage--text__right hide-wide">Create a free ShareWave Account or </h3>
+        <h3 class="homepage--text__right">Login with Spotify to get started</h3>
       </div>
       <div v-show="loggedIn" class="homepage--wave">
         <a href="/#/allPlaylists"><button class="btn btn--secondary">Go To Playlists</button></a>
       </div>
     </div>
+    <login-popup :show="showModal"></login-popup>
   </div>
 </template>
 
 <script>
 import Firebase from './firebaseMixin.js'
+import { EventBus } from './eventBus.js'
+import LoginPopup from './LoginPopup.vue'
 
 export default {
   name: 'Home',
   data() {
     return {
-      loggedIn: false
+      loggedIn: false,
+      showModal: false
     }
   },
   mounted() {
     this.getUser();
+    EventBus.$on('close', () => {
+      this.showModal = false;
+    })
   },
   methods: {
     getUser() {
@@ -56,6 +64,9 @@ export default {
         }
       });
     }
+  },
+  components: {
+    'login-popup': LoginPopup
   }
 }
 </script>
@@ -89,52 +100,90 @@ export default {
   }
 }
 
-.homepage--welcome__right {
+.homepage--welcome__right,
+.container--right {
   color: $logo-color;
   text-align: left;
 }
 
-.homepage--welcome__left {
-  color: white;
-  text-align: right;
+.container--right {
   @media screen and (max-width: $break-tablet) {
-    text-align: left;
+    text-align: center;
   }
 }
 
-.homepage--heading {
+.homepage--welcome__left,
+.container--left {
+  color: white;
+  text-align: right;
+}
+
+.homepage--text {
   color: white;
 }
 
-.homepage--heading__right {
+.homepage--text__right {
   color: $logo-color;
 }
 
-.homepage--heading,
-.homepage--heading__right {
+.homepage--text,
+.homepage--text__right {
   @media screen and (max-width: $break-tablet) {
     font-size: 16px;
-    text-align: left;
   }
 }
 
 .homepage--login {
   @media screen and (max-width: $break-tablet) {
     font-size: 12px;
-    float: left;
   }
 }
 
 .text-container {
   height: 200px;
-  padding-top: 50px;
+  padding: 50px 5px;
+  padding-bottom: 0;
   @media screen and (max-width: $break-tablet) {
-    height: 12vh;
+    height: 18vh;
     padding: 8px;
   }
 }
 
 .homepage--login-container {
-  padding: 8px;
+  padding: 4px;
+}
+
+.share {
+  @media screen and (max-width: $break-tablet) {
+    display: inline-block;
+  }
+}
+
+.wave-left {
+  display: none;
+  @media screen and (max-width: $break-tablet) {
+    display: inline-block;
+  }
+}
+
+.wave-right {
+  display: block;
+  @media screen and (max-width: $break-tablet) {
+    display: none;
+  }
+}
+
+.hide-wide {
+  display: none;
+  @media screen and (max-width: $break-tablet) {
+    display: block;
+  }
+}
+
+.hide-mobile {
+  display: block;
+  @media screen and (max-width: $break-tablet) {
+    display: none;
+  }
 }
 </style>
