@@ -7,11 +7,11 @@
         <h2 class="homepage--text">Add songs to Your Wave</h2>
         <h2 class="homepage--text">Follow your friends to hear what they are listening to</h2>
       </div>
-      <div v-show="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--left hide-mobile">
+      <div v-if="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--left hide-mobile">
         <h3 class="homepage--text">Create a free ShareWave Account or </h3>
         <h3 class="homepage--text hide-wide">Login with Spotify to get started</h3>
       </div>
-      <div v-show="loggedIn" class="homepage--wave">
+      <div v-else="loggedIn" class="homepage--wave">
         <a href="/#/wave"><button class="btn">See Your Wave</button></a>
       </div>
     </div>
@@ -22,15 +22,18 @@
         <h2 class="homepage--text__right">Or search for and discover new ones</h2>
         <small class="homepage--login">(Must login with Spotify)</small>
       </div>
-      <div v-show="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--right">
+      <div v-if="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--right">
         <h3 class="homepage--text__right hide-wide">Create a free ShareWave Account or </h3>
         <h3 class="homepage--text__right">Login with Spotify to get started</h3>
       </div>
-      <div v-show="loggedIn" class="homepage--wave">
+      <div v-else="loggedIn" class="homepage--wave">
         <a href="/#/allPlaylists"><button class="btn btn--secondary">Go To Playlists</button></a>
       </div>
     </div>
     <login-popup :show="showModal"></login-popup>
+    <transition name="fade">
+      <div v-show="!loggedIn" class="hompage--cookies">This website uses Cookies to ensure you get the best ShareWave experience. By continuing, you consent to Cookies being used. <a href="https://www.gov.uk/help/cookies">Find Out More</a> </div>
+    </transition>
   </div>
 </template>
 
@@ -77,13 +80,13 @@ export default {
 
 .left, .right {
   display: inline-block;
+  width: 50%;
+  height: calc(100vh - 64px);
+  position: relative;
   @media screen and (max-width: $break-tablet) {
     width: 100%;
-    height: 45vh;
+    height: calc(50vh - 32px);
   }
-  width: 50%;
-  height: 95vh;
-  position: relative;
 }
 
 .left {
@@ -150,7 +153,17 @@ export default {
 }
 
 .homepage--login-container {
+  cursor: pointer;
   padding: 4px;
+  h3 {
+    transition: 0.2s;
+  }
+}
+
+.homepage--login-container:hover {
+  h3 {
+    color: $play-color;
+  }
 }
 
 .share {
@@ -184,6 +197,19 @@ export default {
   display: block;
   @media screen and (max-width: $break-tablet) {
     display: none;
+  }
+}
+
+.hompage--cookies {
+  background: white;
+  border-top: 2px solid $play-color;
+  bottom: 0;
+  padding: 5px 10px;
+  position: absolute;
+  text-align: left;
+  width: calc(100% - 20px);
+  @media screen and (max-width: $break-tablet) {
+    font-size: 12px;
   }
 }
 </style>

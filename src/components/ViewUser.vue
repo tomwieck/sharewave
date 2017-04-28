@@ -1,8 +1,8 @@
 <template>
   <div class="view-user">
     <div class="view-user--profile-pic" :style="cssObject(imgUrl || placeholder)"/>
-    <h1 class="view-user--name">{{ displayName }}</h1>
-    <div v-show="ownProfile" class="view-user--logout" @click="logout">
+    <h1 v-show="displayName" class="view-user--name">{{ displayName }}</h1>
+    <div v-show="ownProfile && displayName" class="view-user--logout" @click="logout">
       <svg class="icon icon-exit"><use xlink:href="#icon-exit"></use></svg>
       <a>Logout
     </a></div>
@@ -25,7 +25,7 @@ export default {
   name: 'ViewUser',
   data() {
     return {
-      displayName: '',
+      displayName: false,
       friendsArr: [],
       imgUrl: false,
       ownProfile: false,

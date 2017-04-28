@@ -1,6 +1,5 @@
 <template>
   <div class="user-playlists">
-  <button @click="youtubeLogin">YouTube Login</button>
    <div v-if="playlists" class="playlist--list">
       <div>Showing {{ playlists.items.length }} of {{ playlists.total }} playlists</div>
       <transition-group appear class="playlist--all-containers" name="fade">
@@ -81,20 +80,6 @@ export default {
     generateLink(owner, id) {
       owner = encodeURIComponent(owner);
       return `/#/upload/${owner}/${id}`;
-    },
-    youtubeLogin() {
-      this.axios.get('http://localhost:8888/generateUri')
-      .then(function (response) {
-        if (response.data) {
-          window.location.href = response.data;
-        } else {
-          console.log(response);
-        }
-        // vm.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
     }
   }
 }

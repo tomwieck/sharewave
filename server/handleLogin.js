@@ -6,17 +6,17 @@ module.exports = {
   //Create random state and store in cookie
   var state = reusable.generateRandomString(16);
   //Create url and add show dialog to check user
-  let authorizeURL = spotifyApi.createAuthorizeURL(setupVar.scopes, state) 
+  let authorizeURL = spotifyApi.createAuthorizeURL(setupVar.scopes, state)
   	+ '&show_dialog=true';
-  return { 
+  return {
 	  	authUrl: authorizeURL,
-	  	state: state 
+	  	state: state
   	};
 	},
 	generateAccess: function(spotifyApi, req, callback) {
 		// Requests refresh and access tokens, check state parameter
 		let code = req.query.code || null;
-	  
+
 	  // let state = req.query.state || null;
 	  // let storedState = req.cookies ? req.cookies[setupVar.stateKey] : null;
 	  // NEEDS FURTHER TESTING WHEN DEPLOYED
@@ -27,10 +27,9 @@ module.exports = {
 
 	  spotifyApi.authorizationCodeGrant(code)
       .then(function(data) {
-        //Set the access token on the API object to use it in later calls
-        return callback({ 
+        return callback({
         	access_token: data.body['access_token'],
-        	refresh_token: data.body['refresh_token'] 
+        	refresh_token: data.body['refresh_token']
         });
       }, function(err) {
         return callback({ error: 'invalid_token' });

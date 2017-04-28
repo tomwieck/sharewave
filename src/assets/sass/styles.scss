@@ -84,7 +84,7 @@
   letter-spacing: 1px;
   font-size: 13px;
   font-weight: bold;
-  margin-right: 10px;
+  margin: 0 4px;
   transition: 0.3s;
   @media screen and (max-width: $break-tablet) {
     font-size: 11px;
@@ -179,6 +179,11 @@
   float: left;
   margin: auto;
   width: 100px;
+  @media screen and (max-width: $break-tablet) {
+    display: block;
+    float: none;
+    padding-bottom: 4px;
+  }
 }
 
 .icon {

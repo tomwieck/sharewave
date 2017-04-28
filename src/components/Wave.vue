@@ -551,6 +551,9 @@ a:hover {
   text-overflow: ellipsis;
   width: 125px;
   vertical-align: top;
+  @media screen and (max-width: $break-tablet) {
+    width: 92px
+  }
 }
 
 .wave--add-songs {

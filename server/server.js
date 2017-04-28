@@ -76,7 +76,6 @@ app.get('/callback', function(req, res) {
   	handleLogin.generateAccess(spotifyApi, req, function(callback){
 	  	res.clearCookie(setupVar.stateKey);
 	    spotifyApi.setAccessToken(callback.access_token);
-	    // spotifyApi.setRefreshToken(callback.refresh_token);
 	  	spotify.getMe(spotifyApi, function(me) {
 	  		const safeId = me.id.replace(/\./g, '%2E');
 			createFirebaseToken(safeId)
