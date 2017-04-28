@@ -54,7 +54,7 @@
     <transition name="fade">
       <div v-show="friendsClicked">
         <!-- <list-users :add="true" :friendList="Object.keys(waveSongs)" v-on:userClicked="addFriend"></list-users> -->
-        <list-users :add="true" v-on:userClicked="addFriend"></list-users>
+        <list-users :add="true" :search="true" v-on:userClicked="addFriend"></list-users>
       </div>
     </transition>
     <h3 class="wave--add-songs">Add Songs to Your Wave: </h3>
@@ -769,17 +769,19 @@ a:hover {
 }
 
 .wave--scroll-button {
-  position: absolute;
-  top: 40%;
-  z-index: 999;
   background-color: $logo-color;
-  opacity: 0.5;
   border: none;
   border-radius: 50%;
-  width: 30px;
   height: 30px;
-  // display: hidden;
+  opacity: 0.5;
+  position: absolute;
+  top: 70px;
   transition: 0.3s;
+  width: 30px;
+  z-index: 999;
+  @media screen and (max-width: $break-tablet) {
+   top: 60px;
+  }
 }
 
 .wave--scroll-button:hover {

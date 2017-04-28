@@ -203,6 +203,13 @@ export default {
   }
 }
 
+.playlist--tags {
+  @media screen and (max-width: $break-tablet) {
+    display: block;
+    margin-top: -10px;
+  }
+}
+
 .icon {
   margin: auto;
   width: 1em;

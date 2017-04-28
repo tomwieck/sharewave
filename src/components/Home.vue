@@ -78,6 +78,10 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
+.btn {
+  font-size: 24px;
+}
+
 .left, .right {
   display: inline-block;
   width: 50%;
@@ -149,6 +153,7 @@ export default {
   @media screen and (max-width: $break-tablet) {
     height: 18vh;
     padding: 8px;
+    padding-top: 20px;
   }
 }
 
@@ -156,6 +161,7 @@ export default {
   cursor: pointer;
   padding: 4px;
   h3 {
+    text-decoration: underline;
     transition: 0.2s;
   }
 }

@@ -1,33 +1,39 @@
-2<template>
-  <div class="users">
-    <!-- <input class="users--search" placeholder="Search..." v-model="searchTerm"> -->
-    <div class="users--user" v-for="user in addedFriends" :key="user.display_name">
-      <div class="users--profile-pic" :style="cssObject(user.img_url || placeholderUrl)"></div>
-      <span><a class="user--username" :href="'/#/user/' + user.id">{{ user.display_name || safe(user.id) }}</a></span>
-      <small class="users--email">{{ user.email }}</small>
-      <button @click="userClicked(user)" v-show="add" class="btn btn--secondary users--button">
-        Follow
-        <svg class="icon icon-user-plus">
-          <use xlink:href="#icon-user-plus"></use>
-        </svg>
-      </button>
-      <button @click="userClicked(user)" v-show="remove" class="btn btn--main users--button">
-        Unfriend
-        <svg class="icon icon-user-minus">
-          <use xlink:href="#icon-user-minus"></use>
-        </svg>
-      </button>
+<template>
+  <div>
+    <div class="users" :class="[remove !== undefined ? 'reduce-height' : '']">
+      <div class="block" v-show="addedFriends.length === 0 && !search"> No friends :(</div>
+      <input v-show="search" class="users--search input-box block" placeholder="Search..." v-model="searchTerm" >
+      <transition-group class="playlist--all-containers" name="fade" mode="out-in">
+        <div class="users--user" v-for="user in addedFriends" :key="user.display_name">
+          <div class="users--profile-pic" :style="cssObject(user.img_url || placeholderUrl)"></div>
+          <span><a class="user--username" :href="'/#/user/' + user.id">{{ user.display_name || safe(user.id) }}</a></span>
+          <small class="users--email">{{ user.email }}</small>
+          <button @click="userClicked(user)" v-show="add" class="btn btn--secondary users--button">
+            Follow
+            <svg class="icon icon-user-plus">
+              <use xlink:href="#icon-user-plus"></use>
+            </svg>
+          </button>
+          <button @click="userClicked(user)" v-show="remove" class="btn btn--main users--button">
+            Unfriend
+            <svg class="icon icon-user-minus">
+              <use xlink:href="#icon-user-minus"></use>
+            </svg>
+          </button>
+        </div>
+        <div v-show="showMessage && search" :key="showMessage">No results found</div>
+      </transition-group>
     </div>
-  <symbol id="icon-user-plus" viewBox="0 0 32 32">
-    <title>user-plus</title>
-    <path d="M12 23c0-4.726 2.996-8.765 7.189-10.319 0.509-1.142 0.811-2.411 0.811-3.681 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h12.416c-0.271-0.954-0.416-1.96-0.416-3z"></path>
-    <path d="M23 14c-4.971 0-9 4.029-9 9s4.029 9 9 9c4.971 0 9-4.029 9-9s-4.029-9-9-9zM28 24h-4v4h-2v-4h-4v-2h4v-4h2v4h4v2z"></path>
-  </symbol>
-  <symbol id="icon-user-minus" viewBox="0 0 32 32">
-    <title>user-minus</title>
-    <path d="M12 23c0-4.726 2.996-8.765 7.189-10.319 0.509-1.142 0.811-2.411 0.811-3.681 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h12.416c-0.271-0.954-0.416-1.96-0.416-3z"></path>
-    <path d="M23 14c-4.971 0-9 4.029-9 9s4.029 9 9 9c4.971 0 9-4.029 9-9s-4.029-9-9-9zM28 24h-10v-2h10v2z"></path>
-  </symbol>
+    <symbol id="icon-user-plus" viewBox="0 0 32 32">
+      <title>user-plus</title>
+      <path d="M12 23c0-4.726 2.996-8.765 7.189-10.319 0.509-1.142 0.811-2.411 0.811-3.681 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h12.416c-0.271-0.954-0.416-1.96-0.416-3z"></path>
+      <path d="M23 14c-4.971 0-9 4.029-9 9s4.029 9 9 9c4.971 0 9-4.029 9-9s-4.029-9-9-9zM28 24h-4v4h-2v-4h-4v-2h4v-4h2v4h4v2z"></path>
+    </symbol>
+    <symbol id="icon-user-minus" viewBox="0 0 32 32">
+      <title>user-minus</title>
+      <path d="M12 23c0-4.726 2.996-8.765 7.189-10.319 0.509-1.142 0.811-2.411 0.811-3.681 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h12.416c-0.271-0.954-0.416-1.96-0.416-3z"></path>
+      <path d="M23 14c-4.971 0-9 4.029-9 9s4.029 9 9 9c4.971 0 9-4.029 9-9s-4.029-9-9-9zM28 24h-10v-2h10v2z"></path>
+    </symbol>
   </div>
 </template>
 
@@ -38,28 +44,38 @@ export default {
   name: 'ListUsers',
   data() {
     return {
+      showMessage: false,
       placeholderUrl: '../static/placeholder.png',
       searchTerm: '',
       users: [],
       userRef: null
     }
   },
-  props: ['add', 'friendList', 'remove'],
+  props: ['add', 'friendList', 'remove', 'search'],
   mounted() {
     this.getUsers();
-  },
-  deactivated() {
-    console.log('deactivated');
   },
   computed: {
     addedFriends() {
       if (this.friendList) {
-        console.log(this.friendList)
         return this.users.filter(friend => {
-          return this.friendList.includes(friend.id);
+          return this.friendList.includes(friend.id) && friend.display_name.includes(this.searchTerm);
         })
       } else {
-        return this.users;
+        return this.users.filter(friend => {
+          let name = friend.display_name ? friend.display_name.toLowerCase() : undefined;
+          if (name) { return name.includes(this.searchTerm.toLowerCase()) };
+        })
+        // return this.users;
+      }
+    }
+  },
+  watch: {
+    addedFriends() {
+      if (this.addedFriends.length === 0) {
+        this.showMessage = true;
+      } else {
+        this.showMessage = false;
       }
     }
   },
@@ -104,7 +120,7 @@ export default {
 
 .users {
   background-color: $light-grey;
-  max-height: 460px;
+  height: 230px;
   overflow-y: scroll;
 }
 
@@ -148,5 +164,9 @@ export default {
   font-size: 20px;
   bottom: 5px;
   right: 5px;
+}
+
+.reduce-height {
+  height: 150px;
 }
 </style>
