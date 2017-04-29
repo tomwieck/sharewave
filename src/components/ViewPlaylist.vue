@@ -8,7 +8,7 @@
           <p>Uploaded: {{ dateAdded }}</p>
           <p>Uploaded By: {{ uploader }}</p>
           <p>Created By: {{ owner }}</p>
-          <a class="view-playlist--delete" :href="playlistUri">
+          <a class="view-playlist--delete" :href="createSpotifyLink(playlistUri, owner)">
             <button class="btn btn--main block"><svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
               Open in Spotify
             </button>
@@ -117,7 +117,10 @@ export default {
       this.playlistRef.remove();
       VueNotifications.error({message: `Playlist deleted from ShareWave`});
       this.$router.push(`/allPlaylists`);
-    }
+    },
+    createSpotifyLink(user, id) {
+      return `spotify:user:${user}:playlist:${id}`;
+    },
   }
 }
 </script>
