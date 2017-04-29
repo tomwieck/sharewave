@@ -87,22 +87,22 @@
     </div>
     <div class="now-playing--details">
       <div v-if="playing.title">
-        <h3 class="white">Now Playing</h3>
-        <div>
+        <div class="now-playing--title-track">
+          <h3 class="white">Now Playing</h3>
           <span class="now-playing--track">{{playing.artist}} - {{playing.title}}</span>
-          <div class="now-playing--service-control">
-            <a v-bind:href="playing.url" class="now-playing--service">
-              <img v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
-                   :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
-            </a>
-            <div class="now-playing--controls">
-              <span class=" now-playing--control" @click="playWave($event, playing.ownerId, true)">
-                <svg class="icon icon-stop2"><use xlink:href="#icon-stop2"></use></svg>
-              </span>
-              <span class=" now-playing--control" @click="playWave($event, playing.ownerId)">
-                <svg class="icon icon-forward3"><use xlink:href="#icon-forward3"></use></svg>
-              </span>
-            </div>
+        </div>
+        <div class="now-playing--service-control">
+          <a v-bind:href="playing.url" class="now-playing--service">
+            <img v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
+                 :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
+          </a>
+          <div class="now-playing--controls">
+            <span class=" now-playing--control" @click="playWave($event, playing.ownerId, true)">
+              <svg class="icon icon-stop2"><use xlink:href="#icon-stop2"></use></svg>
+            </span>
+            <span class=" now-playing--control" @click="playWave($event, playing.ownerId)">
+              <svg class="icon icon-forward3"><use xlink:href="#icon-forward3"></use></svg>
+            </span>
           </div>
         </div>
       </div>
@@ -487,7 +487,7 @@ export default {
     },
     getArtwork(trackId) {
       this.playing.artwork = this.artPlaceholder;
-      this.axios.get(`https://sharewave.herokuapp.com/trackArtwork?trackId=${trackId}`)
+      this.axios.get(`http://localhost:8888/trackArtwork?trackId=${trackId}`)
       .then(response => {
         this.playing.artwork = response.data;
       })
@@ -750,9 +750,10 @@ a:hover {
 .now-playing--controls {
   display: block;
   float: right;
+  margin-top: 8px;
   @media screen and (max-width: $break-tablet) {
     margin-right: 0;
-    margin-top: 0;
+    margin-top: 5px;
   }
 }
 
@@ -762,9 +763,6 @@ a:hover {
   padding-top: 6px;
   border: none;
   font-size: 28px;
-  @media screen and (max-width: $break-tablet) {
-    font-size: 25px;
-  }
 }
 
 .now-playing--control:hover {
@@ -802,11 +800,12 @@ a:hover {
 
 .now-playing--details {
   display: inline-block;
+  height: 120px;
   float: left;
   padding: 5px;
   padding-left: 8px;
   text-align: left;
-  width: calc(100% - 150px);
+  width: calc(100% - 138px);
 }
 
 .now-playing--track {
@@ -817,6 +816,10 @@ a:hover {
     font-size: 13px;
     max-height: 38px;
   }
+}
+
+.now-playing--title-track {
+  height: 65px;
 }
 
 .now-playing--artwork {
