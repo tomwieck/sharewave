@@ -120,7 +120,7 @@ export default {
     },
     createSpotifyLink(user, id) {
       return `spotify:user:${user}:playlist:${id}`;
-    },
+    }
   }
 }
 </script>
