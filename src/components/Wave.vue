@@ -79,35 +79,35 @@
       </div>
     </div>
   <div id="nowPlaying" class="now-playing">
-    <div class="now-playing--section">
-      <a class="closebtn" @click="closeNowPlaying">&times;</a>
-      <div class="now-playing--details">
-        <div v-if="playing.title">
-          <h3 class="white">Now Playing</h3>
-          <div>
-            <span class="now-playing--track">{{playing.artist}} - {{playing.title}}</span>
-            <a v-bind:href="playing.url">
+    <a class="closebtn" @click="closeNowPlaying">&times;</a>
+    <div v-if="Object.keys(playing).length !== 0" class="now-playing--artwork">
+      <transition mode="out-in" name="fade">
+        <img :key="playing.artwork" :src="playing.artwork ? playing.artwork : getArtwork(playing.id)">
+      </transition>
+    </div>
+    <div class="now-playing--details">
+      <div v-if="playing.title">
+        <h3 class="white">Now Playing</h3>
+        <div>
+          <span class="now-playing--track">{{playing.artist}} - {{playing.title}}</span>
+          <div class="now-playing--service-control">
+            <a v-bind:href="playing.url" class="now-playing--service">
               <img v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
-                   class="service--badge"
                    :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
             </a>
+            <div class="now-playing--controls">
+              <span class=" now-playing--control" @click="playWave($event, playing.ownerId, true)">
+                <svg class="icon icon-stop2"><use xlink:href="#icon-stop2"></use></svg>
+              </span>
+              <span class=" now-playing--control" @click="playWave($event, playing.ownerId)">
+                <svg class="icon icon-forward3"><use xlink:href="#icon-forward3"></use></svg>
+              </span>
+            </div>
           </div>
         </div>
       </div>
-      <div v-if="Object.keys(playing).length !== 0" class="now-playing--artwork">
-        <transition mode="out-in" name="fade">
-          <img :key="playing.artwork" :src="playing.artwork ? playing.artwork : getArtwork(playing.id)">
-        </transition>
-      </div>
     </div>
-    <div class="now-playing--controls">
-      <button class="btn btn--secondary now-playing--control" @click="playWave($event, playing.ownerId, true)">
-        <svg class="icon icon-stop2"><use xlink:href="#icon-stop2"></use></svg>
-      </button>
-      <button class="btn btn--secondary now-playing--control" @click="playWave($event, playing.ownerId)">
-        <svg class="icon icon-forward3"><use xlink:href="#icon-forward3"></use></svg>
-      </button>
-    </div>
+
   </div>
 
   <symbol id="icon-bin" viewBox="0 0 32 32">
@@ -487,7 +487,7 @@ export default {
     },
     getArtwork(trackId) {
       this.playing.artwork = this.artPlaceholder;
-      this.axios.get(`http://localhost:8888/trackArtwork?trackId=${trackId}`)
+      this.axios.get(`https://sharewave.herokuapp.com/trackArtwork?trackId=${trackId}`)
       .then(response => {
         this.playing.artwork = response.data;
       })
@@ -712,52 +712,66 @@ a:hover {
 
 // Now Playing START
 .now-playing {
-  height: 125px;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  bottom: 0;
-  right: 0;
-  opacity: 0.95;
   background-color: $logo-color;
+  bottom: 0;
+  opacity: 0.95;
   overflow-y: hidden;
+  position: fixed;
+  right: 0;
   transition: 0.4s;
   transition-timing-function: cubic-bezier(0.61, 0.12, 0.43, 0.99);
+  width: 0;
+  z-index: 1;
+}
+
+.now-playing,
+.now-playing--artwork img {
+  height: 125px;
+}
+
+.now-playing .closebtn {
+  cursor: pointer;
+  font-size: 38px;
+  right: 5px;
+  padding: 0;
+  position: absolute;
+  top: -5px;
+  transition: 0.3s;
+}
+
+.now-playing--service {
+  float: left;
+  width: 110px;
+  @media screen and (max-width: $break-tablet) {
+    width: 100px;
+  }
 }
 
 .now-playing--controls {
-  margin-right: 120px;
   display: block;
   float: right;
-  padding-right: 8px;
-  padding-top: 2px;
-  margin-top: -10px;
-  transition: 0s !important;
   @media screen and (max-width: $break-tablet) {
     margin-right: 0;
     margin-top: 0;
   }
 }
 
+
 .now-playing--control {
   padding: 2px 2px;
   padding-top: 6px;
   border: none;
-  font-size: 32px;
-  transition: 0s !important;
+  font-size: 28px;
   @media screen and (max-width: $break-tablet) {
-    font-size: 18px;
+    font-size: 25px;
   }
 }
 
-.now-playing--section {
-  display: block;
-  height: 90px;
-  float: left;
-  width: 100%;
+.now-playing--control:hover {
+  color: $play-color;
 }
 
-.now-playing a , .now-playing span, .now-playing div{
+.now-playing a, .now-playing span, .now-playing div{
     text-decoration: none;
     color: white;
     opacity: 0;
@@ -778,19 +792,8 @@ a:hover {
   }
 }
 
-.now-playing a:hover, .offcanvas a:focus{
+.now-playing a:hover {
   color: #f1f1f1;
-}
-
-
-.now-playing .closebtn {
-  cursor: pointer;
-  font-size: 38px;
-  left: 5px;
-  padding: 0;
-  position: absolute;
-  top: -5px;
-  transition: 0.3s;
 }
 
 .now-playing .closebtn:hover {
@@ -800,11 +803,10 @@ a:hover {
 .now-playing--details {
   display: inline-block;
   float: left;
-  max-width: calc(100% - 160px);
   padding: 5px;
-  padding-top: 5px;
-  padding-left: 30px;
+  padding-left: 8px;
   text-align: left;
+  width: calc(100% - 150px);
 }
 
 .now-playing--track {
@@ -818,24 +820,10 @@ a:hover {
 }
 
 .now-playing--artwork {
-  display: inline-block;
-  float: right;
-}
-
-.now-playing--artwork img {
-  height: 125px;
+  float: left;
   width: 125px;
-  @media screen and (max-width: $break-tablet) {
-    height: 90px;
-    width: 90px;
-  }
 }
 
-.service--badge {
-  display: block;
-  height: 40px;
-  width: 110px;
-}
 // Now Playing END
 
 .white {

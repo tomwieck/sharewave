@@ -19,7 +19,7 @@
             <div class="btn btn--main user--preview" @click="playAudio(wave.preview_url, $event)">
               Preview
             </div>
-            <img class="user--service" :src="wave.service === 'itunes' ? itunesBadge : spotifyBadge">
+            <a :href="wave.url"> <img class="user--service" :src="wave.service === 'itunes' ? itunesBadge : spotifyBadge"></a>
           </div>
           <div class="user--song-date">(Added: {{convertTime(wave.date_added)}})</div>
         </div>
