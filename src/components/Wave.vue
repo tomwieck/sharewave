@@ -4,14 +4,6 @@
       <div id="wave-container-all" class="wave-container--all">
         <!-- v-show when complete variable? -->
         <div class="my-wave">
-          <span id="buttons">
-            <span @click="scroll('left')"class="wave--scroll-button wave--scroll-button__left">
-              <svg class="icon icon-arrow icon-arrow--left"><use xlink:href="#icon-arrow"></use></svg>
-            </span>
-            <span @click="scroll()" class="wave--scroll-button wave--scroll-button__right">
-              <svg class="icon icon-arrow icon-arrow--right "><use xlink:href="#icon-arrow"></use></svg>
-            </span>
-          </span>
           <div class="wave-container--user" v-for="(value, key) in waveSongs" v-if="userId === value.id">
             <a :href="'/#/user/' + value.id"><b>My Wave</b></a>
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
@@ -20,7 +12,7 @@
         </div>
         <div class="friend-wave float-left">
           <div class="wave-container--user"v-for="(value, key) in waveSongs" v-if="userId !== value.id && waveSongs[key].songs.length !== 0">
-            <div class="wave-container--user-name"><a :href="'/#/user/' + value.id">{{ value.name || value.id }}</a></div>
+            <div class="wave-container--user-name"><a :href="'/#/user/' + value.id">{{ value.name }}</a></div>
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
             <svg @click="showDetails(key, $event)" class="icon icon-arrow"><use xlink:href="#icon-arrow"></use></svg>
           </div>
@@ -31,6 +23,14 @@
             <wave-user :userKey="key" :imgUrl="value.imgUrl" :waveTrue="waveSongs[key].songs.length !== 0" v-on:playWave="playWave"></wave-user>
           </div>
         </div>
+        <span id="buttons">
+          <span @click="scroll('left')"class="wave--scroll-button wave--scroll-button__left">
+            <svg class="icon icon-arrow icon-arrow--left"><use xlink:href="#icon-arrow"></use></svg>
+          </span>
+          <span @click="scroll()" class="wave--scroll-button wave--scroll-button__right">
+            <svg class="icon icon-arrow icon-arrow--right "><use xlink:href="#icon-arrow"></use></svg>
+          </span>
+        </span>
       </div>
       <div v-bind:class="{'slideup': !detailsOpen, 'slidedown': detailsOpen}">
         <span v-if="details.songs ? details.songs.length === 0 : false"> You have no songs, add some below. </span>
@@ -40,6 +40,9 @@
             {{ song.song_artist }} - {{ song.song_title }}
             <span v-if="userId === details.name">
               <svg class="icon icon-bin" @click="deleteWave(song.id, key)"><use xlink:href="#icon-bin"></use></svg>
+            </span>
+            <span v-else>
+              <a :target="song.service === 'itunes' ? '_blank' : ''" :href="song.url"><svg class="icon icon-new-tab"><use xlink:href="#icon-new-tab"></use></svg></a>
             </span>
           </div>
         </span>
@@ -53,12 +56,10 @@
     </button>
     <transition name="fade">
       <div v-show="friendsClicked">
-        <!-- <list-users :add="true" :friendList="Object.keys(waveSongs)" v-on:userClicked="addFriend"></list-users> -->
         <list-users :add="true" :search="true" v-on:userClicked="addFriend"></list-users>
       </div>
     </transition>
     <h3 class="wave--add-songs">Add Songs to Your Wave: </h3>
-    <!-- <a class="btn btn--main" @click="searchClicked = !searchClicked">Search Spotify and iTunes</a> -->
     <search v-on:addToWave="addToWave"></search>
     <button class="btn btn--main recently-played--btn" v-if="spotify" @click="spotifyRecentlyPlayed">
       See your recent Spotify tracks
@@ -78,26 +79,37 @@
       </div>
     </div>
   <div id="nowPlaying" class="now-playing">
-    <a class="closebtn" @click="closeNowPlaying">&times;</a>
-    <div class="now-playing--details">
-      <div v-if="playing.title">
-        <h3 class="white">Now Playing</h3>
-        <div>
-          <span class="now-playing--track">{{playing.artist}} - {{playing.title}}</span>
-          <a v-bind:href="playing.url">
-            <img v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
-                 class="service--badge"
-                 :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
-          </a>
+    <div class="now-playing--section">
+      <a class="closebtn" @click="closeNowPlaying">&times;</a>
+      <div class="now-playing--details">
+        <div v-if="playing.title">
+          <h3 class="white">Now Playing</h3>
+          <div>
+            <span class="now-playing--track">{{playing.artist}} - {{playing.title}}</span>
+            <a v-bind:href="playing.url">
+              <img v-bind:target="playing.service === 'itunes' ? '_blank' : ''"
+                   class="service--badge"
+                   :src="playing.service === 'itunes' ? itunesBadge: spotifyBadge">
+            </a>
+          </div>
         </div>
       </div>
+      <div v-if="Object.keys(playing).length !== 0" class="now-playing--artwork">
+        <transition mode="out-in" name="fade">
+          <img :key="playing.artwork" :src="playing.artwork ? playing.artwork : getArtwork(playing.id)">
+        </transition>
+      </div>
     </div>
-    <div v-if="Object.keys(playing).length !== 0" class="now-playing--artwork">
-      <transition mode="out-in" name="fade">
-        <img :key="playing.artwork" :src="playing.artwork ? playing.artwork : getArtwork(playing.id)">
-      </transition>
+    <div class="now-playing--controls">
+      <button class="btn btn--secondary now-playing--control" @click="playWave($event, playing.ownerId, true)">
+        <svg class="icon icon-stop2"><use xlink:href="#icon-stop2"></use></svg>
+      </button>
+      <button class="btn btn--secondary now-playing--control" @click="playWave($event, playing.ownerId)">
+        <svg class="icon icon-forward3"><use xlink:href="#icon-forward3"></use></svg>
+      </button>
     </div>
   </div>
+
   <symbol id="icon-bin" viewBox="0 0 32 32">
     <title>bin</title>
     <path d="M4 10v20c0 1.1 0.9 2 2 2h18c1.1 0 2-0.9 2-2v-20h-22zM10 28h-2v-14h2v14zM14 28h-2v-14h2v14zM18 28h-2v-14h2v14zM22 28h-2v-14h2v14z"></path>
@@ -111,6 +123,19 @@
     <title>user-plus</title>
     <path d="M12 23c0-4.726 2.996-8.765 7.189-10.319 0.509-1.142 0.811-2.411 0.811-3.681 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h12.416c-0.271-0.954-0.416-1.96-0.416-3z"></path>
     <path d="M23 14c-4.971 0-9 4.029-9 9s4.029 9 9 9c4.971 0 9-4.029 9-9s-4.029-9-9-9zM28 24h-4v4h-2v-4h-4v-2h4v-4h2v4h4v2z"></path>
+  </symbol>
+  <symbol id="icon-new-tab" viewBox="0 0 32 32">
+    <title>new-tab</title>
+    <path d="M6 2v24h24v-24h-24zM28 24h-20v-20h20v20zM4 28v-21l-2-2v25h25l-2-2h-21z"></path>
+    <path d="M11 8l5 5-6 6 3 3 6-6 5 5v-13z"></path>
+  </symbol>
+  <symbol id="icon-forward3" viewBox="0 0 32 32">
+    <title>forward3</title>
+    <path d="M16 27v-10l-10 10v-22l10 10v-10l11 11z"></path>
+  </symbol>
+  <symbol id="icon-stop2" viewBox="0 0 32 32">
+    <title>stop2</title>
+    <path d="M4 4h24v24h-24z"></path>
   </symbol>
   </div>
 </template>
@@ -386,16 +411,19 @@ export default {
         this.playWave(target, id);
       });
     },
-    playWave(e, id) {
+    playWave(e, id, stop) {
       // e.target when from click event, just e when from playAudio
-      let target = e.target || e;
+      console.log(id);
+      id = id.replace(/\./g, '%2E')
+      let target = document.getElementsByClassName(`${id}`)[0];
       let waveRef = this.waveSongs[id];
       let counter = waveRef.counter;
       target.classList.add('wave--playing');
       target.classList.remove('pulse');
       console.log(id);
       this.resetClasses(id);
-      if (counter === waveRef.songs.length) {
+      console.log(stop);
+      if (counter === waveRef.songs.length || stop) {
         waveRef.counter = 0;
         this.ifPlayingPause();
         this.removeClass(target);
@@ -410,34 +438,11 @@ export default {
       }
     },
     resetClasses(id) {
-      let classes = Array.from(document.getElementsByClassName(id));
+      let classes = Array.from(document.getElementsByClassName(`timer-${id}`));
       classes.forEach((elm) => {
         elm.classList.add('fill');
         var newone = elm.cloneNode(true);
         elm.parentNode.replaceChild(newone, elm);
-      })
-    },
-    setPlaying(song, id) {
-      console.log(song);
-      this.playing = {
-        artist: song.song_artist,
-        artwork: song.artwork_url || null,
-        id: song.id,
-        ownerId: id.replace(/\%2E/g, '.'),
-        title: song.song_title,
-        service: song.service,
-        url: song.url
-      }
-      this.openNowPlaying();
-    },
-    getArtwork(trackId) {
-      this.playing.artwork = this.artPlaceholder;
-      this.axios.get(`http://localhost:8888/trackArtwork?trackId=${trackId}`)
-      .then(response => {
-        this.playing.artwork = response.data;
-      })
-      .catch(error => {
-        console.log(error);
       })
     },
     removeClass(target) {
@@ -479,6 +484,28 @@ export default {
       } else {
         return 'Spotify'
       }
+    },
+    getArtwork(trackId) {
+      this.playing.artwork = this.artPlaceholder;
+      this.axios.get(`http://localhost:8888/trackArtwork?trackId=${trackId}`)
+      .then(response => {
+        this.playing.artwork = response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    },
+    setPlaying(song, id) {
+      this.playing = {
+        artist: song.song_artist,
+        artwork: song.artwork_url || null,
+        id: song.id,
+        ownerId: id.replace(/\%2E/g, '.'),
+        title: song.song_title,
+        service: song.service,
+        url: song.url
+      }
+      this.openNowPlaying();
     },
     openNowPlaying() {
       document.getElementById('wave-container-all').classList.add('wave-container--now-playing');
@@ -641,6 +668,21 @@ a:hover {
 .icon-bin:hover {
   fill: red;
 }
+
+.icon-new-tab {
+  margin-bottom: -3px;
+  margin-left: 4px;
+  display: inline-block;
+}
+
+.icon-new-tab:hover {
+  fill: $play-color;
+}
+
+.icon-forward3,
+.icon-stop2 {
+
+}
 // Icons END
 
 // More Details START
@@ -683,6 +725,37 @@ a:hover {
   transition-timing-function: cubic-bezier(0.61, 0.12, 0.43, 0.99);
 }
 
+.now-playing--controls {
+  margin-right: 120px;
+  display: block;
+  float: right;
+  padding-right: 8px;
+  padding-top: 2px;
+  margin-top: -10px;
+  transition: 0s !important;
+  @media screen and (max-width: $break-tablet) {
+    margin-right: 0;
+    margin-top: 0;
+  }
+}
+
+.now-playing--control {
+  padding: 2px 2px;
+  padding-top: 6px;
+  border: none;
+  font-size: 32px;
+  transition: 0s !important;
+  @media screen and (max-width: $break-tablet) {
+    font-size: 18px;
+  }
+}
+
+.now-playing--section {
+  display: block;
+  height: 90px;
+  float: left;
+  width: 100%;
+}
 
 .now-playing a , .now-playing span, .now-playing div{
     text-decoration: none;
@@ -704,7 +777,6 @@ a:hover {
     opacity: 1;
   }
 }
-
 
 .now-playing a:hover, .offcanvas a:focus{
   color: #f1f1f1;
@@ -739,6 +811,10 @@ a:hover {
   display: block;
   max-height: 45px;
   overflow-x: scroll;
+  @media screen and (max-width: $break-tablet) {
+    font-size: 13px;
+    max-height: 38px;
+  }
 }
 
 .now-playing--artwork {
@@ -749,6 +825,10 @@ a:hover {
 .now-playing--artwork img {
   height: 125px;
   width: 125px;
+  @media screen and (max-width: $break-tablet) {
+    height: 90px;
+    width: 90px;
+  }
 }
 
 .service--badge {
@@ -761,11 +841,6 @@ a:hover {
 .white {
   color: white;
   fill: white;
-}
-
-.float-left {
-  // float: left;
-  order: -1;
 }
 
 .wave--scroll-button {

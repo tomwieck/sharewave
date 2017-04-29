@@ -1,14 +1,14 @@
 <template>
   <div class='timer'>
     <div class="wave--profile-pic"
-         v-bind:class="[ waveTrue ? 'wave-true pulse' : 'wave-false']"
+         v-bind:class="[ waveTrue ? 'wave-true pulse' : 'wave-false', userKey]"
          @click="playWave($event, userKey)"
          :style="cssObject(imgUrl || placeholderUrl)"/>
     <div class='timer--rect timer--left'>
-      <div v-bind:class='userKey'></div>
+      <div v-bind:class='"timer-" + userKey'></div>
     </div>
     <div class='timer--rect timer--right'>
-      <div v-bind:class='userKey'></div>
+      <div v-bind:class='"timer-" + userKey'></div>
     </div>
   </div>
 </template>

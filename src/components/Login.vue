@@ -196,6 +196,7 @@ export default {
 }
 
 .profile-img {
+  margin-top: 3px;
   border-radius: 50%;
   height: 44px;
 }

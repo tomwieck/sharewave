@@ -99,8 +99,11 @@
   border: 1px solid #299dcf;
   border-radius: 2px;
   padding: 5px;
-  width: 265px;
+  width: 60%;
   font-size: 14px;
+  @media screen and (max-width: $break-tablet) {
+    width: 90%;
+  }
 }
 
 .input-box::-webkit-input-placeholder {
