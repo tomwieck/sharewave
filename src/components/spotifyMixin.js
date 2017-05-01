@@ -61,6 +61,7 @@ export default {
       this.setAccessToken(check => {
         let accessToken = this.$cookie.get('access_token') || this.$cookie.get('client_access_token');
         this.spotifyApi.setAccessToken(accessToken);
+        console.log(options.fields);
         this.spotifyApi.getPlaylist(options.user, options.playlist, options.fields)
         .then(function(data) {
           return callback(data);
@@ -68,6 +69,17 @@ export default {
           return callback(err);
         });
       });
+    },
+    getUser: function(id, callback) {
+      this.setAccessToken(check => {
+        console.log(id);
+        this.spotifyApi.getUser(id)
+        .then(function(data) {
+          return callback(data);
+        }, function(err) {
+          return callback(err);
+        });
+      })
     },
     updatePlaylistName: function(userId, playlistId, newName, callback) {
       this.setAccessToken(check => {

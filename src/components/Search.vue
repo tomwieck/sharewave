@@ -74,9 +74,8 @@ export default {
       videoId: ''
     }
   },
-  beforeRouteLeave(to, from, next) {
+  beforeDestroy() {
     this.ifPlayingPause();
-    next();
   },
   mounted: function () {
     if (!this.$cookie.get('client_access_token') || !this.$cookie.get('access_token')) {
@@ -237,8 +236,8 @@ export default {
 
 .icon-search {
   color: #17385e;
-  height: 20px;
-  width: 20px;
+  height: 24px;
+  width: 24px;
   stroke-width: 0;
   stroke: currentColor;
   fill: currentColor;

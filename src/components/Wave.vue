@@ -177,14 +177,12 @@ export default {
     }
   },
   mixins: [SpotifyMixin],
-  beforeRouteLeave(to, from, next) {
+  beforeDestroy() {
     this.ifPlayingPause();
     window.removeEventListener('resize', this.updateLayout)
-    next();
   },
   mounted() {
     this.getUser();
-    // window.addEventListener('resize', this.handleResize)
     window.addEventListener('resize', this.updateLayout, false);
   },
   watch: {
@@ -240,14 +238,12 @@ export default {
       // Could set listeners for all friends so that if they are added updated in real time
       this.userRef = Firebase.database().ref(`users/${userId}`);
       this.userRef.once('value', snapshot => {
-        console.log(snapshot.val())
         this.spotify = snapshot.val().spotify;
         if (snapshot.child('friends').exists()) {
           let friends = snapshot.val().friends;
           this.wave = snapshot.val().wave;
           for (var user in friends) {
             // Should be non blocking, make each call to wave seperately after getting friend list ?
-            console.log(user);
             this.checkFriendsWaves(user)
           }
         } else {
@@ -258,15 +254,14 @@ export default {
     checkFriendsWaves(userId) {
       let friendRef = Firebase.database().ref(`users/${userId}`)
       friendRef.once('value', snapshot => {
-        // let friendWave = snapshot.child('wave').val();
-        // if (friendWave) {
-        let user = {
-          displayName: snapshot.val().display_name,
-          photoURL: snapshot.val().img_url,
-          uid: userId
+        if (snapshot.val()) {
+          let user = {
+            displayName: snapshot.val().display_name,
+            photoURL: snapshot.val().img_url,
+            uid: userId
+          }
+          this.regsiterChildAdded(user);
         }
-        this.regsiterChildAdded(user);
-        // }
       })
     },
     regsiterChildAdded(user) {
@@ -298,7 +293,6 @@ export default {
       // If clicked on the <use> tag, still apply class to svg
       let target = e.target.tagName === 'use' ? e.target.parentNode : e.target;
       // if clicked on the same rotate
-      console.log(this.details.name, this.waveSongs[key].id);
       if (this.details.name === this.waveSongs[key].id) {
         setTimeout(() => { this.details = {}; }, 400);
         this.detailsOpen = false;
@@ -313,14 +307,12 @@ export default {
         let songs = this.waveSongs[key].songs.slice(0);
         this.details.name = this.waveSongs[key].id;
         this.details.songs = songs;
-        console.log(songs);
       }
       this.$forceUpdate();
     },
     // ADD / DELETE WAVE
     addRecentToWave(song) {
       // If album art is needed, could make API call here, or when retrieving album art
-      console.log(song);
       const result = {
         album: null,
         artist: song.artists[0].name,
@@ -413,16 +405,13 @@ export default {
     },
     playWave(e, id, stop) {
       // e.target when from click event, just e when from playAudio
-      console.log(id);
       id = id.replace(/\./g, '%2E')
       let target = document.getElementsByClassName(`${id}`)[0];
       let waveRef = this.waveSongs[id];
       let counter = waveRef.counter;
       target.classList.add('wave--playing');
       target.classList.remove('pulse');
-      console.log(id);
       this.resetClasses(id);
-      console.log(stop);
       if (counter === waveRef.songs.length || stop) {
         waveRef.counter = 0;
         this.ifPlayingPause();
@@ -466,13 +455,11 @@ export default {
       }
     },
     addFriend(user) {
-      console.log(user);
       let safeId = this.userId.replace(/\./g, '%2E')
       if (safeId !== user.id) {
         let friendsRef = Firebase.database().ref(`users/${this.userId.replace(/\./g, '%2E')}/friends`);
         friendsRef.child(user.id).set(true);
-        console.log(user);
-        VueNotifications.success({message: `Added ${user.display_name || safeId}`});
+        VueNotifications.success({message: `Followed ${user.display_name || safeId}`});
         this.checkFriendsWaves(user.id);
       } else {
         VueNotifications.info({message: "Can't add yourself..."});

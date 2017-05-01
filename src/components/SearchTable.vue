@@ -7,7 +7,7 @@
       <img class="search-table--album-art" v-bind:src="result.artwork">
       <div class="search-table--container-details">
         <!-- <span v-if="service === 'YouTube'"><div>{{ result.title }}</div></span> -->
-        <div class="search-table--container-artist"><span><b>{{ result.artist }}</b></span></div>
+        <div class="search-table--container-artist"><span>{{ result.artist }}</span></div>
         <div class="search-table--container-track"><span>{{ result.track }}</span></div>
         <div class="search-table--container-album"><span>{{ result.album }}</span></div>
       </div>
@@ -120,6 +120,7 @@ table {
 .search-table--container-track,
 .search-table--container-artist,
 .search-table--container-album {
+  font-weight: bold;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

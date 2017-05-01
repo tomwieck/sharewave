@@ -23,39 +23,4 @@ export default {
 <style lang="scss">
 @import "./assets/sass/styles.scss";
 @import url('https://fonts.googleapis.com/css?family=Comfortaa|Raleway');
-.block {
-  display: block;
-}
-
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-}
-
-.mini-toastr {
-  bottom: 12px;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  top: auto !important;
-}
-
-.mini-toastr__notification {
-  animation: fadein 0.5s;
-  opacity: 1 !important;
-}
-
-@keyframes fadein {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
-body {
-  margin: 0;
-}
-
-h1, h2, h3, h4 {
-  font-family: 'Raleway', sans-serif;
-  margin: 5px 0;
-}
 </style>

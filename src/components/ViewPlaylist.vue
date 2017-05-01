@@ -13,7 +13,7 @@
               Open in Spotify
             </button>
           </a>
-          <a class="view-playlist--delete" @click="deletePlaylist" v-show="ownPlaylist">
+          <a class="view-playlist--delete" @click="deleteClicked = true" v-show="ownPlaylist">
             <button class="btn btn--secondary"><svg class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
             Delete Playlist from ShareWave
             </button>
@@ -24,6 +24,12 @@
     <div v-else>
       <p>Loading...</p>
     </div>
+    <delete-popup v-show="deleteClicked" v-on:close="deleteClicked = false">
+      <h3 slot="header">Are you sure?</h3>
+        <button slot="body" class="btn btn--main"  @click="deletePlaylist">
+          Delete
+        </button>
+    </delete-popup>
     <symbol id="icon-bin" viewBox="0 0 32 32">
       <title>bin</title>
       <path d="M4 10v20c0 1.1 0.9 2 2 2h18c1.1 0 2-0.9 2-2v-20h-22zM10 28h-2v-14h2v14zM14 28h-2v-14h2v14zM18 28h-2v-14h2v14zM22 28h-2v-14h2v14z"></path>
@@ -40,12 +46,14 @@
 import SpotifyMixin from './spotifyMixin.js'
 import Firebase from './firebaseMixin.js'
 import VueNotifications from 'vue-notifications'
+import Modal from './Modal.vue'
 
 export default {
   name: 'Home',
   data() {
     return {
       dateAdded: '',
+      deleteClicked: false,
       ownPlaylist: false,
       imgUrl: '',
       owner: '',
@@ -58,6 +66,9 @@ export default {
     }
   },
   mixins: [SpotifyMixin],
+  components: {
+    'delete-popup': Modal
+  },
   mounted() {
     this.getUser();
     this.getUrlParam();

@@ -18,7 +18,7 @@
       <div class="playlist--container" v-for="playlist in searchResults" :key="playlist.id">
         <img class="playlist--art" v-bind:src="playlist.imgUrl">
         <h4 class="playlist--title">{{ playlist.title }}</h4>
-        <small class="playlist--uploader"> Uploaded by {{safe(playlist.uploader)}}</small>
+        <small class="playlist--uploader"> Uploaded by {{playlist.uploader_name}}</small>
         <a v-bind:href="createSpotifyLink(playlist.owner, playlist.id)"><img class="playlist--spotify" :src="spotifyBadge"></a>
         <a class="playlist--link" v-bind:href="shareWaveLink(playlist.id)">
           <svg class="icon icon-file-play"><use xlink:href="#icon-file-play"></use></svg>
@@ -116,6 +116,7 @@ export default {
         fields: 'images'
       }
       this.getSinglePlaylist(options, callback => {
+        console.log(callback);
         if (callback.images) {
           playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
         } else {
@@ -137,9 +138,6 @@ export default {
           this.tags = Object.keys(snapshot.val());
         }
       });
-    },
-    safe(id) {
-      return id.replace(/\%2E/g, '.');
     }
   }
 }
@@ -221,9 +219,10 @@ export default {
 }
 
 .icon-search {
+  font-size: 24px;
   position: absolute;
   right: 20%;
-  top: 16px;
+  top: 15px;
   @media screen and (max-width: $break-tablet) {
     right: 5%;
   }

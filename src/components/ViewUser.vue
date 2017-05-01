@@ -53,6 +53,7 @@ export default {
   name: 'ViewUser',
   data() {
     return {
+      audioObject: null,
       displayName: false,
       friendsArr: [],
       imgUrl: false,
@@ -68,11 +69,15 @@ export default {
   beforeMount() {
     this.getUrlParam();
   },
+  beforeDestroy() {
+    this.ifPlayingPause();
+  },
   watch: {
     '$route' (to, from) {
       if (from.params.user !== to.params.user) {
         this.waveHistory = [];
         this.getUrlParam();
+        this.ifPlayingPause();
       }
     }
   },
@@ -113,7 +118,7 @@ export default {
       })
       if (this.waveHistory.length === 0) { }
     },
-    playAudio: function(url, e) {
+    playAudio(url, e) {
       let target = e.target;
       if (target.classList.contains('playing')) {
         this.audioObject.pause();
@@ -142,7 +147,7 @@ export default {
       if (index !== -1) {
         Firebase.database().ref(`users/${safeUser}/friends/${safeFriend}`).remove();
         this.friendsArr.splice(index, 1);
-        VueNotifications.error({message: `Removed ${user.display_name} from friends`});
+        VueNotifications.error({message: `Unfollowed ${user.display_name}`});
       }
     },
     logout() {
@@ -156,6 +161,11 @@ export default {
     convertTime(epoch) {
       let date = new Date(epoch);
       return date.toLocaleDateString('en-GB');
+    },
+    ifPlayingPause() {
+      if (this.audioObject) {
+        this.audioObject.pause();
+      }
     }
   },
   components: {

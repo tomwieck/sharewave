@@ -32,12 +32,6 @@ export default {
     this.checkSpotify();
     this.registerStateChange();
   },
-  beforeRouteLeave(to, from, next) {
-    this.checkRoute();
-    console.log(this.checkSpotify());
-    this.checkSpotify();
-    next();
-  },
   methods: {
     checkRoute(route) {
       return route === this.$route.name;
@@ -59,21 +53,11 @@ export default {
         }
       });
     },
-    // checkSpotify() {
-    //   let userRef = Firebase.database().ref(`users/${this.user.replace(/\./g, '%2E')}`);
-    //   userRef.once('value')
-    //   .then(snapshot => {
-    //     if (!this.imgUrl) {
-    //       this.imgUrl = snapshot.child('img_url').exists ? snapshot.val().img_url : null
-    //     }
-    //   })
-    // },
     emitLogout() {
       this.$refs.loginRef.signout()
     },
     checkSpotify() {
       this.loggedIn = true;
-      // console.log(this.$cookie.get('access_token'))
       this.showPlaylists = true;
     }
   },

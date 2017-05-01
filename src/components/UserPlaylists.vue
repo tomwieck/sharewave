@@ -7,7 +7,6 @@
           <img class="playlist--art" v-bind:src="playlist.images[0] ? playlist.images[0].url : placeholder">
           <span class="playlist--title"><b>{{ playlist.name }} </b></span>
           <a v-bind:href="playlist.uri"><img class="playlist--spotify" :src="spotifyBadge"></a>
-          <!-- <a class="playlist--text" v-bind:href="">Open in Spotify</a> -->
           <div class="playlist--spotify-upload">
             <a class="playlist--upload" v-bind:href="generateLink(playlist.owner.id, playlist.id)">
               <button class="btn btn--main">Upload</button>
