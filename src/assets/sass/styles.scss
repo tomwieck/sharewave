@@ -1,6 +1,4 @@
 @import './colors.scss';
-
-
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -227,6 +225,32 @@ h1, h2, h3, h4 {
     float: none;
     padding-bottom: 4px;
   }
+}
+
+.playlist--link {
+  cursor: pointer;
+  float: left;
+  height: 30px;
+  padding: 0 10px;
+  padding-top: 10px;
+  text-decoration: none;
+  span {
+    text-decoration: underline;
+  }
+  @media screen and (max-width: $break-tablet) {
+    display: block;
+    float: none;
+    padding-top: 4px;
+  }
+}
+
+.playlist--link, .playlist--link a {
+  color: $logo-color;
+  transition: 0.3s;
+}
+
+.playlist--link:hover {
+  color: $play-color;
 }
 // Reusable playlist container END
 

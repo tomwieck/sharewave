@@ -2,7 +2,7 @@
   <div class="nav-login">
     <div v-if="username" class="login--username">
       <a :href="`/#/user/${encodeURIComponent(userId.replace(/\%2E/g, '.'))}`">
-        <img class="profile-img" :src="imgUrl || placeholderUrl">
+        <div class="profile-img" :style="cssObject(imgUrl)"/>
       </a>
     </div>
     <a v-else @click="showModal = !showModal" class="login--link">
@@ -149,6 +149,12 @@ export default {
     },
     redirect() {
       this.$router.push('/');
+    },
+    cssObject(img) {
+      // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
+      return {
+        background: `url(${img}) top/cover no-repeat`
+      }
     }
   },
   components: {
@@ -199,6 +205,7 @@ export default {
   margin-top: 3px;
   border-radius: 50%;
   height: 44px;
+  width: 44px;
 }
 
 .profile-name {

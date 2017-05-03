@@ -3,7 +3,7 @@
     <input v-show="search" class="users--search input-box block" placeholder="Search..." v-model="searchTerm">
       <div v-show="!showMessage">
         <div class="users--user" v-for="user in addedFriends" :key="user.display_name">
-          <div class="users--profile-pic" :style="cssObject(user.img_url || placeholderUrl)"></div>
+          <a :href="'/#/user/' + user.id"><div class="users--profile-pic" :style="cssObject(user.img_url || placeholderUrl)"></div></a>
           <span><a class="user--username" :href="'/#/user/' + user.id">{{ user.display_name || safe(user.id) }}</a></span>
           <small class="users--email">{{ user.email }}</small>
           <button @click="userClicked(user)" v-show="add" class="btn btn--secondary users--button">

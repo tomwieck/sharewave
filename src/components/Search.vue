@@ -2,8 +2,8 @@
   <div class="search" id="search">
     <div class="search-area">
       <div class="search-area--container">
-        <input class="search-area--textbox input-box" placeholder="Search Spotify and iTunes..."v-model="searchTerm">
-        <svg class="icon icon-search"><use xlink:href="#icon-search"></use></svg>
+        <input class="search-area--textbox input-box" @keyup.enter="getSearch" placeholder="Search Spotify and iTunes..." v-model="searchTerm">
+        <svg class="icon icon-search" @click="getSearch"><use xlink:href="#icon-search"></use></svg>
       </div>
       <p v-show="searchPlaceholder">{{ searchPlaceholder }}</p>
     </div>
@@ -27,7 +27,6 @@
           :searchResults="sSearchResults"
           :service="'Spotify'">
         </s-search-table>
-        <!-- If no other result, width 100? -->
 
         <i-search-table
           class="hidden itunes"
@@ -49,7 +48,6 @@
 
 <script>
 import isEmpty from 'lodash/isEmpty'
-import debounce from 'lodash/debounce'
 
 import SpotifyMixin from './spotifyMixin.js'
 import SearchTable from './SearchTable.vue'
@@ -84,79 +82,66 @@ export default {
   },
   watch: {
     // whenever search changes, this function will run
-    searchTerm: function () {
-      this.searchPlaceholder = 'Waiting for you to stop typing...'
-      this.getSearch()
-    },
     checked: function() {
       this.ifPlayingPause();
-      this.getSearch()
+      this.getSearch();
     }
   },
   methods: {
-    ifPlayingPause: function() {
+    ifPlayingPause() {
       if (this.audioObject) {
         this.audioObject.pause();
       }
     },
-    resetTables: function() {
+    resetTables() {
       this.iSearchResults = null;
       this.sSearchResults = null;
     },
-    clientCredentials: function() {
-      var vm = this;
-      vm.axios.get('http://localhost:8888/clientCredential')
-      .then(function (response) {
-        vm.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
+    clientCredentials() {
+      this.axios.get('http://localhost:8888/clientCredential')
+      .then(response => {
+        this.$cookie.set('client_access_token', response.data.access_token, { expires: '1h' });
       })
-      .catch(function (error) {
+      .catch(error => {
         console.log(error);
       })
     },
-    getSearch: debounce(
-      function () {
-        this.ifPlayingPause();
-        if (/\S/.test(this.searchTerm)) {
-          var services = '&services=';
-          this.searchPlaceholder = 'Searching...'
+    getSearch() {
+      this.ifPlayingPause();
+      if (/\S/.test(this.searchTerm)) {
+        let services = '&services=';
+        this.searchPlaceholder = 'Searching...'
 
-          var length = this.checked.length;
-          if (length !== 0) {
-            // add selected services to URL
-            this.checked.forEach(function(v, index) {
-              services += v;
-              if (index !== length - 1) { services += '+' };
-            });
-            let accessToken = this.$cookie.get('access_token') || this.$cookie.get('client_access_token')
-            let accessTokenString = '&access_token=' + accessToken;
-            var vm = this;
-            vm.axios.get('http://localhost:8888/search?searchTerm=' + this.searchTerm + services + accessTokenString)
-            .then(function (response) {
-              vm.updateTables(response.data);
-            })
-            .catch(function (error) {
-              console.log(error)
-              vm.searchPlaceholder = 'Something went wrong, please try again' + error
-            })
-          } else {
-            this.searchPlaceholder = 'Please select service(s) to search'
-            this.resetTables;
-          }
-        } else {
-          this.searchPlaceholder = 'Please enter a search term'
-          this.resetTables;
-        }
-      },
-    // This is the number of milliseconds we wait for the user to stop typing.
-    500),
-    updateTables: function (data) {
-      this.searchPlaceholder = ' ';
+        let length = this.checked.length;
+        // add selected services to URL
+        this.checked.forEach(function(v, index) {
+          services += v;
+          if (index !== length - 1) { services += '+' };
+        });
+        let accessToken = this.$cookie.get('access_token') || this.$cookie.get('client_access_token')
+        let accessTokenString = '&access_token=' + accessToken;
+        this.axios.get('http://localhost:8888/search?searchTerm=' + this.searchTerm + services + accessTokenString)
+        .then(response => {
+          this.updateTables(response.data);
+        })
+        .catch(error => {
+          console.log(error)
+          this.searchPlaceholder = 'Something went wrong, please try again' + error
+        })
+      } else {
+        this.searchPlaceholder = 'Please enter a search term'
+        this.resetTables;
+      }
+    },
+    updateTables(data) {
+      this.searchPlaceholder = '';
+      console.log(data);
       // if data is empty, either add to table or set to null so nothing is rendered
       !isEmpty(data.spotify) ? this.sSearchResults = data.spotify : this.sSearchResults = null;
       !isEmpty(data.itunes) ? this.iSearchResults = data.itunes : this.iSearchResults = null;
       // !isEmpty(data.youtube) ? this.ySearchResults = data.youtube : this.ySearchResults = null;
     },
-    playAudio: function(url, e) {
+    playAudio(url, e) {
       let target = e.target;
       if (target.classList.contains('playing')) {
         this.audioObject.pause();
@@ -168,11 +153,11 @@ export default {
         this.audioObject.play();
         target.classList.add('playing');
         target.innerText = 'Playing';
-        this.audioObject.addEventListener('ended', function () {
+        this.audioObject.addEventListener('ended', () => {
           target.classList.remove('playing');
           target.innerText = 'Preview';
         });
-        this.audioObject.addEventListener('pause', function () {
+        this.audioObject.addEventListener('pause', () => {
           target.classList.remove('playing');
           target.innerText = 'Preview';
         });

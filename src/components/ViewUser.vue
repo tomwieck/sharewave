@@ -6,6 +6,22 @@
       <svg class="icon icon-exit"><use xlink:href="#icon-exit"></use></svg>
       <a>Logout</a>
     </div>
+    <h2>Latest Playlists</h2>
+    <small>Showing {{ topPlaylists.length }} of {{ playlists.length }}</small>
+    <transition-group class="playlist--all-containers" name="fade">
+      <div class="playlist--container" v-for="playlist in topPlaylists" :key="playlist.id">
+    <!-- {{ playlist }} -->
+        <img class="playlist--art" v-bind:src="playlist.imgUrl">
+        <h4 class="playlist--title">{{ playlist.title }}</h4>
+        <small class="playlist--uploader"> Uploaded by {{playlist.uploader_name}}</small>
+        <a v-bind:href="createSpotifyLink(playlist.owner, playlist.id)"><img class="playlist--spotify" :src="spotifyBadge"></a>
+        <a class="playlist--link" v-bind:href="shareWaveLink(playlist.id)">
+          <svg class="icon icon-file-play"><use xlink:href="#icon-file-play"></use></svg>
+          <span>Details</span>
+        </a>
+      </div>
+    </transition-group>
+    <button class="btn btn--secondary show-all" :key="'btn'" @click="limit = 100">Show all Playlists</button>
     <div class="user--friend-list">
       <h2>Friends</h2>
       <list-users :friendList="friendsArr" :remove="ownProfile" :search="false" v-on:userClicked="removeFriend"></list-users>
@@ -40,11 +56,17 @@
       <title>stop2</title>
       <path d="M4 4h24v24h-24z"></path>
     </symbol>
+    <symbol id="icon-file-play" viewBox="0 0 32 32">
+      <title>file-play</title>
+      <path d="M12 12l10 7-10 7v-14z"></path>
+      <path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+    </symbol>
   </div>
 </template>
 
 <script>
 import Firebase from './firebaseMixin.js'
+import SpotifyMixin from './spotifyMixin.js'
 import ListUsers from './ListUsers.vue'
 import { EventBus } from './eventBus.js';
 import VueNotifications from 'vue-notifications'
@@ -53,12 +75,15 @@ export default {
   name: 'ViewUser',
   data() {
     return {
+      artPlaceholder: '../static/artplaceholder.png',
       audioObject: null,
       displayName: false,
       friendsArr: [],
+      limit: 3,
       imgUrl: false,
       ownProfile: false,
       placeholder: '../static/placeholder.png',
+      playlists: [],
       user: '',
       userRef: '',
       waveHistory: [],
@@ -66,16 +91,23 @@ export default {
       spotifyBadge: '../static/spotifyBadge.svg'
     }
   },
+  mixins: [SpotifyMixin],
   beforeMount() {
     this.getUrlParam();
   },
   beforeDestroy() {
     this.ifPlayingPause();
   },
+  computed: {
+    topPlaylists() {
+      return this.playlists.slice(0, this.limit);
+    }
+  },
   watch: {
     '$route' (to, from) {
       if (from.params.user !== to.params.user) {
         this.waveHistory = [];
+        this.playlists = [];
         this.getUrlParam();
         this.ifPlayingPause();
       }
@@ -95,6 +127,7 @@ export default {
           this.ownProfile = false;
         }
         this.getWave();
+        this.getPlaylists();
         unsubscribe();
       });
       this.userRef = Firebase.database().ref(`users/${this.user.replace(/\./g, '%2E')}`);
@@ -116,7 +149,43 @@ export default {
       waveRef.orderByChild(`date_added`).on('child_added', snapshot => {
         this.waveHistory.unshift(snapshot.val());
       })
-      if (this.waveHistory.length === 0) { }
+    },
+    getPlaylists() {
+      let safeUser = this.user.replace(/\./g, '%2E');
+      let playlistIds = [];
+      let userRef = Firebase.database().ref(`users/${safeUser}/playlists`)
+      userRef.on('child_added', snapshot => {
+        playlistIds.unshift(snapshot.key);
+      })
+      playlistIds.forEach(id => {
+        let playlistRef = Firebase.database().ref(`playlists/${id}`)
+        playlistRef.once('value')
+        .then(snapshot => {
+          let childData = snapshot.val();
+          childData.id = snapshot.key;
+          childData.imgUrl = this.artPlaceholder;
+          this.playlists.unshift(childData);
+          this.getPlaylistDetails(snapshot.key, childData)
+        })
+      })
+      // this.$forceUpdate();
+      // let playlistRef = Firebase.database().ref(`playlists/`)
+    },
+    getPlaylistDetails(id, playlist) {
+      const options = {
+        user: playlist.owner,
+        playlist: id,
+        fields: 'images'
+      }
+      this.getSinglePlaylist(options, callback => {
+        console.log(callback);
+        if (callback.images) {
+          playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
+          this.$forceUpdate();
+        } else {
+          playlist.imgUrl = this.placeholder;
+        }
+      });
     },
     playAudio(url, e) {
       let target = e.target;
@@ -130,11 +199,11 @@ export default {
         this.audioObject.play();
         target.classList.add('playing');
         target.innerHTML = 'Playing';
-        this.audioObject.addEventListener('ended', function () {
+        this.audioObject.addEventListener('ended', () => {
           target.classList.remove('playing');
           target.innerHTML = 'Playing';
         });
-        this.audioObject.addEventListener('pause', function () {
+        this.audioObject.addEventListener('pause', () => {
           target.classList.remove('playing');
           target.innerHTML = 'Preview';
         });
@@ -166,6 +235,12 @@ export default {
       if (this.audioObject) {
         this.audioObject.pause();
       }
+    },
+    shareWaveLink(id) {
+      return `/#/playlist/${id}`;
+    },
+    createSpotifyLink(user, id) {
+      return `spotify:user:${user}:playlist:${id}`;
     }
   },
   components: {
@@ -177,6 +252,11 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
+
+.show-all {
+  display: block;
+  margin: auto;
+}
 
 .user--friend-list {
   float: left;
@@ -218,7 +298,6 @@ export default {
 }
 
 .user--history {
-  padding-top: 12px;
   width: 49%;
   float: right;
   @media screen and (max-width: $break-tablet) {
@@ -232,7 +311,7 @@ export default {
 .user--song-container {
   padding: 5px 0;
 }
-.user--song-container:nth-child(even) {
+.user--song-container:nth-child(odd) {
   background: $light-grey;
 }
 
@@ -257,8 +336,6 @@ export default {
 .user--no-wave {
   font-size: 24px;
 }
-
-
 
 .user--preview,
 .user--service {

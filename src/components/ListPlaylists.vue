@@ -146,32 +146,6 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
-.playlist--link {
-  cursor: pointer;
-  float: left;
-  height: 30px;
-  padding: 0 10px;
-  padding-top: 10px;
-  text-decoration: none;
-  span {
-    text-decoration: underline;
-  }
-  @media screen and (max-width: $break-tablet) {
-    display: block;
-    float: none;
-    padding-top: 4px;
-  }
-}
-
-.playlist--link, .playlist--link a {
-  color: $logo-color;
-  transition: 0.3s;
-}
-
-.playlist--link:hover {
-  color: $play-color;
-}
-
 .playlist--upload {
   margin: 10px;
   margin-top: 20px;

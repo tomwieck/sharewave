@@ -191,17 +191,14 @@ export default {
         });
       }
       // https://firebase.googleblog.com/2015/09/introducing-multi-location-updates-and_86.html
+      // Create the data we want to update
+      var updatedUserData = {};
       if (this.tags.length !== 0) {
-        let updates = {}
         this.tags.forEach(tag => {
-          updates[`${tag}/${this.playlistId}`] = true;
+          updatedUserData[`tags/${tag}/${this.playlistId}`] = true;
         });
-        console.log(updates);
-        Firebase.database().ref('tags/').update(updates);
-        // Firebase.database().ref('tags/' + this.tags[0]).update(obj);
       }
-      // Also add to user database, keep list of playlists
-      Firebase.database().ref('playlists/' + this.playlistId).set({
+      updatedUserData[`playlists/${this.playlistId}`] = {
         date_added: new Date().getTime(),
         tags: this.tags,
         title: this.playlistName,
@@ -209,11 +206,44 @@ export default {
         owner_name: this.ownerName,
         uploader: this.uploader,
         uploader_name: this.uploaderName
-      })
-      .then(() => {
-        VueNotifications.success({message: 'Playlist uploaded'});
-        this.$router.push(`/allPlaylists`);
+      };
+      let safeUploader = this.safe(this.uploader);
+      updatedUserData[`users/${safeUploader}/playlists/${this.playlistId}`] = true;
+      console.log(updatedUserData);
+      // Do a deep-path update
+      Firebase.database().ref().update(updatedUserData, (error) => {
+        if (error) {
+          VueNotifications.error({message: 'Something went wrong, please try again'})
+          console.log('Error updating data:', error);
+        } else {
+          VueNotifications.success({message: 'Playlist uploaded'});
+          this.$router.push(`/allPlaylists`);
+        }
       });
+      // if (this.tags.length !== 0) {
+      //   let updates = {}
+      //   this.tags.forEach(tag => {
+      //     updates[`${tag}/${this.playlistId}`] = true;
+      //   });
+      //   console.log(updates);
+      //   Firebase.database().ref('tags/').update(updates);
+      //   // Firebase.database().ref('tags/' + this.tags[0]).update(obj);
+      // }
+      // // Also add to user database, keep list of playlists
+      // Firebase.database().ref('playlists/' + this.playlistId).set({
+      //   date_added: new Date().getTime(),
+      //   tags: this.tags,
+      //   title: this.playlistName,
+      //   owner: this.ownerId,
+      //   owner_name: this.ownerName,
+      //   uploader: this.uploader,
+      //   uploader_name: this.uploaderName
+      // })
+      // .then(() => {
+      // });
+    },
+    safe(id) {
+      return id.replace(/\./g, '%2E');
     }
   }
 }
