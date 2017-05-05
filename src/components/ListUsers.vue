@@ -90,10 +90,7 @@ export default {
       return id.replace(/\%2E/g, '.');
     },
     cssObject(img) {
-      // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
-      return {
-        background: `url(${img}) top/cover no-repeat`
-      }
+      return { background: `url(${img}) top/cover no-repeat` }
     }
   }
 }

@@ -2,7 +2,7 @@
   <div class="nav-login">
     <div v-if="username" class="login--username">
       <a :href="`/#/user/${encodeURIComponent(userId.replace(/\%2E/g, '.'))}`">
-        <div class="profile-img" :style="cssObject(imgUrl)"/>
+        <div class="profile-img" :style="cssObject(imgUrl || placeholderUrl)"/>
       </a>
     </div>
     <a v-else @click="showModal = !showModal" class="login--link">

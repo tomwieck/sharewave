@@ -95,9 +95,6 @@ export default {
         let childData = snapshot.val();
         childData.id = snapshot.key;
         childData.imgUrl = this.placeholder;
-        if (snapshot.child('tags').exists()) {
-          this.tags = this.tags.concat(snapshot.val().tags);
-        }
         this.playlists.unshift(childData);
         this.getPlaylistDetails(childData);
       });
@@ -134,8 +131,10 @@ export default {
     getTags() {
       Firebase.database().ref('tags/').once('value')
       .then(snapshot => {
-        if (snapshot.val()) {
+        if (snapshot.exists()) {
           this.tags = Object.keys(snapshot.val());
+        } else {
+          // Remove tag with playlist child if deleted
         }
       });
     }

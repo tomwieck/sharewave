@@ -44,7 +44,6 @@ export default {
   },
   mixins: [SpotifyMixin],
   mounted() {
-    console.log(this.$route);
     this.getPlaylists(callback => {
       if (callback.status === 401) {
         this.error = true;

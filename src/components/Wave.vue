@@ -61,21 +61,42 @@
     </transition>
     <h3 class="wave--add-songs">Add Songs to Your Wave: </h3>
     <search v-on:addToWave="addToWave"></search>
-    <button class="btn btn--main recently-played--btn" v-if="spotify" @click="spotifyRecentlyPlayed">
-      See your recent Spotify tracks
-      <svg class="icon icon-arrow white"><use xlink:href="#icon-arrow"></use></svg>
-    </button>
-    <div v-if="recentlyPlayedClicked">
-      <div v-if="recentlyPlayed.length === 0">
-        {{ recentlyPlayedText }}
-      </div>
-      <div v-else>
-        <transition-group name="fade">
-          <div class="recently-played" v-for="song in recentlyPlayed" :key="song.track.id">
-            <span>{{ song.track.artists[0].name }} - {{ song.track.name }}</span>
-            <span class="recently-played--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
+    <div class="recently-played--container">
+      <div class="recently-played--inner">
+        <button class="btn btn--main recently-played--btn" v-if="spotify" @click="spotifyRecentlyPlayed">
+          Your Recent Spotify tracks
+          <svg class="icon icon-arrow white"><use xlink:href="#icon-arrow"></use></svg>
+        </button>
+        <div v-if="recentlyPlayedClicked">
+          <div v-if="recentlyPlayed.length === 0">
+            {{ recentlyPlayedText }}
           </div>
-        </transition-group>
+          <div class="recently-played--tracks" v-else>
+            <div class="recently-played" v-for="song in recentlyPlayed" :key="song.track.id">
+              <span>{{ song.track.artists[0].name }} - {{ song.track.name }}</span>
+              <span class="recently-played--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="top-tracks--container">
+      <div class="top-tracks--inner">
+        <button class="btn btn--main top-tracks--btn" v-if="spotify" @click="spotifyTopTracks">
+          Your Top Spotify tracks
+          <svg class="icon icon-arrow white"><use xlink:href="#icon-arrow"></use></svg>
+        </button>
+        <div v-if="topTracksClicked">
+          <div v-if="topTracks.length === 0">
+            {{ topTracksText }}
+          </div>
+          <div class="top-tracks--tracks" v-else>
+            <div class="recently-played" v-for="song in topTracks" :key="song.id">
+              <span>{{ song.artists[0].name }} - {{ song.name }}</span>
+              <span class="recently-played--add" @click="addRecentToWave(song)"> Add to Wave </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   <div id="nowPlaying" class="now-playing">
@@ -167,6 +188,9 @@ export default {
       searchClicked: false,
       spotify: false,
       totalScroll: 0,
+      topTracks: [],
+      topTracksClicked: false,
+      topTracksText: '',
       userId: '',
       userRef: false,
       wave: false,
@@ -183,6 +207,9 @@ export default {
   },
   mounted() {
     this.getUser();
+    this.getTopTracks(callback => {
+      console.log(callback);
+    })
     window.addEventListener('resize', this.updateLayout, false);
   },
   watch: {
@@ -254,15 +281,22 @@ export default {
     checkFriendsWaves(userId) {
       let friendRef = Firebase.database().ref(`users/${userId}`)
       friendRef.once('value', snapshot => {
-        if (snapshot.val()) {
+        if (snapshot.exists()) {
           let user = {
             displayName: snapshot.val().display_name,
             photoURL: snapshot.val().img_url,
             uid: userId
           }
           this.regsiterChildAdded(user);
+        } else {
+          this.deleteFriend(userId);
         }
       })
+    },
+    deleteFriend(friendId) {
+      let safeId = this.userId.replace(/\./g, '%2E')
+      let friendRef = Firebase.database().ref(`users/${safeId}/friends/${friendId}`);
+      friendRef.set(null);
     },
     regsiterChildAdded(user) {
       // Add Child removed listener too for real time updates ?
@@ -388,6 +422,21 @@ export default {
             this.recentlyPlayedText = 'No results, try searching for a song instead';
           } else {
             this.recentlyPlayed = callback.items;
+          }
+        })
+      }
+    },
+    spotifyTopTracks() {
+      if (this.topTracksClicked === true) {
+        this.topTracksClicked = false;
+      } else {
+        this.topTracksClicked = true;
+        this.topTracksText = 'Loading...';
+        this.getTopTracks(callback => {
+          if (callback.items.length === 0) {
+            this.topTracksText = 'No results, try searching for a song instead';
+          } else {
+            this.topTracks = callback.items;
           }
         })
       }
@@ -606,7 +655,7 @@ a:hover {
   color: white;
   display: block;
   margin: auto;
-  max-width: 265px;
+  max-width: 237px;
   padding: 5px 2px;
 }
 
@@ -617,8 +666,41 @@ a:hover {
   font-weight: bold;
 }
 
+.top-tracks--btn,
 .recently-played--btn {
   margin-top: 16px;
+  width: 245px;
+}
+
+.recently-played--container,
+.top-tracks--container {
+  width: 48%;
+  margin: 0 1%;
+  @media screen and (max-width: $break-tablet) {
+    width: 100%;
+  }
+}
+
+.recently-played--container,
+.top-tracks--inner {
+  float: right;
+  @media screen and (max-width: $break-tablet) {
+    float: none;
+  }
+}
+
+
+.top-tracks--container,
+.recently-played--inner {
+  float: left;
+  @media screen and (max-width: $break-tablet) {
+    float: none;
+  }
+}
+
+.recently-played--btn,
+.recently-played--tracks,
+.top-tracks--container {
 }
 // Recently Played END
 
@@ -714,6 +796,7 @@ a:hover {
 .now-playing,
 .now-playing--artwork img {
   height: 125px;
+
 }
 
 .now-playing .closebtn {
@@ -769,6 +852,10 @@ a:hover {
     transition-delay: 0.3s;
   }
   width: 100%;
+  .now-playing--artwork img {
+    height: 125px;
+    max-width: 125px;
+  }
 }
 
 .now-playing--open {

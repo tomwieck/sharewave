@@ -37,6 +37,17 @@ export default {
         });
       });
     },
+    getTopTracks: function(callback) {
+      this.setAccessToken(check => {
+        this.spotifyApi.getMyTopTracks()
+        .then(res => {
+          return callback(res);
+        })
+        .catch(err => {
+          return callback(err);
+        });
+      });
+    },
     getPlaylists: function(callback) {
       this.setAccessToken(check => {
         this.spotifyApi.getUserPlaylists()

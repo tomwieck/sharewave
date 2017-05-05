@@ -147,12 +147,12 @@ export default {
     },
     getOwnerName() {
       this.getUser(this.ownerId, callback => {
-        this.ownerName = callback.display_name;
+        this.ownerName = callback.display_name || this.ownerId;
       })
     },
     getUploaderName() {
       this.getUser(this.uploader, callback => {
-        this.uploaderName = callback.display_name;
+        this.uploaderName = callback.display_name || this.uploader;
       })
     },
     resetChanges: function() {
@@ -192,7 +192,7 @@ export default {
       }
       // https://firebase.googleblog.com/2015/09/introducing-multi-location-updates-and_86.html
       // Create the data we want to update
-      var updatedUserData = {};
+      let updatedUserData = {};
       if (this.tags.length !== 0) {
         this.tags.forEach(tag => {
           updatedUserData[`tags/${tag}/${this.playlistId}`] = true;
@@ -209,7 +209,6 @@ export default {
       };
       let safeUploader = this.safe(this.uploader);
       updatedUserData[`users/${safeUploader}/playlists/${this.playlistId}`] = true;
-      console.log(updatedUserData);
       // Do a deep-path update
       Firebase.database().ref().update(updatedUserData, (error) => {
         if (error) {
