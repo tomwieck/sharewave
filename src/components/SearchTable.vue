@@ -4,7 +4,7 @@
     <small class="search-table--small">Provided courtesy of {{service}}</small>
     <transition-group name="fade" mode="out-in">
     <div :key="result" v-for="result in searchResults" class="search-table--container">
-      <img class="search-table--album-art" v-bind:src="result.artwork">
+      <div class="search-table--album-art" :style="cssObject(result.artwork)"/>
       <div class="search-table--container-details">
         <!-- <span v-if="service === 'YouTube'"><div>{{ result.title }}</div></span> -->
         <div class="search-table--container-artist"><span>{{ result.artist }}</span></div>
@@ -60,6 +60,9 @@ export default {
     },
     addToWave(result) {
       this.$emit('tableToSearch', result);
+    },
+    cssObject(img) {
+      return { background: `url(${img}) top/cover no-repeat` }
     }
   }
 }
@@ -104,6 +107,7 @@ table {
 .search-table--album-art {
   float: left;
   height: 100%;
+  width: 110px;
   @media screen and (max-width: $break-wide) {
     height: 65px;
     width: 65px;

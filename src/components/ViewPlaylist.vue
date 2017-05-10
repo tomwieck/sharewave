@@ -7,8 +7,8 @@
         <div>
           <p>Uploaded: {{ dateAdded }}</p>
           <p>Uploaded By: {{ uploader }}</p>
-          <p>Created By: {{ owner }}</p>
-          <a class="view-playlist--delete" :href="createSpotifyLink(playlistUri, owner)">
+          <p>Created By: {{ ownerName }}</p>
+          <a class="view-playlist--delete" :href="createSpotifyLink(playlistUri, ownerId)">
             <button class="btn btn--main block"><svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
               Open in Spotify
             </button>
@@ -56,7 +56,8 @@ export default {
       deleteClicked: false,
       ownPlaylist: false,
       imgUrl: '',
-      owner: '',
+      ownerId: '',
+      ownerName: '',
       tags: '',
       title: '',
       uploader: '',
@@ -95,10 +96,11 @@ export default {
       this.playlistRef.once('value')
         .then(snapshot => {
           this.dateAdded = this.convertTime(snapshot.val().date_added);
-          this.owner = snapshot.val().owner;
+          this.ownerId = snapshot.val().owner;
+          this.ownerName = snapshot.val().owner_name
           this.title = snapshot.val().title;
           this.tags = snapshot.val().tags;
-          this.uploader = snapshot.val().uploader.replace(/\%2E/g, '.');
+          this.uploader = snapshot.val().uploader_name.replace(/\%2E/g, '.');
           if (this.user === this.uploader) { this.ownPlaylist = true };
           this.getPlaylistImage();
         })
@@ -109,7 +111,7 @@ export default {
     },
     getPlaylistImage() {
       const options = {
-        user: this.owner,
+        user: this.ownerId,
         playlist: this.playlistUri,
         fields: 'images'
       }

@@ -126,7 +126,7 @@ function makeCall(s, searchTerm) {
 		return spotifyApi.searchTracks(searchTerm);
 	}
 	else if (s === 'iTunes') {
-		return axios.get(`http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/wa/wsSearch?country=GB&limit=20&entity=musicTrack&term=${searchTerm}`)
+		return axios.get(`http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/wa/wsSearch?country=GB&limit=20&media=music&entity=song&term=${searchTerm}`)
 	}
 }
 
@@ -138,15 +138,17 @@ function extractData(response) {
 function extractSpotifyData(data) {
 	var spotifyData = {spotify: {}}
 	for (i = 0; i < data.length; i++) {
-		spotifyData.spotify[i] = {
-			album: data[i].album.name,
-			artist: data[i].artists[0].name,
-			artwork: data[i].album.images[1].url,
-			id: data[i].id,
-			previewUrl: data[i].preview_url,
-			service: 'spotify',
-			track: data[i].name,
-			url: data[i].uri
+		if(data[i].preview_url) {
+			spotifyData.spotify[i] = {
+				album: data[i].album.name,
+				artist: data[i].artists[0].name,
+				artwork: data[i].album.images[1].url,
+				id: data[i].id,
+				previewUrl: data[i].preview_url,
+				service: 'spotify',
+				track: data[i].name,
+				url: data[i].uri
+			}
 		}
 	}
 	return spotifyData;
@@ -155,15 +157,17 @@ function extractSpotifyData(data) {
 function extractItunesData(data) {
 	var itunesData = {itunes: {}}
 	for (i = 0; i < data.length; i++) {
-		itunesData.itunes[i] = {
-			album: data[i].collectionName,
-			artist: data[i].artistName,
-			artwork: data[i].artworkUrl100,
-			id: data[i].trackId,
-			previewUrl: data[i].previewUrl,
-			service: 'itunes',
-			track: data[i].trackName,
-			url: data[i].trackViewUrl
+		if (data[i].previewUrl) {
+			itunesData.itunes[i] = {
+				album: data[i].collectionName,
+				artist: data[i].artistName,
+				artwork: data[i].artworkUrl100,
+				id: data[i].trackId,
+				previewUrl: data[i].previewUrl,
+				service: 'itunes',
+				track: data[i].trackName,
+				url: data[i].trackViewUrl
+			}
 		}
 	}
 	return itunesData;
@@ -183,5 +187,6 @@ function createFirebaseToken(id) {
   return admin.auth().createCustomToken(`${id}`);
 }
 
-console.log('Listening on 8888');
-server.listen(8888);
+let port = process.env.PORT || 8888
+console.log('Listening on ' + port);
+server.listen(port);

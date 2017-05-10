@@ -13,7 +13,7 @@
       <div v-show="!showResults"><b>Show Search Results</b></div>
     </div>
 
-    <div v-show="showResults">
+    <div class="search--containers" v-show="showResults">
       <button v-show="sSearchResults" @click="show('spotify')" v-bind:class="[ selected === 'spotify' ? 'btn--secondary' : 'btn--disabled']" class="btn result-select">Spotify Results</button>
       <button v-show="iSearchResults" @click="show('itunes')" v-bind:class="[ selected === 'itunes' ? 'btn--secondary' : 'btn--disabled']" class="btn result-select">iTunes Results</button>
 
@@ -208,6 +208,10 @@ export default {
   @media screen and (max-width: $break-tablet) {
     width: 98%;
   }
+}
+
+.search--containers {
+  width: 100%;
 }
 
 .search--show-results {
