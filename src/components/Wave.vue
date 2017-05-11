@@ -71,10 +71,11 @@
           <div v-if="recentlyPlayed.length === 0">
             {{ recentlyPlayedText }}
           </div>
-          <div class="recently-played--tracks" v-else>
+          <div v-else>
             <div class="recently-played" v-for="song in recentlyPlayed" :key="song.track.id">
-              <span>{{ song.track.artists[0].name }} - {{ song.track.name }}</span>
-              <span class="recently-played--add" @click="addRecentToWave(song.track)"> Add to Wave </span>
+              <span class="recently-played--track">{{ song.track.artists[0].name }} <br> {{ song.track.name }}</span>
+              <button class="btn btn--secondary" @click="playAudio(song.track.preview_url, $event)"> Preview </button>
+              <button class="btn btn--main" @click="addRecentToWave(song.track)"> Add to Wave </button>
             </div>
           </div>
         </div>
@@ -90,10 +91,11 @@
           <div v-if="topTracks.length === 0">
             {{ topTracksText }}
           </div>
-          <div class="top-tracks--tracks" v-else>
+          <div v-else>
             <div class="recently-played" v-for="song in topTracks" :key="song.id">
-              <span>{{ song.artists[0].name }} - {{ song.name }}</span>
-              <span class="recently-played--add" @click="addRecentToWave(song)"> Add to Wave </span>
+              <span class="recently-played--track">{{ song.artists[0].name }} <br> {{ song.name }}</span>
+              <button class="btn btn--secondary" @click="playAudio(song.preview_url, $event)"> Preview </button>
+              <button class="btn btn--main" @click="addRecentToWave(song)"> Add to Wave </button>
             </div>
           </div>
         </div>
@@ -207,9 +209,6 @@ export default {
   },
   mounted() {
     this.getUser();
-    this.getTopTracks(callback => {
-      console.log(callback);
-    })
     window.addEventListener('resize', this.updateLayout, false);
   },
   watch: {
@@ -243,7 +242,6 @@ export default {
       adiv.scrollLeft = this.totalScroll;
     },
     // Add LOADING...
-    // When redirected to this page after login, user may not be created in DB in time (emit event?)
     // SET UP
     getUser() {
       // Get logged in user and check if wave
@@ -262,7 +260,6 @@ export default {
       });
     },
     checkWaveTrue(userId) {
-      // Could set listeners for all friends so that if they are added updated in real time
       this.userRef = Firebase.database().ref(`users/${userId}`);
       this.userRef.once('value', snapshot => {
         this.spotify = snapshot.val().spotify;
@@ -270,11 +267,8 @@ export default {
           let friends = snapshot.val().friends;
           this.wave = snapshot.val().wave;
           for (var user in friends) {
-            // Should be non blocking, make each call to wave seperately after getting friend list ?
             this.checkFriendsWaves(user)
           }
-        } else {
-
         }
       })
     },
@@ -299,7 +293,6 @@ export default {
       friendRef.set(null);
     },
     regsiterChildAdded(user) {
-      // Add Child removed listener too for real time updates ?
       let userId = user.uid;
       this.waveSongs[userId] = {};
       let userRef = this.waveSongs[userId];
@@ -441,19 +434,30 @@ export default {
         })
       }
     },
-    playAudio: function(url, target, id) {
-      // apply playing class only to target?
-      // Toggle visibility of songs with target too??
-      this.ifPlayingPause(target);
-      this.resetOtherCounters(id);
-      this.audioObject = new Audio(url);
-      this.audioObject.play();
-      this.audioObject.addEventListener('ended', () => {
-        this.playWave(target, id);
-      });
+    playAudio(url, e) {
+      let target = e.target;
+      if (target.classList.contains('playing')) {
+        this.audioObject.pause();
+      } else {
+        if (this.audioObject) {
+          this.audioObject.pause();
+        }
+        this.audioObject = new Audio(url);
+        this.audioObject.play();
+        target.classList.add('playing');
+        target.innerText = 'Playing';
+        this.audioObject.addEventListener('ended', () => {
+          target.classList.remove('playing');
+          target.innerText = 'Preview';
+        });
+        this.audioObject.addEventListener('pause', () => {
+          target.classList.remove('playing');
+          target.innerText = 'Preview';
+        });
+      }
     },
     playWave(e, id, stop) {
-      // e.target when from click event, just e when from playAudio
+      // e.target when from click event, just e when from playWaveAudio
       id = id.replace(/\./g, '%2E')
       let target = document.getElementsByClassName(`${id}`)[0];
       let waveRef = this.waveSongs[id];
@@ -471,9 +475,20 @@ export default {
       } else {
         this.setPlaying(waveRef.songs[counter], id);
         let url = waveRef.songs[counter].preview_url;
-        this.playAudio(url, target, id);
+        this.playWaveAudio(url, target, id);
         waveRef.counter++;
       }
+    },
+    playWaveAudio: function(url, target, id) {
+      // apply playing class only to target?
+      // Toggle visibility of songs with target too??
+      this.ifPlayingPause(target);
+      this.resetOtherCounters(id);
+      this.audioObject = new Audio(url);
+      this.audioObject.play();
+      this.audioObject.addEventListener('ended', () => {
+        this.playWave(target, id);
+      });
     },
     resetClasses(id) {
       let classes = Array.from(document.getElementsByClassName(`timer-${id}`));
@@ -604,7 +619,10 @@ a:hover {
   @media screen and (max-width: $break-tablet) {
     width: 92px
   }
-  // margin: auto;
+
+  .icon-arrow:hover {
+    fill: $play-color;
+  }
 }
 
 .wave-container--user-name {
@@ -649,10 +667,11 @@ a:hover {
 
 // Recently Played START
 .recently-played {
-  background-color: $play-color;
+  // background-color: $play-color;
   border: 2px solid $play-light-color;
   border-top: none;
-  color: white;
+  // color: white;
+  font-weight: bold;
   display: block;
   margin: auto;
   max-width: 237px;
@@ -689,7 +708,6 @@ a:hover {
   }
 }
 
-
 .top-tracks--container,
 .recently-played--inner {
   float: left;
@@ -698,9 +716,11 @@ a:hover {
   }
 }
 
-.recently-played--btn,
-.recently-played--tracks,
-.top-tracks--container {
+.recently-played--track {
+  display: block;
+  margin-bottom: 6px;
+  margin-left: 6px;
+  text-align: left;
 }
 // Recently Played END
 
@@ -783,7 +803,6 @@ a:hover {
 .now-playing {
   background-color: $logo-color;
   bottom: 0;
-  opacity: 0.95;
   overflow-y: hidden;
   position: fixed;
   right: 0;
@@ -813,7 +832,9 @@ a:hover {
   float: left;
   width: 110px;
   @media screen and (max-width: $break-tablet) {
-    width: 100px;
+    img {
+      width: 100px;
+    }
   }
 }
 

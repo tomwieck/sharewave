@@ -6,6 +6,7 @@
     <div v-else>
       <div class="upload-playlist--cover-container">
         <img class="upload-playlist--cover" v-bind:src="imgUrl ? imgUrl : placeholder">
+        <small v-show="ownerName" class="upload-playlist--created">Created by - {{ownerName}}</small>
       </div>
       <div class="upload-playlist--details-container">
         <span v-if="ownPlaylist">
@@ -16,19 +17,18 @@
               <svg @click="resetChanges" v-show="resetButton" class="icon icon-undo"><use xlink:href="#icon-undo"></use></svg>
             </transition>
           </span>
-          <span class="help is-danger"> Note: Changes to the name will be reflected in Spotify</span>
+          <small class="help is-danger"> Note: Changes to the name will be reflected in Spotify</small>
         </span>
 
         <span v-else>
           <h3 class="upload-playlist--name-span"> {{ playlistName }}</h3>
         </span>
 
-        <small v-show="ownerName" class="upload-playlist--created">Created by - {{ownerName}}</small>
-
         <div>
           <h4 class="upload-playlist--tags-span">Tags: </h4>
+          <small>Enter as many tags as you'd like</small>
           <span class="upload-playlist--icon-container">
-          <input class="upload-playlist--name-input input-box" name="tags" placeholder="Pop, Punk, 90s..." @keyup.enter="addTag" v-bind:class="{ 'padding-right': addButton }" v-model="tag">
+          <input class="upload-playlist--name-input input-box" name="tags" placeholder="Tag..." @keyup.enter="addTag" v-bind:class="{ 'padding-right': addButton }" v-model="tag">
             <transition name="fade">
               <svg class="icon icon-plus" v-show="addButton" @click="addTag"><use xlink:href="#icon-plus"></use></svg>
             </transition>
@@ -182,7 +182,7 @@ export default {
     },
     removeTag(tag) {
       let index = this.tags.indexOf(tag);
-      this.tags.splice(index);
+      this.tags.splice(index, 1);
     },
     addToDatabase: function() {
       if (this.ownPlaylist && this.playlistNameChanged()) {
@@ -191,7 +191,6 @@ export default {
         });
       }
       // https://firebase.googleblog.com/2015/09/introducing-multi-location-updates-and_86.html
-      // Create the data we want to update
       let updatedUserData = {};
       if (this.tags.length !== 0) {
         this.tags.forEach(tag => {
@@ -209,7 +208,6 @@ export default {
       };
       let safeUploader = this.safe(this.uploader);
       updatedUserData[`users/${safeUploader}/playlists/${this.playlistId}`] = true;
-      // Do a deep-path update
       Firebase.database().ref().update(updatedUserData, (error) => {
         if (error) {
           VueNotifications.error({message: 'Something went wrong, please try again'})
@@ -219,27 +217,6 @@ export default {
           this.$router.push(`/allPlaylists`);
         }
       });
-      // if (this.tags.length !== 0) {
-      //   let updates = {}
-      //   this.tags.forEach(tag => {
-      //     updates[`${tag}/${this.playlistId}`] = true;
-      //   });
-      //   console.log(updates);
-      //   Firebase.database().ref('tags/').update(updates);
-      //   // Firebase.database().ref('tags/' + this.tags[0]).update(obj);
-      // }
-      // // Also add to user database, keep list of playlists
-      // Firebase.database().ref('playlists/' + this.playlistId).set({
-      //   date_added: new Date().getTime(),
-      //   tags: this.tags,
-      //   title: this.playlistName,
-      //   owner: this.ownerId,
-      //   owner_name: this.ownerName,
-      //   uploader: this.uploader,
-      //   uploader_name: this.uploaderName
-      // })
-      // .then(() => {
-      // });
     },
     safe(id) {
       return id.replace(/\./g, '%2E');
@@ -250,6 +227,11 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
+
+small {
+  display: inline-block;
+  padding-bottom: 10px;
+}
 
 .upload-playlist {
   padding-top: 20px;
@@ -279,7 +261,6 @@ export default {
 
 .inner {
   bottom: 0;
-  position: absolute;
   width: calc(60%);
   @media screen and (max-width: $break-tablet) {
     text-align: center;
@@ -319,7 +300,6 @@ export default {
 
 .upload-playlist--created {
   display: block;
-  padding-bottom: 12px;
 }
 
 .upload-playlist--cover {

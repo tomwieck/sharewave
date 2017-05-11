@@ -2,6 +2,7 @@
   <div class="users" :class="[search ? 'reduce-height' : '']">
     <input v-show="search" class="users--search input-box block" placeholder="Search..." v-model="searchTerm">
       <div v-show="!showMessage">
+        <h4 v-show="search" style="text-decoration: underline;">All Users</h4>
         <div class="users--user" v-for="user in addedFriends" :key="user.display_name">
           <a :href="'/#/user/' + user.id"><div class="users--profile-pic" :style="cssObject(user.img_url || placeholderUrl)"></div></a>
           <span><a class="user--username" :href="'/#/user/' + user.id">{{ user.display_name || safe(user.id) }}</a></span>

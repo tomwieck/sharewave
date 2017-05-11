@@ -4,7 +4,7 @@
       <div class="modal-wrapper">
         <div class="modal-container" >
 
-          <div @click="$emit('close')">
+          <div @click="$emit('closeButton')">
             <svg class="icon icon-cancel-circle"><use xlink:href="#icon-cancel-circle"></use></svg>
           </div>
 

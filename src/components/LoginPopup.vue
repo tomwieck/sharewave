@@ -1,24 +1,29 @@
 <template>
   <div>
-    <modal v-if="localShow" @close="emitClose">
+    <modal v-if="localShow" @closeButton="emitClose">
       <h3 slot="header">Login</h3>
-        <button slot="body" class="btn btn--main block" v-on:click="spotifyRedirect">
+        <button slot="body" class="btn btn--main block" @click="spotifyRedirect">
           <svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
-          With Spotify
+          <span v-if="loading">Loading...</span>
+          <span v-else>With Spotify</span>
         </button>
-        <a class="modal-link" slot="body" href="/#/emailLogin"><button class="btn btn--main block">
+        <a class="modal-link" slot="body" href="/#/emailLogin" v-on:click="emitClose">
+          <button class="btn btn--main block">
           <svg class="icon icon-sharewave"><use xlink:href="#icon-sharewave"></use></svg>
           With ShareWave
-        </button></a>
+          </button>
+        </a>
       <h3 slot="footer">Don't have an account?</h3>
         <a class="modal-link" slot="footer" href="https://www.spotify.com/signup/"><button class="btn btn--secondary block">
           <svg class="icon icon-spotify"><use xlink:href="#icon-spotify"></use></svg>
           <span>Sign up for a Spotify Account</span>
         </button></a>
-        <a class="modal-link" slot="footer" href="/#/emailSignup"> <button  class="btn btn--secondary block">
+        <a class="modal-link" slot="footer" href="/#/emailSignup" v-on:click="emitClose">
+          <button  class="btn btn--secondary block">
           <svg class="icon icon-sharewave"><use xlink:href="#icon-sharewave"></use></svg>
           Sign up for a Sharewave Account
-        </button></a>
+          </button>
+        </a>
     </modal>
     <symbol id="icon-spotify" viewBox="0 0 32 32">
       <title>spotify</title>
@@ -44,6 +49,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       localShow: false
     }
   },
@@ -59,6 +65,7 @@ export default {
       EventBus.$emit('close');
     },
     spotifyRedirect() {
+      this.loading = true;
       this.axios.get('http://localhost:8888/login')
         .then(response => {
           if (response.data) {
@@ -75,6 +82,10 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
+
+.icon {
+  margin-bottom: -2px;
+}
 
 .modal-link {
   text-decoration: none;

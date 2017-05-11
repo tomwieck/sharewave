@@ -1,64 +1,67 @@
 <template>
-  <div v-show="displayName" class="view-user">
-    <div class="view-user--profile-pic" :style="cssObject(imgUrl || placeholder)"/>
-    <h1 v-show="displayName" class="view-user--name">{{ displayName }}</h1>
-    <div v-show="ownProfile && displayName" class="view-user--logout" @click="logout">
-      <svg class="icon icon-exit"><use xlink:href="#icon-exit"></use></svg>
-      <a>Logout</a>
-    </div>
-    <div class="view-user--playlists" v-show="playlists.length !== 0">
-      <h2>Playlists</h2>
-      <small>Showing {{ topPlaylists.length }} of {{ playlists.length }}</small>
-      <transition-group class="playlist--all-containers" name="fade">
-        <div class="playlist--container" v-for="playlist in topPlaylists" :key="playlist.id">
-      <!-- {{ playlist }} -->
-          <img class="playlist--art" v-bind:src="playlist.imgUrl">
-          <h4 class="playlist--title">{{ playlist.title }}</h4>
-          <small class="playlist--uploader"> Uploaded by {{playlist.uploader_name}}</small>
-          <a v-bind:href="createSpotifyLink(playlist.owner, playlist.id)"><img class="playlist--spotify" :src="spotifyBadge"></a>
-          <a class="playlist--link" v-bind:href="shareWaveLink(playlist.id)">
-            <svg class="icon icon-file-play"><use xlink:href="#icon-file-play"></use></svg>
-            <span>Details</span>
-          </a>
-        </div>
-      </transition-group>
-      <button class="btn btn--main show-all" :key="'btn'" @click="limit = 100">Show all Playlists</button>
-    </div>
-    <div class="user--friend-list">
-      <h2>Friends</h2>
-      <list-users :friendList="friendsArr" :remove="ownProfile" :search="false" v-on:userClicked="removeFriend"></list-users>
-    </div>
-    <div class="user--history">
-      <h2>Wave History</h2>
-      <div v-if="waveHistory.length !== 0" class="user--all-songs">
-        <div class="user--song-container" v-for="wave in waveHistory">
-          <h4 class="user--song">{{wave.song_artist}} - {{wave.song_title}}</h4>
-          <div class="user--preview-service-container">
-            <div class="btn btn--main user--preview" @click="playAudio(wave.preview_url, $event)">
-              Preview
-            </div>
-            <a :href="wave.url"> <img class="user--service" :src="wave.service === 'itunes' ? itunesBadge : spotifyBadge"></a>
+  <div class="view-user">
+    <div v-if="displayName">
+      <div class="view-user--profile-pic" :style="cssObject(imgUrl || placeholder)"/>
+      <h1 v-show="displayName" class="view-user--name">{{ displayName }}</h1>
+      <div v-show="ownProfile && displayName" class="view-user--logout" @click="logout">
+        <svg class="icon icon-exit"><use xlink:href="#icon-exit"></use></svg>
+        <a>Logout</a>
+      </div>
+      <div class="view-user--playlists" v-show="playlists.length !== 0">
+        <h2>Playlists</h2>
+        <small>Showing {{ topPlaylists.length }} of {{ playlists.length }}</small>
+        <transition-group class="playlist--all-containers" name="fade">
+          <div class="playlist--container" v-for="playlist in topPlaylists" :key="playlist.id">
+        <!-- {{ playlist }} -->
+            <img class="playlist--art" v-bind:src="playlist.imgUrl">
+            <h4 class="playlist--title">{{ playlist.title }}</h4>
+            <small class="playlist--uploader"> Uploaded by {{playlist.uploader_name}}</small>
+            <a v-bind:href="createSpotifyLink(playlist.owner, playlist.id)"><img class="playlist--spotify" :src="spotifyBadge"></a>
+            <a class="playlist--link" v-bind:href="shareWaveLink(playlist.id)">
+              <svg class="icon icon-file-play"><use xlink:href="#icon-file-play"></use></svg>
+              <span>Details</span>
+            </a>
           </div>
-          <div class="user--song-date">(Added: {{convertTime(wave.date_added)}})</div>
+        </transition-group>
+        <button class="btn btn--main show-all" :key="'btn'" @click="limit = 100">Show all Playlists</button>
+      </div>
+      <div class="user--friend-list">
+        <h2>Friends</h2>
+        <list-users :friendList="friendsArr" :remove="ownProfile" :search="false" v-on:userClicked="removeFriend"></list-users>
+      </div>
+      <div class="user--history">
+        <h2>Wave History</h2>
+        <div v-if="waveHistory.length !== 0" class="user--all-songs">
+          <div class="user--song-container" v-for="wave in waveHistory">
+            <h4 class="user--song">{{wave.song_artist}} - {{wave.song_title}}</h4>
+            <div class="user--preview-service-container">
+              <div class="btn btn--main user--preview" @click="playAudio(wave.preview_url, $event)">
+                Preview
+              </div>
+              <a :href="wave.url"> <img class="user--service" :src="wave.service === 'itunes' ? itunesBadge : spotifyBadge"></a>
+            </div>
+            <div class="user--song-date">(Added: {{convertTime(wave.date_added)}})</div>
+          </div>
+        </div>
+        <div class="user--no-wave" v-else>
+          No previous Waves :(
         </div>
       </div>
-      <div class="user--no-wave" v-else>
-        No previous Waves :(
+      <div class="view-user--delete-container">
+        <button v-show="ownProfile && displayName" class="btn btn--secondary view-user--delete" @click="deleteClicked = true">
+          <svg class="icon icon-exit"><use xlink:href="#icon-bin"></use></svg>
+          <a>Delete Profile</a>
+        </button>
       </div>
+      <delete-popup v-show="deleteClicked" v-on:close="deleteClicked = false">
+        <h3 slot="header">Are you sure?</h3>
+        <small slot="header">(This cannot be undone)</small>
+        <button slot="body" class="btn btn--main"  @click="deleteProfile">
+          Yes, Delete my Profile
+        </button>
+      </delete-popup>
     </div>
-    <div class="view-user--delete-container">
-      <button v-show="ownProfile && displayName" class="btn btn--secondary view-user--delete" @click="deleteClicked = true">
-        <svg class="icon icon-exit"><use xlink:href="#icon-bin"></use></svg>
-        <a>Delete Profile</a>
-      </button>
-    </div>
-    <delete-popup v-show="deleteClicked" v-on:close="deleteClicked = false">
-      <h3 slot="header">Are you sure?</h3>
-      <small slot="header">(This cannot be undone)</small>
-      <button slot="body" class="btn btn--main"  @click="deleteProfile">
-        Yes, Delete my Profile
-      </button>
-    </delete-popup>
+    <div v-else>Loading...</div>
     <symbol id="icon-exit" viewBox="0 0 32 32">
       <title>exit</title>
       <path d="M24 20v-4h-10v-4h10v-4l6 6zM22 18v8h-10v6l-12-6v-26h22v10h-2v-8h-16l8 4v18h8v-6z"></path>

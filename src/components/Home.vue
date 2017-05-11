@@ -5,6 +5,7 @@
       <h1 class="homepage--welcome homepage--welcome__left logo-font wave-left">Wave</h1>
       <div class="text-container">
         <h2 class="homepage--text">Add songs to Your Wave</h2>
+        <h2 class="homepage--text">The songs you add will last for 24 hours</h2>
         <h2 class="homepage--text">Follow your friends to hear what they are listening to</h2>
       </div>
       <div v-if="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--left hide-mobile">
@@ -18,9 +19,9 @@
     <div class="right">
       <h1 class="homepage--welcome homepage--welcome__right logo-font wave-right">Wave</h1>
       <div class="text-container">
-        <h2 class="homepage--text__right hide-wide">Upload Playlists to ShareWave</h2>
+        <h2 class="homepage--text__right">Upload Playlists to ShareWave</h2>
         <h2 class="homepage--text__right">Or search for and discover new ones</h2>
-        <small class="homepage--login">(Must login with Spotify)</small>
+        <h3 class="homepage--text__right">(Must login with Spotify)</h3>
       </div>
       <div v-if="!loggedIn" @click="showModal = !showModal" class="homepage--login-container container--right">
         <h3 class="homepage--text__right hide-wide">Create a free ShareWave Account or </h3>
@@ -89,7 +90,7 @@ export default {
   position: relative;
   @media screen and (max-width: $break-tablet) {
     width: 100%;
-    height: calc(50vh - 32px);
+    height: calc(50vh - 48px);
   }
 }
 
@@ -135,8 +136,10 @@ export default {
 
 .homepage--text,
 .homepage--text__right {
+  font-size: 22px;
+  line-height: 1.5;
   @media screen and (max-width: $break-tablet) {
-    font-size: 16px;
+    font-size: 3vh;
   }
 }
 
@@ -151,9 +154,8 @@ export default {
   padding: 50px 5px;
   padding-bottom: 0;
   @media screen and (max-width: $break-tablet) {
-    height: 18vh;
+    height: auto;
     padding: 8px;
-    padding-top: 20px;
   }
 }
 
