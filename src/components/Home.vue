@@ -80,7 +80,6 @@ export default {
 @import "../assets/sass/colors.scss";
 
 .btn {
-  font-size: 24px;
 }
 
 .left, .right {
@@ -139,7 +138,14 @@ export default {
   font-size: 22px;
   line-height: 1.5;
   @media screen and (max-width: $break-tablet) {
-    font-size: 3vh;
+    font-size: 2.5vh;
+  }
+}
+
+.btn {
+  font-size: 24px;
+  @media screen and (max-width: $break-tablet) {
+    font-size: 2.5vh;
   }
 }
 

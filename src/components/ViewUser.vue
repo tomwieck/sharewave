@@ -18,8 +18,10 @@
             <small class="playlist--uploader"> Uploaded by {{playlist.uploader_name}}</small>
             <a v-bind:href="createSpotifyLink(playlist.owner, playlist.id)"><img class="playlist--spotify" :src="spotifyBadge"></a>
             <a class="playlist--link" v-bind:href="shareWaveLink(playlist.id)">
-              <svg class="icon icon-file-play"><use xlink:href="#icon-file-play"></use></svg>
-              <span>Details</span>
+              <button class="btn btn--main">
+                <svg class="icon icon-file-play"><use xlink:href="#icon-file-play"></use></svg>
+                Details
+              </button>
             </a>
           </div>
         </transition-group>

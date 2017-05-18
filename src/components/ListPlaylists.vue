@@ -140,7 +140,6 @@ export default {
         fields: 'images'
       }
       this.getSinglePlaylist(options, callback => {
-        console.log(callback);
         if (callback.images) {
           playlist.imgUrl = callback.images[1] ? callback.images[1].url : callback.images[0].url;
         } else {

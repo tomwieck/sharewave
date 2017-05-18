@@ -8,20 +8,19 @@
         </div>
         <div>
           <div class="view-playlist--details-container">
-            <h3 class="view-playlist--name-span"> {{ title }}</h3>
-            <p>Uploaded: {{ dateAdded }}</p>
-            <p>Uploaded By: {{ uploader }}</p>
-            <p>Created By: {{ ownerName }}</p>
+            <h2 class="view-playlist--name-span"> {{ title }}</h2>
+            <p>Uploaded By: <a class="view-playlist--uploader" :href="'/#/user/' + uploaderId">{{ uploader }}</a></p>
+            <p>Uploaded Date: {{ dateAdded }}</p>
             <div class="upload-playlist--tags">
-            <span>Tags</span>
+            <span v-show="tags">Tags</span>
               <span v-for="tag in tags">
-                <div class="tag" @click="removeTag(tag)">#{{tag}}</div>
+                <div class="tag">#{{tag}}</div>
               </span>
             </div>
-            <a v-bind:href="createSpotifyLink(ownerId, playlistUri)"><img class="playlist--spotify" :src="spotifyBadge"></a>
+            <a class="inline" v-bind:href="createSpotifyLink(ownerId, playlistUri)"><img class="playlist--spotify" :src="spotifyBadge"></a>
             <a class="view-playlist--delete" @click="deleteClicked = true" v-show="ownPlaylist">
               <button class="btn btn--secondary"><svg class="icon icon-bin"><use xlink:href="#icon-bin"></use></svg>
-              Delete Playlist from ShareWave
+                Delete Playlist from ShareWave
               </button>
             </a>
           </div>
@@ -43,47 +42,6 @@
       <path d="M26.5 4h-6.5v-2.5c0-0.825-0.675-1.5-1.5-1.5h-7c-0.825 0-1.5 0.675-1.5 1.5v2.5h-6.5c-0.825 0-1.5 0.675-1.5 1.5v2.5h26v-2.5c0-0.825-0.675-1.5-1.5-1.5zM18 4h-6v-1.975h6v1.975z"></path>
     </symbol>
   </div>
-<!--
-
-      <div class="upload-playlist--details-container">
-        <span v-if="ownPlaylist">
-          <h4>Name: </h4>
-          <span class="upload-playlist--icon-container">
-            <input class="upload-playlist--name-input input-box" v-model="playlistName">
-            <transition name="fade">
-              <svg @click="resetChanges" v-show="resetButton" class="icon icon-undo"><use xlink:href="#icon-undo"></use></svg>
-            </transition>
-          </span>
-          <small class="help is-danger"> Note: Changes to the name will be reflected in Spotify</small>
-        </span>
-
-        <div>
-          <h4 class="upload-playlist--tags-span">Tags: </h4>
-          <small>Enter as many tags as you'd like</small>
-          <span class="upload-playlist--icon-container">
-          <input class="upload-playlist--name-input input-box" name="tags" placeholder="Tag..." @keyup.enter="addTag" v-bind:class="{ 'padding-right': addButton }" v-model="tag">
-            <transition name="fade">
-              <svg class="icon icon-plus" v-show="addButton" @click="addTag"><use xlink:href="#icon-plus"></use></svg>
-            </transition>
-          </span>
-        </div>
-
-        <div class="upload-playlist--tags">
-          <div v-show="errorMessage" class="help is-danger">{{ errorMessage }}</div>
-          <span v-for="tag in tags">
-            <div class="tag" @click="removeTag(tag)">#{{tag}}</div>
-          </span>
-        </div>
-      <div class="inner">
-        <a @click="addToDatabase">
-          <button class="btn btn--main upload-playlist--button">
-            <svg class="icon icon-cloud-upload"><use xlink:href="#icon-cloud-upload"></use></svg>
-            Upload to ShareWave
-          </button>
-        </a>
-        </div>
-      </div>
-    </div> -->
 </template>
 
 <script>
@@ -93,7 +51,7 @@ import VueNotifications from 'vue-notifications'
 import Modal from './Modal.vue'
 
 export default {
-  name: 'Home',
+  name: 'ViewPlaylist',
   data() {
     return {
       dateAdded: '',
@@ -105,6 +63,7 @@ export default {
       tags: [],
       title: '',
       uploader: '',
+      uploaderId: '',
       user: '',
       placeholder: '../static/artplaceholder.png',
       playlistRef: '',
@@ -147,7 +106,8 @@ export default {
           this.title = snapshot.val().title;
           this.tags = snapshot.val().tags;
           this.uploader = snapshot.val().uploader_name.replace(/\%2E/g, '.');
-          if (this.user === this.uploader) { this.ownPlaylist = true };
+          this.uploaderId = snapshot.val().uploader.replace(/\%2E/g, '.');
+          if (this.user === this.uploaderId) { this.ownPlaylist = true };
           this.getPlaylistImage();
         })
     },
@@ -188,6 +148,13 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/colors.scss";
 
+.playlist--spotify {
+  display: inline-block;
+  padding-top: 14px;
+  text-align: left;
+  width: 150px;
+}
+
 .view-playlist {
   padding-top: 20px;
 }
@@ -204,12 +171,13 @@ export default {
 .view-playlist--details-container {
   float: left;
   height: 300px;
-  text-align: left;
   padding-left: 20px;
   position: relative;
+  text-align: left;
   width: calc(60% - 320px);
   min-width: 250px;
   @media screen and (max-width: $break-tablet) {
+    text-align: center;
     width: calc(100% - 50px);
   }
 }
@@ -224,8 +192,25 @@ export default {
 }
 
 .view-playlist--delete {
+  bottom: 0;
   cursor: pointer;
+  display: block;
+  left: 16px;
+  margin: auto;
   text-decoration: none;
+  .btn {
+    margin-top: 8px;
+  }
+}
+
+.view-playlist--uploader {
+  color: $logo-color;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.view-playlist--uploader:hover {
+  color: $play-color;
 }
 
 </style>

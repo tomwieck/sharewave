@@ -73,8 +73,6 @@ export default {
         Firebase.auth().signInWithCustomToken(token)
           .then(user => {
             // If Spotify email, img, id or email do not match whats on firebase authentication, update them
-            // console.log('imgUrl', this.imgUrl);
-            // console.log('userPhoto', user.photoURL);
             if (this.username !== user.displayName || this.imgUrl !== user.photoURL || this.userId !== user.userId || this.email !== user.email) {
               user.updateProfile({
                 displayName: this.username,
@@ -95,7 +93,6 @@ export default {
       });
     },
     addToUserDatabase() {
-      // console.log('adding to DB with imgURL = ', this.imgUrl);
       Firebase.database().ref('users/' + this.userId).set({
         display_name: this.username,
         email: this.email,
@@ -118,14 +115,10 @@ export default {
     registerStateChange() {
       Firebase.auth().onAuthStateChanged(user => {
         if (user === null) {
-          // resetDetails();
-          console.log('null');
         } else {
-          // console.log('updating details')
           if (this.shouldUpdate) {
             this.updateDetails(user);
           }
-          // unsubscribe();
           this.$emit('loginEmit');
         }
       });
@@ -135,7 +128,6 @@ export default {
       this.imgUrl = spotifyUser.images.length !== 0 ? spotifyUser.images[0].url : null
       this.userId = spotifyUser.id.replace(/\./g, '%2E');
       this.username = spotifyUser.display_name ? spotifyUser.display_name : spotifyUser.id;
-      // console.log('finished setting details');
     },
     updateDetails(user) {
       this.imgUrl = user.photoURL;
@@ -151,7 +143,6 @@ export default {
       this.$router.push('/');
     },
     cssObject(img) {
-      // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
       return {
         background: `url(${img}) top/cover no-repeat`
       }

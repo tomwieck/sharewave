@@ -6,8 +6,6 @@
     <ul v-if="loggedIn" class="nav-links-ul">
       <li><a class="nav-bar--link" v-bind:class="checkRoute('Wave') ? 'active' : ''" href="#/wave">Wave</a></li>
       <li v-show="showPlaylists" v-bind:class="!showPlaylists ? 'no-margin' : ''"><a class="nav-bar--link" v-bind:class="checkRoute('All Playlists') ? 'active' : ''" href="#/allPlaylists">Playlists</a></li>
-      <!-- <li><a class="nav-bar--link" v-bind:class="checkRoute('allPlaylists') ? 'active' : ''" href="#/allPlaylists">All Playlists</a></li> -->
-      <!-- <li><a class="nav-bar--link nav-bar--link__logout" @click="emitLogout">Logout</a></li> -->
     </ul>
     <login ref="loginRef" v-on:loginEmit="checkSpotify"></login>
   </div>
@@ -37,18 +35,13 @@ export default {
       return route === this.$route.name;
     },
     registerStateChange() {
-      // console.log(this.$route)
       Firebase.auth().onAuthStateChanged(user => {
         if (user === null) {
-          console.log('loggedin = false')
           this.loggedIn = false;
         } else {
-          console.log(user.displayName);
           if (user.displayName !== null) {
-            console.log(user.uid);
             this.loggedIn = true;
             this.$forceUpdate();
-            // unsubscribe();
           }
         }
       });
