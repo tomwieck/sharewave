@@ -75,7 +75,6 @@ export default {
     }
   },
   methods: {
-    // Check logged in user so yourself is not displayed
     getUsers() {
       let ref = Firebase.database().ref('users').orderByKey()
       ref.on('child_added', snapshot => {

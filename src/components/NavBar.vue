@@ -113,9 +113,6 @@ export default {
 }
 
 .nav-links-ul {
-  // @media screen and (max-width: $break-tablet) {
-  //   display: none;
-  // }
   @media screen and (max-width: $break-tablet) {
     float: none;
     margin-top: 8px;

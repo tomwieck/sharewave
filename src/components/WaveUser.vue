@@ -27,7 +27,6 @@ export default {
       this.$emit('playWave', event, key)
     },
     cssObject(img) {
-      // { 'background': 'url(' + (user.img_url ? user.img_url : placeholderUrl) + ') no-repeat center center' }
       return {
         background: `url(${img}) top/cover no-repeat`
       }

@@ -2,7 +2,6 @@
   <div class="wave">
     <div id="background" class="wave-container--background">
       <div id="wave-container-all" class="wave-container--all">
-        <!-- v-show when complete variable? -->
         <div class="my-wave">
           <div class="wave-container--user" v-for="(value, key) in waveSongs" v-if="userId === value.id">
             <a :href="'/#/user/' + value.id"><b>My Wave</b></a>
@@ -220,7 +219,6 @@ export default {
   },
   methods: {
     updateLayout: debounce(() => {
-      // let vm = this;
       var adiv = document.getElementById('wave-container-all');
       var buttons = document.getElementsByClassName('wave--scroll-button')
       if (adiv.scrollWidth > window.innerWidth) {
@@ -241,7 +239,6 @@ export default {
       }
       adiv.scrollLeft = this.totalScroll;
     },
-    // Add LOADING...
     // SET UP
     getUser() {
       // Get logged in user and check if wave
@@ -249,7 +246,6 @@ export default {
         if (user === null) {
           // Not logged in
         } else {
-          // this.userId = user.uid;
           this.userId = user.uid.replace(/\%2E/g, '.');
           this.checkWaveTrue(user.uid);
           // Add listener to see if wave added for user
@@ -297,7 +293,7 @@ export default {
       this.waveSongs[userId] = {};
       let userRef = this.waveSongs[userId];
       this.setUpUser(userRef, user);
-      // get wave DB entry for specifc user and register child added
+      // Get wave DB entry for specifc user and register child added
       this.waveRef = Firebase.database().ref(`wave/${userId}`);
       let day = 60 * 60 * 24 * 1000;
       let yesterday = new Date().getTime() - day;
@@ -319,7 +315,7 @@ export default {
     showDetails(key, e) {
       // If clicked on the <use> tag, still apply class to svg
       let target = e.target.tagName === 'use' ? e.target.parentNode : e.target;
-      // if clicked on the same rotate
+      // if clicked on the same arrow, rotate
       if (this.details.name === this.waveSongs[key].id) {
         setTimeout(() => { this.details = {}; }, 400);
         this.detailsOpen = false;
@@ -339,7 +335,6 @@ export default {
     },
     // ADD / DELETE WAVE
     addRecentToWave(song) {
-      // If album art is needed, could make API call here, or when retrieving album art
       const result = {
         album: null,
         artist: song.artists[0].name,
@@ -480,8 +475,6 @@ export default {
       }
     },
     playWaveAudio: function(url, target, id) {
-      // apply playing class only to target?
-      // Toggle visibility of songs with target too??
       this.ifPlayingPause(target);
       this.resetOtherCounters(id);
       this.audioObject = new Audio(url);
@@ -500,7 +493,6 @@ export default {
     },
     removeClass(target) {
       target.classList.remove('wave--playing');
-      // target.classList.remove('pulse');
     },
     resetOtherCounters(id) {
       for (let key in this.waveSongs) {
@@ -652,25 +644,18 @@ a:hover {
 
 .my-wave,
 .friend-wave {
-  // float: left;
   display: inline-block;
 }
 
 .friend-wave {
   dispay: flex;
 }
-
-// .friend-wave:last-of-type {
-//   padding-right: 110px;
-// }
 // Wave Styles END
 
 // Recently Played START
 .recently-played {
-  // background-color: $play-color;
   border: 2px solid $play-light-color;
   border-top: none;
-  // color: white;
   font-weight: bold;
   display: block;
   margin: auto;
@@ -742,7 +727,6 @@ a:hover {
   font-size: 40px;
   margin-top: -18px;
   transform: rotate(180deg);
-  // transition: 0.2s;
 }
 
 .icon-user-plus {
@@ -848,7 +832,6 @@ a:hover {
   }
 }
 
-
 .now-playing--control {
   padding: 2px 2px;
   padding-top: 6px;
@@ -921,7 +904,6 @@ a:hover {
   float: left;
   width: 125px;
 }
-
 // Now Playing END
 
 .white {

@@ -86,7 +86,7 @@ export default {
   },
   computed: {
     searchResults() {
-      // returns true if tag or title
+      // Returns true if tag OR title
       return this.playlists.filter(el => {
         let tagCheck = false;
         if (el.tags) {
@@ -103,7 +103,6 @@ export default {
     updateLayout: debounce(() => {
       var tags = document.getElementById('playlist-tags');
       var showAll = document.getElementById('playlist-show-all');
-      // var buttons = document.getElementsByClassName('wave--scroll-button')
       if (tags.offsetHeight > 51 || tags.offsetHeight === 50) {
         showAll.style.display = 'block';
         tags.classList.add('hidden-tags');

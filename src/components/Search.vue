@@ -75,14 +75,13 @@ export default {
   beforeDestroy() {
     this.ifPlayingPause();
   },
-  mounted: function () {
+  mounted() {
     if (!this.$cookie.get('client_access_token') || !this.$cookie.get('access_token')) {
       this.clientCredentials();
     }
   },
   watch: {
-    // whenever search changes, this function will run
-    checked: function() {
+    checked() {
       this.ifPlayingPause();
       this.getSearch();
     }
@@ -110,10 +109,9 @@ export default {
       this.ifPlayingPause();
       if (/\S/.test(this.searchTerm)) {
         let services = '&services=';
-        this.searchPlaceholder = 'Searching...'
-
         let length = this.checked.length;
-        // add selected services to URL
+        this.searchPlaceholder = 'Searching...'
+        // add services to URL
         this.checked.forEach(function(v, index) {
           services += v;
           if (index !== length - 1) { services += '+' };
@@ -139,7 +137,6 @@ export default {
       // if data is empty, either add to table or set to null so nothing is rendered
       !isEmpty(data.spotify) ? this.sSearchResults = data.spotify : this.sSearchResults = null;
       !isEmpty(data.itunes) ? this.iSearchResults = data.itunes : this.iSearchResults = null;
-      // !isEmpty(data.youtube) ? this.ySearchResults = data.youtube : this.ySearchResults = null;
     },
     playAudio(url, e) {
       let target = e.target;
@@ -187,7 +184,6 @@ export default {
   components: {
     'i-search-table': SearchTable,
     's-search-table': SearchTable
-    // 'y-search-table': SearchTable
   }
 }
 </script>

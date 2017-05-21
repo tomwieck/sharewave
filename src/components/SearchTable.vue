@@ -6,14 +6,12 @@
     <div :key="result" v-for="result in searchResults" class="search-table--container">
       <div class="search-table--album-art" :style="cssObject(result.artwork)"/>
       <div class="search-table--container-details">
-        <!-- <span v-if="service === 'YouTube'"><div>{{ result.title }}</div></span> -->
         <div class="search-table--container-artist"><span>{{ result.artist }}</span></div>
         <div class="search-table--container-track"><span>{{ result.track }}</span></div>
         <div class="search-table--container-album"><span>{{ result.album }}</span></div>
       </div>
       <div class="search-table--container-links">
         <div class="btn btn--secondary search-table--preview-link" v-on:click="parentPlay(result.previewUrl, $event)">
-          <!-- Need to refactor playing logic for icon <svg class="icon icon-play3"><use xlink:href="#icon-play3"></use></svg> -->
           <a>Preview</a>
         </div>
         <div @click="addToWave(result)" class="btn btn--main search-table--container-add">
@@ -143,7 +141,6 @@ table {
 
 .search-table--preview-link,
 .search-table--container-add {
-  // border-left: none;
   margin: 0 5px;
   cursor: pointer;
   display: inline-block;
@@ -164,7 +161,6 @@ table {
 }
 
 .search-table--badge-container {
-  // border-top: 2px solid #299dcf;
   display: inline-block;
   float: left;
   width: 110px;

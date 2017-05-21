@@ -100,7 +100,6 @@ export default {
         spotify: true,
         wave: false
       });
-      // console.log('finished adding to db');
     },
     signout() {
       this.shouldUpdate = true;

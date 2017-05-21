@@ -76,7 +76,6 @@ export default {
     })
   },
   methods: {
-    // ADD LOADING...
     emailSignup() {
       Firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
       .then(response => {
@@ -94,8 +93,6 @@ export default {
       });
     },
     addToUserDb(user) {
-      // Check if display name is already in use?
-      // Allow image upload (S3?)
       Firebase.database().ref('users/' + user.uid).set({
         display_name: this.username,
         email: this.email,

@@ -12,7 +12,6 @@
         <small>Showing {{ topPlaylists.length }} of {{ playlists.length }}</small>
         <transition-group class="playlist--all-containers" name="fade">
           <div class="playlist--container" v-for="playlist in topPlaylists" :key="playlist.id">
-        <!-- {{ playlist }} -->
             <img class="playlist--art" v-bind:src="playlist.imgUrl">
             <h4 class="playlist--title">{{ playlist.title }}</h4>
             <small class="playlist--uploader"> Uploaded by {{playlist.uploader_name}}</small>
@@ -256,9 +255,7 @@ export default {
       let allTags = [];
       let safeId = this.safe(this.user);
       this.playlists.forEach(playlist => {
-        // console.log(playlist.id);
         allTags[playlist.id] = playlist.tags;
-        // console.log(allTags);
       })
       for (let key in allTags) {
         let obj = allTags[key];
@@ -287,36 +284,6 @@ export default {
           });
         }
       });
-      // Object.keys(allTags).forEach(tag => {
-      //   console.log(tag);
-      //   // updatedUserData[`tags/${tag}/`]
-      // })
-      // Firebase.database().ref('tags/').once('value')
-
-      // allTags = [].concat(allTags);
-
-      // Firebase.database().ref('tags/').once('value')
-      // .then(snapshot => {
-      //   console.log(snapshot.val());
-      //   Object.values(snapshot.val()).forEach(tag => {
-      //     console.log(tag + '/' + Object.keys(tag));
-      //   })
-      // })
-      // // let playlistsRef = Firebase.database().ref('users/${safeId}/playlists');
-      // let updatedUserData = {};
-
-      // // updatedUserData[`tags/${tag}/${this.playlistId}`] = true;
-      // updatedUserData[`playlists/${this.playlistId}`] = {
-      //   date_added: new Date().getTime(),
-      //   tags: this.tags,
-      //   title: this.playlistName,
-      //   owner: this.ownerId,
-      //   owner_name: this.ownerName,
-      //   uploader: this.uploader,
-      //   uploader_name: this.uploaderName
-      // };
-      // updatedUserData[`users/${safeUploader}/playlists/${this.playlistId}`] = true;
-      // // Do a deep-path update
     },
     safe(id) {
       return id.replace(/\./g, '%2E');
